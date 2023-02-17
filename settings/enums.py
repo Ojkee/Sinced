@@ -13,10 +13,12 @@ class Save_File(Enum):
 
 class Img_Path(Enum):
     BACK_BUTTON = 'imgs/back_button.png'
-    Todo = 'imgs/todo_icon.png'
-    Todo_Selected = 'imgs/todo_selected.png'
-    Pen = 'imgs/pen.png'
-    Pencil = 'imgs/pencil/png'
+    TODO = 'imgs/todo_icon.png'
+    TODO_SELECTED = 'imgs/todo_selected.png'
+    PEN = 'imgs/pen.png'
+    PENCIL = 'imgs/pencil/png'
 
 
+class Date_Format(Enum):
+    DD_MM_YYYY = "%d-%m-%Y"
 

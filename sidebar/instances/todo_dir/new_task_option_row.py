@@ -3,7 +3,7 @@ from typing import Union
 from datetime import datetime
 
 from settings.config_init import cg
-from settings.enums import Color
+from settings.enums import Color, Date_Format
 
 class Task_Option_Row(ft.Row):
     def __init__(self, add_task):
@@ -73,7 +73,7 @@ class Task_Option_Row(ft.Row):
         if not self.text_field.value:
             return True
         try:
-            date = datetime.strptime(self.text_field.value, "%d-%m-%Y")
+            date = datetime.strptime(self.text_field.value, Date_Format.DD_MM_YYYY.value)
             if date.date() >= datetime.today().date():
                 return True
             else:
@@ -81,6 +81,8 @@ class Task_Option_Row(ft.Row):
         except ValueError:
             return False
 
+
     def get_deadline(self) -> Union[str, None]:
-        return None if len(self.text_field.value) == 0 else self.text_field.value
+        return None if len(self.text_field.value) == 0 \
+            else datetime.strptime(self.text_field.value, Date_Format.DD_MM_YYYY.value)
 

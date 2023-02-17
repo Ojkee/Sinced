@@ -1,26 +1,31 @@
 import flet as ft
 import datetime
+from dataclasses import dataclass
 
 from typing import Union
 from settings.config_init import cg
 from settings.enums import Color
-from bridges.file_saver import Saver
 
 
+@dataclass()
+class Task:
+    id: int
+    text: str
+    date_added: str
+    deadline: str | None = None
 
-class Task(ft.Container):
+
+class Task_Container(ft.Container):
     def __init__(
             self,
+            t_id: int,
             text: str,
             date_added: str,
-            t_id: int,
-            deadline: Union[str, None] = None,
+            deadline: str | None = None
     ):
-        self.t_date_added: str = date_added
-        self.t_id: int = t_id
-        self.t_text: str = text
+
+        self.task = Task(t_id, text, date_added, deadline)
         self.t_is_checked: bool = False
-        self.t_deadline: Union[str, None] = deadline
 
         self.checkbox = ft.Checkbox(
             fill_color=cg.get_color(Color.DARK),
@@ -30,7 +35,7 @@ class Task(ft.Container):
             controls=[
                 self.checkbox,
                 ft.Text(
-                    value=text,
+                    value=self.task.text,
                     color=cg.get_color(Color.DARK),
                     font_family=cg.font(),
                     weight=ft.FontWeight.W_700,
@@ -42,32 +47,36 @@ class Task(ft.Container):
             content=self.main_task_row,
             on_click=self.clicked
         )
+        print(self)
+
+    def __repr__(self) -> str:
+        return f"""{self.task.id} | "{self.task.text}"\nCreated: {self.task.date_added}\nDeadline: {self.task.deadline}"""
 
     @property
     def deadline(self) -> Union[str, None]:
-        return self.t_deadline
+        return self.task.deadline
 
     @deadline.setter
     def deadline(self, val: Union[str, None]):
-        self.t_deadline = val
+        self.task.deadline = val
 
 
     @property
     def id(self) -> int:
-        return self.t_id
+        return self.task.id
 
     @id.setter
     def id(self, val: int):
-        self.t_id = val
+        self.task.id = val
 
 
     @property
     def text(self) -> str:
-        return self.t_text
+        return self.task.text
 
     @text.setter
     def text(self, val: str):
-        self.t_text = val
+        self.task.text = val
 
 
     @property

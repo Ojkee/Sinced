@@ -24,14 +24,14 @@ class Navigation_Bar:
                 ft.NavigationRailDestination(
                     icon_content=ft.Container(
                         content=ft.Image(
-                            src=Img_Path.Todo.value,
+                            src=Img_Path.TODO.value,
                             fit=ft.ImageFit.FILL,
                             color=cg.get_color(Color.LIGHT)
                         ),
                     ),
                     selected_icon_content=ft.Container(
                         content=ft.Image(
-                            src=Img_Path.Todo_Selected.value,
+                            src=Img_Path.TODO_SELECTED.value,
                             fit=ft.ImageFit.FILL,
                             color=cg.get_color(Color.LIGHT)
                         ),
