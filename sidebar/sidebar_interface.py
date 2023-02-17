@@ -24,7 +24,6 @@ class Sidebar(ft.Container):
         self.content = self.main_col
 
 
-
     def hide(self, e):
         self.left = -cg.sidebar_width
         self.update()

@@ -11,7 +11,6 @@ class Save_File(Enum):
     TASKS = 'tasks.tk'
 
 
-
 class Img_Path(Enum):
     BACK_BUTTON = 'imgs/back_button.png'
     Todo = 'imgs/todo_icon.png'

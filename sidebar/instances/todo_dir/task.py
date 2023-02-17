@@ -9,12 +9,18 @@ from bridges.file_saver import Saver
 
 
 class Task(ft.Container):
-    def __init__(self, text: str):
-        self.t_date_added: Union[str, None] = None
-        self.t_deadline: Union[str, None] = None
-        self.t_id: int = 0
+    def __init__(
+            self,
+            text: str,
+            date_added: str,
+            t_id: int,
+            deadline: Union[str, None] = None,
+    ):
+        self.t_date_added: str = date_added
+        self.t_id: int = t_id
         self.t_text: str = text
         self.t_is_checked: bool = False
+        self.t_deadline: Union[str, None] = deadline
 
         self.checkbox = ft.Checkbox(
             fill_color=cg.get_color(Color.DARK),
@@ -36,7 +42,6 @@ class Task(ft.Container):
             content=self.main_task_row,
             on_click=self.clicked
         )
-
 
     @property
     def deadline(self) -> Union[str, None]:

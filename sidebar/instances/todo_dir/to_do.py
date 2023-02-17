@@ -1,10 +1,12 @@
 import flet as ft
 
-from sidebar.instances.todo_dir.task import Task
 from settings.config_init import cg
 from settings.enums import Color
-from sidebar.sidebar_interface import Sidebar
 
+from sidebar.sidebar_interface import Sidebar
+from sidebar.instances.todo_dir.to_do_text_field import To_Do_Text_Field
+from sidebar.instances.todo_dir.new_task_option_row import Task_Option_Row
+from sidebar.instances.todo_dir.task_list import Task_List
 
 
 class To_Do(Sidebar):
@@ -26,33 +28,7 @@ class To_Do(Sidebar):
             height=60,
         )
 
-        self.text_field = ft.TextField(
-            label="new todos",
-            label_style=ft.TextStyle(
-                color=cg.get_color(Color.DARK),
-                font_family=cg.font(),
-                weight=ft.FontWeight.BOLD,
-            ),
-            hint_text="awesome task",
-            hint_style=ft.TextStyle(
-                color=cg.get_color(Color.DARK),
-                font_family=cg.font(),
-                weight=ft.FontWeight.BOLD,
-                italic=True,
-            ),
-            text_style=ft.TextStyle(
-                color=cg.get_color(Color.DARK),
-                font_family=cg.font(),
-                weight=ft.FontWeight.BOLD,
-            ),
-            expand=True,
-            border=ft.InputBorder.UNDERLINE,
-            border_color=cg.get_color(Color.DARK),
-            cursor_color=cg.get_color(Color.DARK),
-            content_padding=10,
-            on_change=self.field_text_on_change
-        )
-
+        self.text_field = To_Do_Text_Field(self.field_text_on_change, self.add_new_task)
 
         self.submit_button = ft.Container(
             ft.Image(
@@ -64,7 +40,6 @@ class To_Do(Sidebar):
             height=40,
             on_click=self.add_new_task,
         )
-
 
         self.field_text_row = ft.Row(
             controls=[
@@ -80,60 +55,36 @@ class To_Do(Sidebar):
             vertical_alignment=ft.CrossAxisAlignment.START,
             width=cg.sidebar_width,
         )
-
-
-        self.new_task_option = ft.Row(
-            controls=[
-                ft.Container(
-                    content=ft.Row(
-                        width=cg.sidebar_width,
-                        height=60,
-                    ),
-                    bgcolor=cg.get_color(Color.DEBUG),
-                )
-            ],
-            width=cg.sidebar_width,
-            height=60,
-            vertical_alignment=ft.CrossAxisAlignment.START,
-            visible=False,
-        )
-
-
-        self.tasks_list_col = ft.Column(
-            controls=[
-
-            ],
-            width=cg.sidebar_width,
-            scroll=ft.ScrollMode.ALWAYS
-        )
-
+        self.new_task_option = Task_Option_Row(self.add_new_task)
+        self.tasks_list = Task_List()
 
         self.main_col.controls.extend([
             self.title_row,
             self.field_text_row,
             self.new_task_option,
-            self.tasks_list_col
+            self.tasks_list
         ])
 
 
     def add_new_task(self, e):
-        if self.text_field.value != "" and self.text_field.value.strip():
-            self.tasks_list_col.controls.append(
-                Task(self.text_field.value.strip()),
+        if not self.text_field.is_empty() and self.new_task_option.is_date_validated():
+            self.tasks_list.add_task(
+                self.text_field.get_normalized_task_text(),
+                self.new_task_option.get_deadline()
             )
-            self.tasks_list_col.update()
+            self.new_task_option.reset()
+            self.new_task_option.visible = False
 
-        self.new_task_option.visible = False
-        self.new_task_option.update()
-        self.text_field.value = ""
-        self.text_field.update()
+            self.tasks_list.update()
+            self.new_task_option.update()
+            self.text_field.reset()
 
 
     def field_text_on_change(self, e):
-        if self.text_field.value != "" and self.text_field.value.strip():
-            self.new_task_option.visible = True
+        if not self.text_field.is_empty():
+            self.new_task_option.is_visible = True
         else:
-            self.new_task_option.visible = False
+            self.new_task_option.is_visible = False
         self.new_task_option.update()
 
 

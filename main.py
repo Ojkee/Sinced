@@ -24,16 +24,18 @@ class MainUI(ft.UserControl):
             height=cg.window_height,
             bgcolor=cg.get_color(Color.DARK)
         )
+
         self.main_row = ft.Row(
             height=cg.window_height,
             spacing=0,
         )
 
-        self.main_row.controls.append(ft.Container(
-            self.navigation_bar.rail,
-            margin=0,
-        ))
-
+        self.main_row.controls.append(
+            ft.Container(
+                self.navigation_bar.rail,
+                margin=0,
+            )
+        )
 
         self._active_view: ft.Control = ft.Column(
             controls=[
@@ -45,7 +47,6 @@ class MainUI(ft.UserControl):
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
-
 
         self.main_row.controls.extend([self.sidebar_container.main_stack, self._active_view])
         self.main.content = self.main_row

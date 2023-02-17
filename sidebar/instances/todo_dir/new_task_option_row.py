@@ -1,0 +1,86 @@
+import flet as ft
+from typing import Union
+from datetime import datetime
+
+from settings.config_init import cg
+from settings.enums import Color
+
+class Task_Option_Row(ft.Row):
+    def __init__(self, add_task):
+        self.text_field = ft.TextField(
+            keyboard_type=ft.KeyboardType.DATETIME,
+            label="Deadline",
+            label_style=ft.TextStyle(
+                color=cg.get_color(Color.DARK),
+                font_family=cg.font(),
+                weight=ft.FontWeight.BOLD,
+            ),
+            text_style=ft.TextStyle(
+                color=cg.get_color(Color.DARK),
+                font_family=cg.font(),
+                weight=ft.FontWeight.BOLD,
+            ),
+            hint_text="dd-mm-yyyy",
+            hint_style=ft.TextStyle(
+                color=cg.get_color(Color.DARK),
+                font_family=cg.font(),
+                italic=True,
+
+            ),
+            border=ft.InputBorder.UNDERLINE,
+            border_color=cg.get_color(Color.DARK),
+            cursor_color=cg.get_color(Color.DARK),
+            content_padding=10,
+            on_submit=add_task
+        )
+
+        super().__init__(
+            controls=[
+                ft.Container(
+                    content=ft.Row(
+                        controls=[
+                            self.text_field,
+                        ],
+                        width=cg.sidebar_width,
+                        height=60,
+                    ),
+                    bgcolor=cg.get_color(Color.LIGHT),
+                )
+            ],
+            width=cg.sidebar_width,
+            height=60,
+            vertical_alignment=ft.CrossAxisAlignment.START,
+            visible=False,
+        )
+
+
+    @property
+    def is_visible(self) -> bool:
+        return self.visible
+
+
+    @is_visible.setter
+    def is_visible(self, val: bool) -> None:
+        self.visible = val
+
+
+    def reset(self) -> None:
+        self.controls[0].content.controls[0].value = ""
+        self.update()
+
+
+    def is_date_validated(self) -> bool:
+        if not self.text_field.value:
+            return True
+        try:
+            date = datetime.strptime(self.text_field.value, "%d-%m-%Y")
+            if date.date() >= datetime.today().date():
+                return True
+            else:
+                return False
+        except ValueError:
+            return False
+
+    def get_deadline(self) -> Union[str, None]:
+        return None if len(self.text_field.value) == 0 else self.text_field.value
+
