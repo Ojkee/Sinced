@@ -34,6 +34,7 @@ class Config:
             'dark': '#333333',
             'light': '#FFF8E7',
             'light_2': "#FFF0DF",
+            'light_3': '#FFE8D7',
             'debug': '#7600BC',
             'error': '#FF3333'
         }

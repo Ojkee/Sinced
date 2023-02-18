@@ -9,7 +9,7 @@ class Task_Option_Row(ft.Row):
     def __init__(self, add_task):
         self.text_field = ft.TextField(
             keyboard_type=ft.KeyboardType.DATETIME,
-            label="Deadline",
+            label="deadline",
             label_style=ft.TextStyle(
                 color=cg.get_color(Color.DARK),
                 font_family=cg.font(),

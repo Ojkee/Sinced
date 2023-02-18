@@ -27,15 +27,21 @@ class Task_Container(ft.Container):
         self.text_size = 16
 
         self.text_info = self.build_task_info()
+        self.modify_task_field = self.build_modify_task_field()
 
-        self.main_task_row = ft.Row(
+
+        self.main_task_row = ft.Column(
             controls=[
                 self.text_info,
+                self.modify_task_field
             ],
         )
 
         super().__init__(
             content=self.main_task_row,
+            bgcolor=cg.get_color(Color.LIGHT_2),
+            border_radius=20,
+            padding=10
         )
 
     def __repr__(self) -> str:
@@ -103,16 +109,14 @@ class Task_Container(ft.Container):
                     width=cg.sidebar_width // 4,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     alignment=ft.MainAxisAlignment.CENTER
-                )
+                ),
             ],
             width=cg.sidebar_width,
-            spacing=10
+            spacing=10,
         )
         return ft.Container(
             content=main_row,
-            border_radius=10,
-            bgcolor=cg.get_color(Color.LIGHT_2),
-            on_click=None
+            on_click=self.info_clicked
         )
 
 
@@ -121,5 +125,64 @@ class Task_Container(ft.Container):
         now = datetime.now()
         delta = datetime.strptime(date_text, Date_Format.DD_MM_YYYY.value) - now
         return f"{delta.days}\ndays"
+
+
+    def build_modify_task_field(self) -> ft.Row:
+        remaining = "" if self.task_data.deadline is None else self.task_data.deadline
+        main_row = ft.Row(
+            controls=[
+                ft.Container(
+                    content=ft.TextField(
+                        value=remaining,
+                        text_style=ft.TextStyle(
+                            color=cg.get_color(Color.DARK),
+                            font_family=cg.font(),
+                            weight=ft.FontWeight.BOLD,
+                        ),
+                        label="modify deadline",
+                        label_style=ft.TextStyle(
+                            color=cg.get_color(Color.DARK),
+                            font_family=cg.font(),
+                            weight=ft.FontWeight.BOLD,
+                        ),
+                        hint_text="dd-mm-yyyy",
+                        hint_style=ft.TextStyle(
+                            color=cg.get_color(Color.DARK),
+                            font_family=cg.font(),
+                            italic=True,
+                        ),
+                        border=ft.InputBorder.NONE,
+                        border_color=cg.get_color(Color.DARK),
+                        cursor_color=cg.get_color(Color.DARK),
+                        content_padding=10,
+                        on_submit=self.modify_task_field_on_click,
+                    ),
+                    width=cg.sidebar_width * 3 // 4,
+                )
+            ],
+            visible=False
+        )
+        return main_row
+
+    def info_clicked(self, e) -> None:
+        if not self.modify_task_field.visible:
+            self.expand_info(e)
+            self.bgcolor = cg.get_color(Color.LIGHT_3)
+        else:
+            self.hide_info(e)
+            self.bgcolor = cg.get_color(Color.LIGHT_2)
+        self.modify_task_field.update()
+        self.update()
+
+
+    def modify_task_field_on_click(self, e) -> None:
+        pass
+
+    def expand_info(self, e) -> None:
+        self.modify_task_field.visible = True
+
+    def hide_info(self, e) -> None:
+        self.modify_task_field.visible = False
+
 
 

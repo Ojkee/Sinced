@@ -18,6 +18,7 @@ class Task_List(ft.Column):
             width=cg.sidebar_width,
             height=cg.window_height * 4 // 5,
             scroll=ft.ScrollMode.ALWAYS,
+            spacing=6
         )
 
 
