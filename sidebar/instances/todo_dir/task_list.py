@@ -4,7 +4,7 @@ from datetime import datetime
 
 from settings.config_init import cg
 from settings.enums import Date_Format
-from sidebar.instances.todo_dir.task_container import Task, Task_Container
+from sidebar.instances.todo_dir.task_container import Task_Container
 
 
 class Task_List(ft.Column):
@@ -16,7 +16,8 @@ class Task_List(ft.Column):
 
             ],
             width=cg.sidebar_width,
-            scroll=ft.ScrollMode.ALWAYS
+            height=cg.window_height * 4 // 5,
+            scroll=ft.ScrollMode.ALWAYS,
         )
 
 

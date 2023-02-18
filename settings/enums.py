@@ -4,6 +4,7 @@ from enum import Enum
 class Color(Enum):
     DARK = 'dark'
     LIGHT = 'light'
+    LIGHT_2 = 'light_2'
     DEBUG = 'debug'
 
 

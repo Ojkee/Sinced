@@ -1,10 +1,10 @@
 import flet as ft
-import datetime
+from datetime import datetime
 from dataclasses import dataclass
 
 from typing import Union
 from settings.config_init import cg
-from settings.enums import Color
+from settings.enums import Color, Date_Format
 
 
 @dataclass()
@@ -23,60 +23,49 @@ class Task_Container(ft.Container):
             date_added: str,
             deadline: str | None = None
     ):
+        self.task_data = Task(t_id, text, date_added, deadline)
+        self.text_size = 16
 
-        self.task = Task(t_id, text, date_added, deadline)
-        self.t_is_checked: bool = False
+        self.text_info = self.build_task_info()
 
-        self.checkbox = ft.Checkbox(
-            fill_color=cg.get_color(Color.DARK),
-            on_change=self.clicked,
-        )
         self.main_task_row = ft.Row(
             controls=[
-                self.checkbox,
-                ft.Text(
-                    value=self.task.text,
-                    color=cg.get_color(Color.DARK),
-                    font_family=cg.font(),
-                    weight=ft.FontWeight.W_700,
-                )
+                self.text_info,
             ],
         )
 
         super().__init__(
             content=self.main_task_row,
-            on_click=self.clicked
         )
-        print(self)
 
     def __repr__(self) -> str:
-        return f"""{self.task.id} | "{self.task.text}"\nCreated: {self.task.date_added}\nDeadline: {self.task.deadline}"""
+        return f"""{self.task_data.id} | "{self.task_data.text}"\nCreated: {self.task_data.date_added}\nDeadline: {self.task_data.deadline}"""
 
     @property
     def deadline(self) -> Union[str, None]:
-        return self.task.deadline
+        return self.task_data.deadline
 
     @deadline.setter
     def deadline(self, val: Union[str, None]):
-        self.task.deadline = val
+        self.task_data.deadline = val
 
 
     @property
     def id(self) -> int:
-        return self.task.id
+        return self.task_data.id
 
     @id.setter
     def id(self, val: int):
-        self.task.id = val
+        self.task_data.id = val
 
 
     @property
     def text(self) -> str:
-        return self.task.text
+        return self.task_data.text
 
     @text.setter
     def text(self, val: str):
-        self.task.text = val
+        self.task_data.text = val
 
 
     @property
@@ -84,12 +73,53 @@ class Task_Container(ft.Container):
         return self.is_checked
 
 
-    @is_checked.setter
-    def is_checked(self, val: bool):
-        self.t_is_checked = val
+    def build_task_info(self) -> ft.Container:
+        remaining = "" if self.task_data.deadline is None else self.get_remaining_time_to_deadline(self.task_data.deadline)
+        main_row = ft.Row(
+            controls=[
+                ft.Column(
+                    controls=[
+                        ft.Text(
+                            value=self.task_data.text,
+                            color=cg.get_color(Color.DARK),
+                            font_family=cg.font(),
+                            weight=ft.FontWeight.W_700,
+                            size=self.text_size,
+                        ),
+                    ],
+                    width=cg.sidebar_width * 3 // 4,
+                    horizontal_alignment=ft.CrossAxisAlignment.START,
+                ),
+                ft.Column(
+                    controls=[
+                        ft.Text(
+                            value=remaining,
+                            color=cg.get_color(Color.DARK),
+                            font_family=cg.font(),
+                            weight=ft.FontWeight.W_700,
+                            size=self.text_size // 6 * 5,
+                        ),
+                    ],
+                    width=cg.sidebar_width // 4,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    alignment=ft.MainAxisAlignment.CENTER
+                )
+            ],
+            width=cg.sidebar_width,
+            spacing=10
+        )
+        return ft.Container(
+            content=main_row,
+            border_radius=10,
+            bgcolor=cg.get_color(Color.LIGHT_2),
+            on_click=None
+        )
 
 
-    def clicked(self, e):
-        self.t_is_checked = not self.t_is_checked
-        self.checkbox.value = self.t_is_checked
-        self.checkbox.update()
+    @staticmethod
+    def get_remaining_time_to_deadline(date_text: str) -> str:
+        now = datetime.now()
+        delta = datetime.strptime(date_text, Date_Format.DD_MM_YYYY.value) - now
+        return f"{delta.days}\ndays"
+
+

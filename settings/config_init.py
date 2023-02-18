@@ -33,6 +33,7 @@ class Config:
         self._config_parser['colors'] = {
             'dark': '#333333',
             'light': '#FFF8E7',
+            'light_2': "#FFF0DF",
             'debug': '#7600BC',
             'error': '#FF3333'
         }

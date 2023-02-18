@@ -25,7 +25,6 @@ class Task_Option_Row(ft.Row):
                 color=cg.get_color(Color.DARK),
                 font_family=cg.font(),
                 italic=True,
-
             ),
             border=ft.InputBorder.UNDERLINE,
             border_color=cg.get_color(Color.DARK),
@@ -65,7 +64,7 @@ class Task_Option_Row(ft.Row):
 
 
     def reset(self) -> None:
-        self.controls[0].content.controls[0].value = ""
+        self.text_field.value = ""
         self.update()
 
 
@@ -84,5 +83,8 @@ class Task_Option_Row(ft.Row):
 
     def get_deadline(self) -> Union[str, None]:
         return None if len(self.text_field.value) == 0 \
-            else datetime.strptime(self.text_field.value, Date_Format.DD_MM_YYYY.value)
+            else datetime.strftime(
+                datetime.strptime(self.text_field.value, Date_Format.DD_MM_YYYY.value),
+                Date_Format.DD_MM_YYYY.value
+            )
 
