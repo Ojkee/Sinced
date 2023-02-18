@@ -5,8 +5,11 @@ from datetime import datetime
 from settings.config_init import cg
 from settings.enums import Color, Date_Format
 
-class Task_Option_Row(ft.Row):
-    def __init__(self, add_task):
+class Text_Field_Date_Row(ft.Row):
+    def __init__(
+            self,
+            custom_on_submit
+    ):
         self.text_field = ft.TextField(
             keyboard_type=ft.KeyboardType.DATETIME,
             label="deadline",
@@ -30,7 +33,7 @@ class Task_Option_Row(ft.Row):
             border_color=cg.get_color(Color.DARK),
             cursor_color=cg.get_color(Color.DARK),
             content_padding=10,
-            on_submit=add_task
+            on_submit=custom_on_submit
         )
 
         super().__init__(
