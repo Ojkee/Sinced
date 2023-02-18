@@ -15,7 +15,7 @@ class To_Do(Sidebar):
         self.title_row = ft.Row(
             controls=[
                 ft.Text(
-                    value="to do",
+                    value="To do",
                     color=cg.get_color(Color.DARK),
                     style=ft.TextThemeStyle.HEADLINE_LARGE,
                     weight=ft.FontWeight.BOLD,
@@ -67,7 +67,7 @@ class To_Do(Sidebar):
 
 
     def add_new_task(self, e):
-        if self.new_task_option.is_date_validated():
+        if self.new_task_option.is_date_validated() and not self.text_field.is_empty():
             self.tasks_list.add_task(
                 self.text_field.get_normalized_task_text(),
                 self.new_task_option.get_deadline()

@@ -3,7 +3,6 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import Union
 
-
 from settings.config_init import cg
 from settings.enums import Color, Date_Format
 
@@ -15,9 +14,14 @@ class Task:
     date_added: str
     deadline: str | None = None
 
+    def __repr__(self) -> str:
+        return f"""{self.id} | "{self.text}"\nCreated: {self.date_added}\nDeadline: {self.deadline}"""
+
 
     def get_deadline_str(self) -> str:
         return "" if self.deadline is None else f"{self.deadline}"
+
+
 
 
 class Task_Container(ft.Container):
@@ -28,9 +32,11 @@ class Task_Container(ft.Container):
             date_added: str,
             deadline: str | None = None
     ):
+        self._width: int = cg.sidebar_width
         self.task_data = Task(t_id, text, date_added, deadline)
         self.text_size = 16
         self.ratio: tuple[int, int] = (7, 3)
+
 
         self.text_info = self.build_task_info()
         self.modify_deadline_text_field = ft.TextField(
@@ -76,7 +82,8 @@ class Task_Container(ft.Container):
         )
 
     def __repr__(self) -> str:
-        return f"""{self.task_data.id} | "{self.task_data.text}"\nCreated: {self.task_data.date_added}\nDeadline: {self.task_data.deadline}"""
+        return self.task_data.__repr__()
+
 
     @property
     def deadline(self) -> Union[str, None]:
@@ -124,7 +131,7 @@ class Task_Container(ft.Container):
                             size=self.text_size,
                         ),
                     ],
-                    width=cg.sidebar_width * self.ratio[0] // sum(self.ratio),
+                    width=self._width * self.ratio[0] // sum(self.ratio),
                     horizontal_alignment=ft.CrossAxisAlignment.START,
                 ),
                 ft.Column(
@@ -137,12 +144,12 @@ class Task_Container(ft.Container):
                             size=self.text_size // 6 * 5,
                         ),
                     ],
-                    width=cg.sidebar_width * self.ratio[1] // sum(self.ratio),
+                    width=self._width * self.ratio[1] // sum(self.ratio),
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     alignment=ft.MainAxisAlignment.CENTER
                 ),
             ],
-            width=cg.sidebar_width,
+            width=self._width,
             spacing=10,
         )
         return ft.Container(
@@ -151,26 +158,29 @@ class Task_Container(ft.Container):
         )
 
 
+    def build_modify_task_field(self) -> ft.Row:
+        main_row = ft.Row(
+            controls=[
+                ft.Column(
+                    controls = [
+                        self.modify_deadline_text_field
+                    ],
+                    width=self._width * self.ratio[0] // sum(self.ratio),
+                )
+            ],
+            visible=False
+        )
+        return main_row
+
+
+
     @staticmethod
     def get_remaining_time_to_deadline(date_text: str | None) -> str | None:
         if date_text is None:
             return None
         now = datetime.now()
         delta = datetime.strptime(date_text, Date_Format.DD_MM_YYYY.value) - now
-        return f"{delta.days}\ndays"
-
-
-    def build_modify_task_field(self) -> ft.Row:
-        main_row = ft.Row(
-            controls=[
-                ft.Container(
-                    content=self.modify_deadline_text_field,
-                    width=cg.sidebar_width * self.ratio[0] // sum(self.ratio),
-                )
-            ],
-            visible=False
-        )
-        return main_row
+        return f"{delta.days + 1}\ndays" if delta.days + 1 != 1 else "1\nday"
 
 
     def info_clicked(self, e) -> None:
@@ -187,21 +197,21 @@ class Task_Container(ft.Container):
     def modify_task_field_on_submit(self, e) -> None:
         if self.is_date_validated():
             self.task_data.deadline = self.get_deadline_from_text_field()
-        self.update_text_info()
-        self.modify_task_field.visible = False
+            self.update_text_info()
+            self.modify_task_field.visible = False
         self.update()
 
 
     def update_text_info(self) -> None:
-        self.text_info.content.controls[1].controls[0].value = self.get_remaining_time_to_deadline(self.get_deadline_from_text_field())
-
+        self.text_info.content.controls[1].controls[0].value = self.get_remaining_time_to_deadline(
+            self.get_deadline_from_text_field()
+        )
 
     def expand_info(self, e) -> None:
         self.modify_task_field.visible = True
 
     def hide_info(self, e) -> None:
         self.modify_task_field.visible = False
-
 
 
     def is_date_validated(self) -> bool:
