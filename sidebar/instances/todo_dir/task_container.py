@@ -166,6 +166,16 @@ class Task_Container(ft.Container):
                         self.modify_deadline_text_field
                     ],
                     width=self._width * self.ratio[0] // sum(self.ratio),
+                ),
+                ft.Container(
+                    ft.Image(
+                        src="imgs/pen.png",
+                        fit=ft.ImageFit.SCALE_DOWN,
+                        color=cg.get_color(Color.DARK),
+                    ),
+                    width=self._width * self.ratio[1] // sum(self.ratio),
+                    height=40,
+                    on_click=self.modify_task_field_on_submit,
                 )
             ],
             visible=False

@@ -9,8 +9,9 @@ class Color(Enum):
     DEBUG = 'debug'
 
 
-class Save_File(Enum):
-    TASKS = 'tasks.tk'
+class Savefile_Path(Enum):
+    TASKS_ON_GOING = 'saves/tasks_on_going.json'
+    TASKS_DONE = 'saves/tasks_done.json'
 
 
 class Img_Path(Enum):

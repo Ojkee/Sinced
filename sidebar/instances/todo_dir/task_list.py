@@ -23,14 +23,13 @@ class Task_List(ft.Column):
 
 
     def add_task(self, text: str, deadline: Union[str, None]) -> None:
-        self.controls.append(
-            Task_Container(
-                t_id=Task_List.Tasks_Added_Counter,
-                text=text,
-                date_added=datetime.now().strftime(Date_Format.DD_MM_YYYY.value),
-                deadline=deadline,
-            )
+        new_task = Task_Container(
+            t_id=Task_List.Tasks_Added_Counter,
+            text=text,
+            date_added=datetime.now().strftime(Date_Format.DD_MM_YYYY.value),
+            deadline=deadline,
         )
+        self.controls.append(new_task)
         Task_List.Tasks_Added_Counter += 1
 
 
