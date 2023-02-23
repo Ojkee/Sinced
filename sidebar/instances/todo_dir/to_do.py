@@ -6,7 +6,7 @@ from settings.enums import Color
 from sidebar.sidebar_interface import Sidebar
 from sidebar.instances.todo_dir.to_do_text_field import To_Do_Text_Field
 from sidebar.instances.todo_dir.text_field_date_row import Text_Field_Date_Row
-from sidebar.instances.todo_dir.task_list import Task_List
+from sidebar.instances.todo_dir.task_list.task_list_manager import Task_List_Manager
 
 
 class To_Do(Sidebar):
@@ -56,7 +56,7 @@ class To_Do(Sidebar):
             width=cg.sidebar_width,
         )
         self.new_task_option = Text_Field_Date_Row(self.add_new_task)
-        self.tasks_list = Task_List()
+        self.tasks_list = Task_List_Manager()
 
         self.main_col.controls.extend([
             self.title_row,

@@ -9,6 +9,21 @@ class Config:
     def __init__(self):
         self._config_parser = configparser.ConfigParser()
 
+        self._config_parser['colors'] = {
+            'dark': '#333333',
+            'light': '#FFF8E7',
+            'light_2': "#FFF0DF",
+            'light_3': '#FFE8D7',
+            'red': '#CA3B38',
+            'green': '#8DFE3A',
+            'debug': '#7600BC',
+            'error': '#FF3333'
+        }
+
+        self._config_parser['font'] = {
+            'default': "PWS"
+        }
+
         self._config_parser['window_options'] = {
             'width': '1400',
             'height': '1000'
@@ -19,10 +34,15 @@ class Config:
             'height': '1000'
         }
 
-
         self._config_parser['sidebar'] = {
             'width': '300',
             'height': '1000'
+        }
+
+        self._config_parser['task_list'] = {
+            'closed_ratio': '1',
+            'opened_ratio': '28',
+            'sum': '30'
         }
 
         self._config_parser['content_area'] = {
@@ -30,18 +50,7 @@ class Config:
             'height': '1000'
         }
 
-        self._config_parser['colors'] = {
-            'dark': '#333333',
-            'light': '#FFF8E7',
-            'light_2': "#FFF0DF",
-            'light_3': '#FFE8D7',
-            'debug': '#7600BC',
-            'error': '#FF3333'
-        }
 
-        self._config_parser['font'] = {
-            'default': "PWS"
-        }
 
         with open(os.path.join(os.getcwd(), 'settings/configfile.ini'), 'w') as configfile:
             self._config_parser.write(configfile)

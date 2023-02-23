@@ -6,6 +6,8 @@ class Color(Enum):
     LIGHT = 'light'
     LIGHT_2 = 'light_2'
     LIGHT_3 = "light_3"
+    RED = 'red'
+    GREEN = 'green'
     DEBUG = 'debug'
 
 
