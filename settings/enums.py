@@ -9,11 +9,12 @@ class Color(Enum):
     RED = 'red'
     GREEN = 'green'
     DEBUG = 'debug'
+    DEBUG_2 = 'debug_2'
+    DEBUG_3 = 'debug_3'
 
 
 class Savefile_Path(Enum):
-    TASKS_ON_GOING = 'saves/tasks_on_going.json'
-    TASKS_DONE = 'saves/tasks_done.json'
+    TASKS = 'saves/tasks.json'
 
 
 class Img_Path(Enum):
@@ -26,4 +27,12 @@ class Img_Path(Enum):
 
 class Date_Format(Enum):
     DD_MM_YYYY = "%d-%m-%Y"
+
+
+class Task_Status(Enum):
+    CANCELED = 'canceled'
+    ON_GOING = 'on_going'
+    DONE = 'done'
+    EXPIRED = 'expired'
+    EXTENDED = 'extended'
 

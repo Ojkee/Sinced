@@ -56,26 +56,26 @@ class To_Do(Sidebar):
             width=cg.sidebar_width,
         )
         self.new_task_option = Text_Field_Date_Row(self.add_new_task)
-        self.tasks_list = Task_List_Manager()
+        self.tasks_list_manager = Task_List_Manager()
 
         self.main_col.controls.extend([
             self.title_row,
             self.field_text_row,
             self.new_task_option,
-            self.tasks_list
+            self.tasks_list_manager
         ])
 
 
     def add_new_task(self, e):
         if self.new_task_option.is_date_validated() and not self.text_field.is_empty():
-            self.tasks_list.add_task(
+            self.tasks_list_manager.add_new_task(
                 self.text_field.get_normalized_task_text(),
                 self.new_task_option.get_deadline()
             )
             self.new_task_option.reset()
             self.new_task_option.visible = False
 
-            self.tasks_list.update()
+            self.tasks_list_manager.update()
             self.new_task_option.update()
             self.text_field.reset()
 

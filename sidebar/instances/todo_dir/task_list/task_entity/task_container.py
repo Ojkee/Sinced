@@ -1,69 +1,34 @@
 import flet as ft
 from datetime import datetime
-from dataclasses import dataclass
 from typing import Union
 
 from settings.config_init import cg
-from settings.enums import Color, Date_Format
+from settings.enums import Color, Date_Format, Task_Status
+
+from sidebar.instances.todo_dir.task_list.task_entity.task_dataclass import Task
 
 
-@dataclass()
-class Task:
-    id: int
-    text: str
-    date_added: str
-    deadline: str | None = None
-
-    def __repr__(self) -> str:
-        return f"""{self.id} | "{self.text}"\nCreated: {self.date_added}\nDeadline: {self.deadline}"""
-
-
-    def get_deadline_str(self) -> str:
-        return "" if self.deadline is None else f"{self.deadline}"
-
-
-
-
-class Task_Container(ft.Container):
+class Task_Container_Builder(ft.Container):
     def __init__(
             self,
-            t_id: int,
-            text: str,
-            date_added: str,
-            deadline: str | None = None
+            task: Task
     ):
-        self._width: int = cg.sidebar_width
-        self.task_data = Task(t_id, text, date_added, deadline)
+        self._width: int = cg.get_task_list_width(is_opened=True) * 17 // 20
+        self.task_data = task
         self.text_size = 16
         self.ratio: tuple[int, int] = (7, 3)
 
 
+        self.base_color = Color.LIGHT_2
+        self.clicked_color = Color.LIGHT_3
+        self.font_color = Color.DARK
+
+        self.current_base_color_value = cg.get_color(self.base_color)
+        self.current_clicked_color_value = cg.get_color(self.clicked_color)
+
+
         self.text_info = self.build_task_info()
-        self.modify_deadline_text_field = ft.TextField(
-            value=self.task_data.get_deadline_str(),
-            text_style=ft.TextStyle(
-                color=cg.get_color(Color.DARK),
-                font_family=cg.font(),
-                weight=ft.FontWeight.BOLD,
-            ),
-            label="modify deadline",
-            label_style=ft.TextStyle(
-                color=cg.get_color(Color.DARK),
-                font_family=cg.font(),
-                weight=ft.FontWeight.BOLD,
-            ),
-            hint_text="dd-mm-yyyy",
-            hint_style=ft.TextStyle(
-                color=cg.get_color(Color.DARK),
-                font_family=cg.font(),
-                italic=True,
-            ),
-            border=ft.InputBorder.NONE,
-            border_color=cg.get_color(Color.DARK),
-            cursor_color=cg.get_color(Color.DARK),
-            content_padding=10,
-            on_submit=self.modify_task_field_on_submit,
-        )
+        self.modify_deadline_text_field = self.build_modify_deadline_text_field()
         self.modify_task_field = self.build_modify_task_field()
 
 
@@ -76,9 +41,9 @@ class Task_Container(ft.Container):
 
         super().__init__(
             content=self.main_task_row,
-            bgcolor=cg.get_color(Color.LIGHT_2),
+            bgcolor=self.current_base_color_value,
             border_radius=20,
-            padding=10
+            padding=10,
         )
 
     def __repr__(self) -> str:
@@ -117,68 +82,121 @@ class Task_Container(ft.Container):
         return self.is_checked
 
 
+    @property
+    def Width(self) -> int:
+        return self._width
+
+    @Width.setter
+    def Width(self, val: int) -> None:
+        self._width = val
+
+
+    @property
+    def current_status_color(self) -> str:
+        return cg.get_color(self.clicked_color) if self.modify_task_field.visible else cg.get_color(self.base_color)
+
+    def set_current_color(self, color: str) -> None:
+        if self.modify_task_field.visible:
+            self.current_clicked_color_value = color
+            self.bgcolor = self.current_clicked_color_value
+        else:
+            self.current_base_color_value = color
+            self.bgcolor = self.current_base_color_value
+        self.update()
+
+    def reset_color(self) -> None:
+        self.current_base_color_value = cg.get_color(self.base_color)
+        self.current_clicked_color_value = cg.get_color(self.clicked_color)
+        self.bgcolor = cg.get_color(self.clicked_color) if self.modify_task_field.visible else cg.get_color(self.base_color)
+        self.update()
+
+
     def build_task_info(self) -> ft.Container:
         remaining = "" if self.task_data.deadline is None else self.get_remaining_time_to_deadline(self.task_data.deadline)
         main_row = ft.Row(
             controls=[
-                ft.Column(
-                    controls=[
-                        ft.Text(
-                            value=self.task_data.text,
-                            color=cg.get_color(Color.DARK),
-                            font_family=cg.font(),
-                            weight=ft.FontWeight.W_700,
-                            size=self.text_size,
-                        ),
-                    ],
+                ft.Container(
+                    content=ft.Text(
+                        value=self.task_data.text,
+                        color=cg.get_color(self.font_color),
+                        font_family=cg.font(),
+                        weight=ft.FontWeight.W_700,
+                        size=self.text_size,
+                    ),
                     width=self._width * self.ratio[0] // sum(self.ratio),
-                    horizontal_alignment=ft.CrossAxisAlignment.START,
+                    alignment=ft.alignment.center_left,
                 ),
-                ft.Column(
-                    controls=[
-                        ft.Text(
-                            value=remaining,
-                            color=cg.get_color(Color.DARK),
-                            font_family=cg.font(),
-                            weight=ft.FontWeight.W_700,
-                            size=self.text_size // 6 * 5,
+                ft.Container(
+                    content=ft.Text(
+                        value=remaining,
+                        color=cg.get_color(self.font_color),
+                        font_family=cg.font(),
+                        weight=ft.FontWeight.W_700,
+                        size=self.text_size // 6 * 5,
                         ),
-                    ],
                     width=self._width * self.ratio[1] // sum(self.ratio),
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    alignment=ft.MainAxisAlignment.CENTER
+                    alignment=ft.alignment.center_right,
                 ),
             ],
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             width=self._width,
             spacing=10,
         )
         return ft.Container(
             content=main_row,
-            on_click=self.info_clicked
         )
+
+
+    def build_modify_deadline_text_field(self) -> ft.TextField:
+        text_field = ft.TextField(
+            value=self.task_data.get_deadline_str(),
+            text_style=ft.TextStyle(
+                color=cg.get_color(self.font_color),
+                font_family=cg.font(),
+                weight=ft.FontWeight.BOLD,
+            ),
+            label="modify deadline",
+            label_style=ft.TextStyle(
+                color=cg.get_color(self.font_color),
+                font_family=cg.font(),
+                weight=ft.FontWeight.BOLD,
+            ),
+            hint_text="dd-mm-yyyy",
+            hint_style=ft.TextStyle(
+                color=cg.get_color(self.font_color),
+                font_family=cg.font(),
+                italic=True,
+            ),
+            border=ft.InputBorder.NONE,
+            border_color=cg.get_color(self.font_color),
+            cursor_color=cg.get_color(self.font_color),
+            content_padding=10,
+            on_submit=self.modify_task_field_on_submit,
+        )
+        return text_field
 
 
     def build_modify_task_field(self) -> ft.Row:
         main_row = ft.Row(
             controls=[
-                ft.Column(
-                    controls = [
-                        self.modify_deadline_text_field
-                    ],
+                ft.Container(
+                    content=self.modify_deadline_text_field,
                     width=self._width * self.ratio[0] // sum(self.ratio),
                 ),
                 ft.Container(
                     ft.Image(
                         src="imgs/pen.png",
                         fit=ft.ImageFit.SCALE_DOWN,
-                        color=cg.get_color(Color.DARK),
+                        color=cg.get_color(self.font_color),
                     ),
                     width=self._width * self.ratio[1] // sum(self.ratio),
                     height=40,
                     on_click=self.modify_task_field_on_submit,
                 )
             ],
-            visible=False
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            visible=False,
+            width=self._width,
         )
         return main_row
 
@@ -196,10 +214,10 @@ class Task_Container(ft.Container):
     def info_clicked(self, e) -> None:
         if not self.modify_task_field.visible:
             self.expand_info(e)
-            self.bgcolor = cg.get_color(Color.LIGHT_3)
+            self.bgcolor = self.current_clicked_color_value
         else:
             self.hide_info(e)
-            self.bgcolor = cg.get_color(Color.LIGHT_2)
+            self.bgcolor = self.current_base_color_value
         self.modify_task_field.update()
         self.update()
 
@@ -213,7 +231,7 @@ class Task_Container(ft.Container):
 
 
     def update_text_info(self) -> None:
-        self.text_info.content.controls[1].controls[0].value = self.get_remaining_time_to_deadline(
+        self.text_info.content.controls[1].content.value = self.get_remaining_time_to_deadline(
             self.get_deadline_from_text_field()
         )
 

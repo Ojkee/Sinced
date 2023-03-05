@@ -15,8 +15,10 @@ class Config:
             'light_2': "#FFF0DF",
             'light_3': '#FFE8D7',
             'red': '#CA3B38',
-            'green': '#8DFE3A',
-            'debug': '#7600BC',
+            'green': '#85A67B',
+            'debug': '#A50AFF',
+            'debug_2': '#7600BC',
+            'debug_3': '#5A008F',
             'error': '#FF3333'
         }
 
@@ -40,8 +42,8 @@ class Config:
         }
 
         self._config_parser['task_list'] = {
-            'closed_ratio': '1',
-            'opened_ratio': '28',
+            'closed_ratio': '3',
+            'opened_ratio': '27',
             'sum': '30'
         }
 
@@ -89,6 +91,12 @@ class Config:
             print(e)
             return self._config_parser['colors']['error']
 
+
+    def get_task_list_width(self, is_opened: bool) -> int:
+        width: int = int(self._config_parser['sidebar']['width'])
+        width *= int(self._config_parser['task_list']['opened_ratio']) if is_opened else int(self._config_parser['task_list']['closed_ratio'])
+        width //= int(self._config_parser['task_list']['sum'])
+        return width
 
     def font(self, name: str = None) -> str:
         return self._config_parser['font']['default'] if name is None \
