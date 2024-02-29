@@ -1,0 +1,12 @@
+0 "Before no repetetive" 1 19777 0 0 0
+1 "In no repetetive" 1 20145 0 0 0
+2 "After no repetetive" 1 20510 0 0 0
+3 "No deadline" 1 -1 0 0 0
+4 "Deadline date no repetetive" 1 20505 0 0 0
+5 "Before repetetive not in" 0 19777 0 0 3
+6 "Before repetetive in" 0 19777 50 0 0
+7 "In repetetive" 0 20145 7 0 0
+8 "After repetetive" 0 20511 0 2 0
+9 "Deadline date repetetive" 0 20505 20 0 0
+10 "Today no repetetive" 0 19782 0 0 0
+11 "Today repetetive" 0 19782 0 1 0

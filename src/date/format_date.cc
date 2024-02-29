@@ -1,9 +1,8 @@
-#include "date/format_date.hpp"
-
 #include <sstream>
 #include <iomanip>
 #include <format>
-#include <utility>
+
+#include "../../include/date/format_date.hpp"
 
 
 std::string FormatDate::add_leading_char(const int16_t& d, uint16_t width, char ch)
@@ -49,7 +48,7 @@ std::string DMY::get(const int16_t& day, const int16_t& month, const int16_t& ye
 }
 
 
-std::string MMDDYYYY::get(const int16_t& day,const int16_t& month, const int16_t& year) const
+std::string MMDDYYYY::get(const int16_t& day, const int16_t& month, const int16_t& year) const
 {
   std::string fday = FormatDate::add_leading_char(day, 2, '0');
   std::string fmonth = FormatDate::add_leading_char(month, 2, '0');
@@ -58,7 +57,7 @@ std::string MMDDYYYY::get(const int16_t& day,const int16_t& month, const int16_t
 }
 
 
-std::string MMDDYY::get(const int16_t& day,const int16_t& month, const int16_t& year) const
+std::string MMDDYY::get(const int16_t& day, const int16_t& month, const int16_t& year) const
 {
   std::string fday = add_leading_char(day, 2, '0');
   std::string fmonth = add_leading_char(month, 2, '0');
@@ -67,7 +66,7 @@ std::string MMDDYY::get(const int16_t& day,const int16_t& month, const int16_t& 
 }
 
 
-std::string MDY::get(const int16_t& day,const int16_t& month, const int16_t& year) const
+std::string MDY::get(const int16_t& day, const int16_t& month, const int16_t& year) const
 {
   std::string fday = std::to_string(day);
   std::string fmonth = std::to_string(month);
@@ -76,7 +75,7 @@ std::string MDY::get(const int16_t& day,const int16_t& month, const int16_t& yea
 }
 
 
-std::string YYYYMMDD::get(const int16_t& day,const int16_t& month, const int16_t& year) const
+std::string YYYYMMDD::get(const int16_t& day, const int16_t& month, const int16_t& year) const
 {
   std::string fday = FormatDate::add_leading_char(day, 2, '0');
   std::string fmonth = FormatDate::add_leading_char(month, 2, '0');
@@ -85,7 +84,7 @@ std::string YYYYMMDD::get(const int16_t& day,const int16_t& month, const int16_t
 }
 
 
-std::string MonthDY::get(const int16_t& day,const int16_t& month, const int16_t& year) const
+std::string MonthDY::get(const int16_t& day, const int16_t& month, const int16_t& year) const
 {
   std::string fday = std::to_string(day);
   std::string fmonth = months_full_name.at(month - 1);
@@ -94,7 +93,7 @@ std::string MonthDY::get(const int16_t& day,const int16_t& month, const int16_t&
 }
 
 
-std::string Roman::get(const int16_t& day,const int16_t& month, const int16_t& year) const
+std::string Roman::get(const int16_t& day, const int16_t& month, const int16_t& year) const
 {
   std::string fday = std::to_string(day);
   std::string fmonth = roman_numerals.at(month - 1);
