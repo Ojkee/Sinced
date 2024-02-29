@@ -3,6 +3,11 @@
 add_library(mainsrc SHARED
     date/base_date.cc
     date/format_date.cc
+    entry/entry_handler.cc
+    entry/entry_base.cc
+    entry/entry_sorter.cc
+    entry/entry_filter.cc
+    parser/parser.cc
 )
 
 target_include_directories(mainsrc PUBLIC "${PROJECT_SOURCE_DIR}/include")

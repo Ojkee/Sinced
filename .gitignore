@@ -3,10 +3,14 @@
 *.o
 *.obj
 
+whiteboard/*
 build/*
-records/*
+records/database/testing_db
 src/build/*
 test/build/*
+
+.clangd
+.clang-format
 
 CMakeLists.txt.user
 CMakeCache.txt

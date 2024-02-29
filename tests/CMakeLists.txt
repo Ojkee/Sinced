@@ -5,6 +5,8 @@ add_executable("test")
 set(TARGET_SOURCES
     "test_cfg_main.cc"
     "test_date.cc"
+    "test_entry.cc"
+    "test_parser.cc"
 )
 
 #list(TRANSFORM TARGET_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/test/")
