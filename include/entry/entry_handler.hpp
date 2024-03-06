@@ -9,6 +9,10 @@
 
 #include "entry_base.hpp"
 #include "entry_filter.hpp"
+#include "entry_sorter.hpp"
+
+typedef std::vector<std::shared_ptr<EntryTask>> SP_TASKS;
+typedef std::vector<std::shared_ptr<EntryCategory>> SP_CATEGORIES;
 
 class EntryHandler {
 public:
@@ -27,6 +31,9 @@ public:
   std::vector<std::shared_ptr<EntryType>>
   filter_load_db(const std::string &path) noexcept;
 
+  [[nodiscard]] std::string fitered_tasks_info();
+  [[nodiscard]] std::string sorted_tasks_info();
+
   [[nodiscard]] std::string tasks_info_all() const;
   [[nodiscard]] std::string categories_info_all() const;
 
@@ -41,7 +48,9 @@ public:
   void set_filter(std::unique_ptr<EntryFilter> &&_filter) {
     filter = std::move(_filter);
   }
-  [[nodiscard]] std::string fitered_tasks_info();
+  void set_sorter(std::unique_ptr<EntrySorter> &&_sorter) {
+    sorter = std::move(_sorter);
+  }
 
 private:
   template <typename EntryType>
@@ -54,10 +63,8 @@ private:
   [[nodiscard]] std::shared_ptr<EntryType>
   entry_by_id(const std::string &id, const std::string &path) const;
 
-  [[nodiscard]] std::vector<std::shared_ptr<EntryTask>>
-  tasks_by_category_id(const std::string &id);
-  [[nodiscard]] std::vector<std::shared_ptr<EntryTask>>
-  tasks_by_category_id(const uint16_t &id);
+  [[nodiscard]] SP_TASKS tasks_by_category_id(const std::string &id);
+  [[nodiscard]] SP_TASKS tasks_by_category_id(const uint16_t &id);
 
   template <typename EntryType>
   [[nodiscard]] std::vector<std::shared_ptr<EntryType>>
@@ -67,11 +74,12 @@ private:
   const std::string categories_db_path;
   const std::string relations_db_path;
 
-  std::vector<std::shared_ptr<EntryTask>> tasks;
-  std::vector<std::shared_ptr<EntryCategory>> categories;
+  SP_TASKS tasks;
+  SP_CATEGORIES categories;
   std::vector<std::shared_ptr<EntryRelation>> relations;
 
   std::unique_ptr<EntryFilter> filter = std::make_unique<DefaultFilter>();
+  std::unique_ptr<EntrySorter> sorter = std::make_unique<DefaultSorter>();
 };
 
 #endif // ENTRY_HANDLER_HPP
