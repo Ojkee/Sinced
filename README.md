@@ -1,6 +1,6 @@
 # Sinced
 
-Basic todo app for Linux terminal written in C++.
+Basic todo app for Linux terminal written in C++. (Modern cpp learning phase)
 
 # TODO
 - Date format  

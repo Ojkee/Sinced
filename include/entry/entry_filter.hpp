@@ -10,7 +10,7 @@
 
 class EntryFilter {
 public:
-  EntryFilter() {}
+  EntryFilter() = default;
   virtual ~EntryFilter() = default;
   virtual bool passes(const std::shared_ptr<EntryTask> &entry) const = 0;
   virtual bool passes(const std::shared_ptr<EntryCategory> &entry) const = 0;
@@ -86,6 +86,24 @@ public:
 
 private:
   std::unique_ptr<BaseDate> deadline_ = nullptr;
+};
+
+class StatusFilter : public EntryFilter {
+public:
+  StatusFilter() = delete;
+  StatusFilter(Status status) : status_(status){};
+  bool passes(const std::shared_ptr<EntryTask> &entry) const override;
+  bool passes([[maybe_unused]] const std::shared_ptr<EntryCategory> &entry)
+      const override {
+    return false;
+  }
+  bool passes([[maybe_unused]] const std::shared_ptr<EntryRelation> &entry)
+      const override {
+    return false;
+  }
+
+private:
+  Status status_ = Status::undetermined;
 };
 
 #endif // !ENTRY_FILTER_HPP

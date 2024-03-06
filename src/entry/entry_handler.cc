@@ -10,9 +10,15 @@
 #include <vector>
 
 void EntryHandler::load_db() noexcept {
-  tasks = load_entries<EntryTask>(tasks_db_path);
-  categories = load_entries<EntryCategory>(categories_db_path);
-  relations = load_entries<EntryRelation>(relations_db_path);
+  if (!tasks_db_path.empty()) {
+    tasks = load_entries<EntryTask>(tasks_db_path);
+  }
+  if (!categories_db_path.empty()) {
+    categories = load_entries<EntryCategory>(categories_db_path);
+  }
+  if (!relations_db_path.empty()) {
+    relations = load_entries<EntryRelation>(relations_db_path);
+  }
 }
 
 template <typename EntryType>
@@ -34,12 +40,23 @@ EntryHandler::filter_load_db(const std::string &path) noexcept {
   return entries;
 }
 
+[[nodiscard]] std::string EntryHandler::fitered_tasks_info() {
+  const auto filtered_tasks = filter_load_db<EntryTask>(tasks_db_path);
+  return entries_info<EntryTask>(filtered_tasks);
+}
+
+[[nodiscard]] std::string EntryHandler::sorted_tasks_info() {
+  const auto sorted_tasks = sorter->arranged(tasks);
+  return entries_info(sorted_tasks);
+}
+
 template <typename EntryType>
 [[nodiscard]] std::vector<std::shared_ptr<EntryType>>
 EntryHandler::load_entries(const std::string &file_name) const {
   std::ifstream entry_file(file_name);
   if (!entry_file.is_open()) {
-    std::cerr << "Error loading file: " << file_name << '\n';
+    std::cerr << "Error loading file: "
+              << ((file_name.empty()) ? "Empty name" : file_name) << '\n';
     exit(EXIT_FAILURE);
   }
   std::string line;
@@ -103,11 +120,6 @@ EntryHandler::tasks_info_by_category_id(const std::string &id) {
 [[nodiscard]] std::string
 EntryHandler::tasks_info_by_category_id(const uint16_t &id) {
   return tasks_info_by_category_id(std::to_string(id));
-}
-
-[[nodiscard]] std::string EntryHandler::fitered_tasks_info() {
-  auto filtered_tasks = filter_load_db<EntryTask>(tasks_db_path);
-  return entries_info<EntryTask>(filtered_tasks);
 }
 
 template <typename EntryType>

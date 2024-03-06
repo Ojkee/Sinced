@@ -6,6 +6,8 @@ set(TARGET_SOURCES
     "test_cfg_main.cc"
     "test_date.cc"
     "test_entry.cc"
+    "test_entry_filter.cc"
+    "test_entry_sorter.cc"
     "test_parser.cc"
 )
 

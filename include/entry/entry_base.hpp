@@ -4,6 +4,7 @@
 #include "../date/base_date.hpp"
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -41,6 +42,11 @@ public:
   [[nodiscard]] bool
   is_in_timeframe(const std::unique_ptr<BaseDate> &date_) const;
   [[nodiscard]] BaseDate next_repetetive_deadline() const;
+
+  [[nodiscard]] inline Status get_status() const { return status; }
+  [[nodiscard]] inline const std::unique_ptr<BaseDate> &get_deadline() const {
+    return deadline;
+  }
 
 protected:
   std::unique_ptr<BaseDate> deadline = nullptr;
