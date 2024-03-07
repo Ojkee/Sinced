@@ -24,3 +24,18 @@ SP_TASKS StatusSorter::arranged(SP_TASKS entries) const {
             });
   return entries;
 }
+
+[[nodiscard]] SP_TASKS AlphabeticalSorter::arranged(SP_TASKS entries) const {
+  std::erase_if(entries, [](const auto &entry) { return !entry; });
+  std::sort(entries.begin(), entries.end(),
+            [](const auto &lhs, const auto &rhs) {
+              return lhs->get_content() < rhs->get_content();
+            });
+  return entries;
+}
+
+[[nodiscard]] SP_TASKS
+CategoryWiseSorter::arranged(const SP_RELATIONS &relations,
+                             SP_TASKS entries) const {
+  return entries;
+}
