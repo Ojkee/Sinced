@@ -80,4 +80,11 @@ TEST_CASE("Deadline sorter") {
                    "\n\tUndetermined"
                    "\n\tdeadline: 10-01-2094\n";
   REQUIRE(r2 == t2);
+
+  et1.set_sorter(std::make_unique<AlphabeticalSorter>());
+  std::string r3 = et1.sorted_tasks_info();
+  std::string t3 = "";
+  REQUIRE(r3 == t3);
 }
+
+TEST_CASE("Sorting by categories") {}
