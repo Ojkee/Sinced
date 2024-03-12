@@ -2,6 +2,7 @@
 #define BASE_ENTRY_HPP
 
 #include "../date/base_date.hpp"
+#include "../entry/entry_formatter.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -24,14 +25,23 @@ public:
   [[nodiscard]] std::string get_id() const { return id; }
   [[nodiscard]] std::string get_content() const { return content; }
 
+  const EntryInfoFormatter &get_info_formatter() const {
+    return *info_formatter;
+  }
+  void set_info_formatter(std::unique_ptr<EntryInfoFormatter> &&_formatter) {
+    info_formatter = std::move(_formatter);
+  }
+
 protected:
   std::string id{};
   std::string content{};
+
+  std::unique_ptr<EntryInfoFormatter> info_formatter = nullptr;
 };
 
 class EntryTask : public EntryBase {
 public:
-  EntryTask() {}
+  EntryTask() = delete;
   EntryTask(const std::string &line) { tokenize(line); }
   void tokenize(const std::string &line) override;
   operator std::string() const override;
@@ -58,7 +68,7 @@ protected:
 
 class EntryCategory : public EntryBase {
 public:
-  EntryCategory() {}
+  EntryCategory() = delete;
   EntryCategory(const std::string &line) { tokenize(line); }
   void tokenize(const std::string &line) override;
   operator std::string() const override;
@@ -67,7 +77,7 @@ public:
 
 class EntryRelation : public EntryBase {
 public:
-  EntryRelation() {}
+  EntryRelation() = delete;
   EntryRelation(const std::string &line) { tokenize(line); }
   void tokenize(const std::string &line) override;
   operator std::string() const override;
