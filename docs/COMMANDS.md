@@ -1,11 +1,11 @@
 # Syntax
 ```
-  scd [command] [subject] [additional flas with parameters]
+  scd <command> <subject> [optional flags with parameters]
 ```
 
 ***Example:***
 ```
-  scd add "My awesome task" -rw
+  scd add "My awesome task" -rw 4
 ```
 
 ## Commands
@@ -19,25 +19,25 @@
 ### Task
 some todo task, name containing space should be written in quotation marks
 ```
-  scd [command] "new task"
-  scd [command] new_task
+  scd <command> "new task"
+  scd <command> new_task
 ```
 
 ##### Additional flags
-- **@category** - \[command\] directly into/from @category
+- **@category** - \<command\> directly into/from @category
 
   ```
   scd add "new task" @"category name"
   ```
 
-- **-d / -w / -m \[number\]** - deadline in day/week/month \*number
+- **-d / -w / -m \<number\>** - deadline in day/week/month \*number
 
   ```
   scd add "new task" @"category name" -w
   scd add "new task" -w 5
   ```
 
-- **-rd / -rw / -rm \[number\]** - same that above but task is repetetive
+- **-rd / -rw / -rm \<number\>** - same that above but task is repetetive
   ```
   scd add "new task" @1 -rm
   scd add "new task" -rw 5
@@ -53,8 +53,8 @@ some todo task, name containing space should be written in quotation marks
 ### Category
 tasks can be categorized info folder-like categories with '@' at the beggining of the name.
 ```
- scd [command] @"category name"
- scd [command] @category_name
+ scd <command> @"category name"
+ scd <command> @category_name
 ```
 
 

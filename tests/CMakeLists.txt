@@ -8,7 +8,7 @@ set(TARGET_SOURCES
     "test_entry.cc"
     "test_entry_filter.cc"
     "test_entry_sorter.cc"
-    "test_parser.cc"
+    "test_lexer.cc"
 )
 
 #list(TRANSFORM TARGET_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/test/")

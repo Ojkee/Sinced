@@ -42,12 +42,15 @@ public:
   [[nodiscard]] SP_TASKS arranged(SP_TASKS entries) const override;
 };
 
-class CategoryWiseSorter : public EntrySorter {
-public:
-  CategoryWiseSorter() = default;
-  [[nodiscard]] SP_TASKS arranged(SP_TASKS entries) = delete;
-  [[nodiscard]] SP_TASKS arranged(const SP_RELATIONS &relations,
-                                  SP_TASKS entries) const;
-};
+// --TODO--
+// class CategoryWiseSorter : public EntrySorter {
+// public:
+//   CategoryWiseSorter() = default;
+//   [[nodiscard]] SP_TASKS arranged(SP_TASKS entries) const override {
+//     return entries;
+//   }
+//   [[nodiscard]] SP_TASKS arranged(SP_RELATIONS relations,
+//                                   SP_TASKS entries) const;
+// };
 
 #endif // !ENTRY_SORTER_HPP
