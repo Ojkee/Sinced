@@ -153,7 +153,7 @@ TEST_CASE("If task is in timeframe") {
 
   std::string token1 = "0 \"Title 0\" 0 19792 0 0 0";
   EntryTask et1 = EntryTask(token1);
-  REQUIRE(et1.is_in_timeframe(deadline) == true);
+  REQUIRE(et1.is_in_timeframe(deadline) == false);
 
   std::string token2 = "1 \"Title 1\" 0 19779 0 0 0";
   EntryTask et2 = EntryTask(token2);

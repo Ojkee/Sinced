@@ -15,7 +15,7 @@ TEST_CASE("Is leap year") {
   REQUIRE(BaseDate::is_leap(2023) == false);
 }
 
-TEST_CASE("Date format") {
+TEST_CASE("Validation") {
   BaseDate b1 = BaseDate(-4, 2, 2023);
   REQUIRE(std::string(b1) == "01-02-2023");
 
