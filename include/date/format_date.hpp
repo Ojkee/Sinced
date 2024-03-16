@@ -11,8 +11,8 @@ public:
   FormatDate(std::string _separator) : separator(_separator) {}
   virtual std::string get(const int16_t &day, const int16_t &month,
                           const int16_t &year) const = 0;
-  static std::string add_leading_char(const int16_t &d, uint16_t width,
-                                      char ch);
+  virtual bool is_valid(const std::string &text) const = 0;
+  static std::string add_leading_char(const int16_t d, uint16_t width, char ch);
   void set_separator(std::string _separator) {
     separator = std::move(_separator);
   }
@@ -35,6 +35,7 @@ public:
   DDMMYYYY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
+  bool is_valid(const std::string &text) const override;
 };
 
 class DDMMYY : public FormatDate {
@@ -43,6 +44,7 @@ public:
   DDMMYY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
+  bool is_valid(const std::string &text) const override;
 };
 
 class DMY : public FormatDate {
@@ -51,6 +53,7 @@ public:
   DMY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
+  bool is_valid(const std::string &text) const override;
 };
 
 class MMDDYYYY : public FormatDate {
@@ -59,6 +62,7 @@ public:
   MMDDYYYY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
+  bool is_valid(const std::string &text) const override;
 };
 
 class MMDDYY : public FormatDate {
@@ -67,6 +71,7 @@ public:
   MMDDYY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
+  bool is_valid(const std::string &text) const override;
 };
 
 class MDY : public FormatDate {
@@ -75,6 +80,7 @@ public:
   MDY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
+  bool is_valid(const std::string &text) const override;
 };
 
 class YYYYMMDD : public FormatDate {
@@ -83,6 +89,7 @@ public:
   YYYYMMDD(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
+  bool is_valid(const std::string &text) const override;
 };
 
 class MonthDY : public FormatDate {
@@ -91,6 +98,9 @@ public:
   MonthDY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
+  bool is_valid([[maybe_unused]] const std::string &text) const override {
+    return false;
+  }
 };
 
 class Roman : public FormatDate {
@@ -99,6 +109,9 @@ public:
   Roman(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
+  bool is_valid([[maybe_unused]] const std::string &text) const override {
+    return false;
+  }
 };
 
 #endif // FORMAT_DATE_HPP

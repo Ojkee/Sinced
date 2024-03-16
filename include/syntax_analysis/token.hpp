@@ -9,12 +9,14 @@ enum class TokenType {
   CATEGORY_NAME,
   OPTION,
   NUMBER,
-  BLANK_SPACE
+  DATE,
+  BLANK_SPACE // Just in case
 };
 
 struct Token {
   const TokenType type;
   const std::string content;
+  bool operator==(const Token &other) const = default;
 };
 
 #endif // TOKEN_HPP

@@ -9,7 +9,7 @@ endif()
 project(Sinced)
 
 set(CMAKE_CXX_STANDARD 20)
-add_compile_options(-Wall -Wextra --debug)
+add_compile_options(-Wall -Wextra -Wshadow -Wconversion -Wpedantic -Werror --debug)
 
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

@@ -1,7 +1,6 @@
 #ifndef BASE_DATE_HPP
 #define BASE_DATE_HPP
 
-#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <memory>
@@ -48,21 +47,22 @@ public:
   void add_days(int16_t _days) noexcept;
   void add_months(int16_t _months) noexcept;
   void add_years(int16_t _years) noexcept;
-  uint16_t day_of_week() noexcept;
-  std::string day_of_week_name() noexcept;
-  int16_t remaining_days() noexcept;
+  uint16_t day_of_week() const noexcept;
+  [[nodiscard]] std::string const day_of_week_name() const noexcept;
+  [[nodiscard]] int16_t remaining_days() const noexcept;
 
-  static constexpr inline bool is_leap(const int16_t &_year) noexcept {
+  [[nodiscard]] static constexpr inline bool
+  is_leap(const int16_t &_year) noexcept {
     const bool p = _year % 4 == 0;
     const bool q = _year % 100 == 0;
     const bool t = _year % 400 == 0;
     return ((p && !q) || t);
   }
-  static uint16_t date_to_days(const BaseDate &bd);
-  static BaseDate days_to_date(int32_t _days);
-  static BaseDate today();
+  [[nodiscard]] static uint16_t date_to_days(const BaseDate &bd);
+  [[nodiscard]] static BaseDate days_to_date(int32_t _days);
+  [[nodiscard]] static BaseDate today();
 
-  const FormatDate &get_formatter() const { return *formatter; }
+  [[nodiscard]] const FormatDate &get_formatter() const { return *formatter; }
   void set_formatter(std::unique_ptr<FormatDate> &&_formatter) {
     formatter = std::move(_formatter);
   }
@@ -71,7 +71,7 @@ private:
   int16_t day{1};
   int16_t month{1};
   int16_t year{1970};
-  void validate();
+  void validate() noexcept;
   constexpr static uint16_t lower_bound_day{1};
   constexpr static uint16_t lower_bound_month{1};
   constexpr static uint16_t lower_bound_year{1970};
