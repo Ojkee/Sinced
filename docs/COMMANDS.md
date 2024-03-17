@@ -33,14 +33,14 @@ some todo task, name containing space should be written in quotation marks
 - **-d / -w / -m \<number\>** - deadline in day/week/month \*number
 
   ```
-  scd add "new task" @"category name" -w
-  scd add "new task" -w 5
+  scd add "new task" @"category name" -w   //Task in category with deadline in 7 days
+  scd add "new task" -w 5                  //Task with deadline today + 5 * 7 days
   ```
 
 - **-rd / -rw / -rm \<number\>** - same that above but task is repetetive
   ```
-  scd add "new task" @1 -rm
-  scd add "new task" -rw 5
+  scd add "new task" @1 -rm                //Task in category "1" every month 
+  scd add "new task" -rw 5                 //Task with deadline every 5 weeks
   ```
 
 - **date** - adds task with deadline on specific date
@@ -58,16 +58,20 @@ tasks can be categorized info folder-like categories with '@' at the beggining o
 ```
 
 
+### Configure
+```
+  scd set YYYYMMDD -i                       // date format date in input to program
+  scd set YYYYMMDD -o                       // date format that program displays
+  scd set -s'sep'                           // separator in date format in 
+                                            (TODO: POSSIBLE BETTER SYNTAX IDEA)
+```
 
-### list
+
+### List
 - scd list
 - scd list -a
 - scd list @category
 - scd list -s
 - scd list -s 10
 - scd list -w 2
-
-
-### Configure
-- scd set date YYYYMMDD
 

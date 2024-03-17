@@ -25,15 +25,19 @@ public:
                               input_string);
   }
   [[nodiscard]] bool is_date(const std::string &input_string) const {
-    return formatter->is_valid(input_string);
+    return date_formatter->is_valid(input_string);
+  }
+  void set_formatter(std::unique_ptr<FormatDate> &&_formatter) {
+    date_formatter = std::move(_formatter);
   }
 
 private:
   [[nodiscard]] TokenType get_token_type(const std::string &input_string) const;
   [[nodiscard]] std::string process_content(const std::string &content) const;
 
-  constexpr static auto commands_set = {"add", "list", "rm"};
-  std::unique_ptr<FormatDate> formatter = std::make_unique<DDMMYYYY>();
+  constexpr static auto commands_set = {"add", "list", "rm",
+                                        "set"}; // KEEP LEXICOGRAPHIC
+  std::unique_ptr<FormatDate> date_formatter = std::make_unique<DDMMYYYY>();
 };
 
 #endif // LEXER_HPP

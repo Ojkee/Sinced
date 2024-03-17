@@ -10,6 +10,7 @@ add_library(mainsrc SHARED
     entry/entry_formatter.cc
     syntax_analysis/lexer.cc
     syntax_analysis/token.cc
+    syntax_analysis/interpreter.cc
 )
 
 target_include_directories(mainsrc PUBLIC "${PROJECT_SOURCE_DIR}/include")

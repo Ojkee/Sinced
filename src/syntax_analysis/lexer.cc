@@ -1,6 +1,5 @@
 #include "../../include/syntax_analysis/lexer.hpp"
 
-#include <cassert>
 #include <cctype>
 #include <string>
 
@@ -9,29 +8,26 @@ Lexer::tokenize(const std::string &line) const {
   std::string word;
   std::vector<Token> tokens;
   bool in_quotes = false;
+  auto append_and_clear = [&tokens, this](std::string &word) {
+    tokens.emplace_back(get_token_type(word), process_content(word));
+    word.clear();
+  };
   for (const char &c : line) {
-    if (c == '\"' && !in_quotes) {
+    if (c == '\"') {
       in_quotes = !in_quotes;
-    } else if (c == '\"' && in_quotes) {
-      in_quotes = !in_quotes;
-      const Token t{get_token_type(word), process_content(word)};
-      tokens.emplace_back(t);
-      word.clear();
+      if (!in_quotes && !word.empty()) {
+        append_and_clear(word);
+      }
     } else if (std::isspace(c) && !in_quotes) {
       if (!word.empty()) {
-        const Token t{get_token_type(word), process_content(word)};
-        tokens.emplace_back(t);
-        word.clear();
+        append_and_clear(word);
       }
-    } else {
+    } else [[likely]] {
       word += c;
     }
   }
-  assert(!in_quotes);
   if (!word.empty()) {
-    const Token t{get_token_type(word), process_content(word)};
-    tokens.emplace_back(t);
-    word.clear();
+    tokens.emplace_back(Token{get_token_type(word), process_content(word)});
   }
   return tokens;
 }

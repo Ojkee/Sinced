@@ -9,10 +9,11 @@ class FormatDate {
 public:
   FormatDate() = default;
   FormatDate(std::string _separator) : separator(_separator) {}
-  virtual std::string get(const int16_t &day, const int16_t &month,
-                          const int16_t &year) const = 0;
-  virtual bool is_valid(const std::string &text) const = 0;
-  static std::string add_leading_char(const int16_t d, uint16_t width, char ch);
+  [[nodiscard]] virtual std::string
+  get(const int16_t &day, const int16_t &month, const int16_t &year) const = 0;
+  [[nodiscard]] virtual bool is_valid(const std::string &text) const = 0;
+  [[nodiscard]] static std::string add_leading_char(const int16_t d,
+                                                    uint16_t width, char ch);
   void set_separator(std::string _separator) {
     separator = std::move(_separator);
   }
@@ -20,13 +21,16 @@ public:
 
 protected:
   std::string separator = "-";
-  std::array<std::string, 12> months_full_name = {
+  constexpr static std::array<std::string, 12> months_full_name = {
       "January", "February", "March",     "April",   "May",      "June",
       "July",    "August",   "September", "October", "November", "December"};
-  std::array<std::string, 12> roman_numerals = {
+  constexpr static std::array<std::string, 12> roman_numerals = {
       "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
   std::string build(const std::string &d1, const std::string &d2,
                     const std::string &d3) const;
+  [[nodiscard]] std::string build_validation_expr(const std::string &d1,
+                                                  const std::string &d2,
+                                                  const std::string &d3) const;
 };
 
 class DDMMYYYY : public FormatDate {
@@ -87,6 +91,15 @@ class YYYYMMDD : public FormatDate {
 public:
   YYYYMMDD() = default;
   YYYYMMDD(std::string _separator) : FormatDate(_separator) {}
+  std::string get(const int16_t &day, const int16_t &month,
+                  const int16_t &year) const override;
+  bool is_valid(const std::string &text) const override;
+};
+
+class YYMMDD : public FormatDate {
+public:
+  YYMMDD() = default;
+  YYMMDD(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
