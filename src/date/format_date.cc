@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstddef>
 #include <format>
 #include <iomanip>
 #include <regex>
@@ -152,7 +153,7 @@ bool YYMMDD::is_valid(const std::string &text) const {
 std::string MonthDY::get(const int16_t &day, const int16_t &month,
                          const int16_t &year) const {
   std::string fday = std::to_string(day);
-  std::string fmonth = months_full_name.at(month - 1);
+  std::string fmonth = months_full_name.at(static_cast<std::size_t>(month - 1));
   std::string fyear = std::to_string(year);
   return std::format("{} {}, {}", fmonth, fday, fyear);
 }
@@ -160,7 +161,7 @@ std::string MonthDY::get(const int16_t &day, const int16_t &month,
 std::string Roman::get(const int16_t &day, const int16_t &month,
                        const int16_t &year) const {
   std::string fday = std::to_string(day);
-  std::string fmonth = roman_numerals.at(month - 1);
+  std::string fmonth = roman_numerals.at(static_cast<std::size_t>(month - 1));
   std::string fyear = std::to_string(year);
   return build(fday, fmonth, fyear);
 }

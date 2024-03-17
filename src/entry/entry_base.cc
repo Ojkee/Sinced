@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <cstdint>
 #include <format>
 #include <iomanip>
 #include <sstream>
@@ -80,9 +81,9 @@ std::string EntryTask::info() const {
     if (result >= today_date) {
       return result;
     }
-    result.add_years(r_years);
-    result.add_months(r_months);
-    result.add_days(r_days);
+    result.add_years(static_cast<int16_t>(r_years));
+    result.add_months(static_cast<int16_t>(r_months));
+    result.add_days(static_cast<int16_t>(r_days));
   }
   return result;
 }
