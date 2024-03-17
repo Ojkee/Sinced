@@ -308,6 +308,76 @@ TEST_CASE("Displaying different formats of date") {
   REQUIRE(std::string(b11) == "28.02.70");
 }
 
+TEST_CASE("Date formatter validation checker") {
+  DDMMYY f1 = DDMMYY(",");
+  std::string d1 = "12,03,23";
+  CHECK(f1.is_valid(d1) == true);
+
+  DDMMYY f2 = DDMMYY(",");
+  std::string d2 = "22,03-23";
+  CHECK(f2.is_valid(d2) == false);
+
+  DDMMYY f3 = DDMMYY();
+  std::string d3 = "33-03-2033";
+  CHECK(f3.is_valid(d3) == false);
+
+  DDMMYY f4 = DDMMYY();
+  std::string d4 = "1-1-22";
+  CHECK(f4.is_valid(d4) == true);
+
+  DDMMYY f5 = DDMMYY("/");
+  std::string d5 = "1/1/22";
+  CHECK(f5.is_valid(d5) == true);
+
+  YYYYMMDD f6 = YYYYMMDD();
+  std::string d6 = "2001-1-2";
+  CHECK(f6.is_valid(d6) == true);
+
+  YYYYMMDD f7 = YYYYMMDD("?");
+  std::string d7 = "2001?01?2";
+  CHECK(f7.is_valid(d7) == true);
+
+  YYYYMMDD f8 = YYYYMMDD("test");
+  std::string d8 = "2001test01test2";
+  CHECK(f8.is_valid(d8) == true);
+
+  YYYYMMDD f9 = YYYYMMDD("?..d");
+  std::string d9 = "2001?..d01?..d2";
+  CHECK(f9.is_valid(d9) == true);
+
+  YYYYMMDD f10 = YYYYMMDD("??");
+  std::string d10 = "2001..1..2";
+  CHECK(f10.is_valid(d10) == false);
+
+  YYYYMMDD f11 = YYYYMMDD("??");
+  std::string d11 = "2001??1??2";
+  CHECK(f11.is_valid(d11) == true);
+
+  YYMMDD f12 = YYMMDD("??");
+  std::string d12 = "01??1??2";
+  CHECK(f12.is_valid(d12) == true);
+
+  YYMMDD f13 = YYMMDD("??");
+  std::string d13 = "1??1??2";
+  CHECK(f13.is_valid(d13) == false);
+
+  YYMMDD f14 = YYMMDD("..");
+  std::string d14 = "01..1..2";
+  CHECK(f14.is_valid(d14) == true);
+
+  YYMMDD f15 = YYMMDD("..");
+  std::string d15 = "01?.1?.2";
+  CHECK(f15.is_valid(d15) == false);
+
+  YYMMDD f16 = YYMMDD("*");
+  std::string d16 = "01.1.2";
+  CHECK(f16.is_valid(d16) == false);
+
+  YYMMDD f17 = YYMMDD("*");
+  std::string d17 = "01*1*2";
+  CHECK(f17.is_valid(d17) == true);
+}
+
 TEST_CASE("Day of week from date") {
   BaseDate b1 = BaseDate(1, 7, 1970);
   REQUIRE(b1.day_of_week() == 3);
