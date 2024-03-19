@@ -173,7 +173,7 @@ EntryHandler::entry_if_id_in_set(const std::set<std::string> &ids,
     std::shared_ptr<EntryType> current_task = std::make_shared<EntryType>(line);
     std::string current_id = current_task->get_id();
     if (ids.contains(current_id)) {
-      filtered_entries.push_back(current_task);
+      filtered_entries.emplace_back(current_task);
     }
   }
   return filtered_entries;
