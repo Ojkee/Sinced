@@ -31,6 +31,10 @@ public:
   std::vector<std::shared_ptr<EntryType>>
   filter_load_db(const std::string &path) noexcept;
 
+  template <typename EntryType>
+  [[nodiscard]] std::string
+  entries_info(const std::vector<std::shared_ptr<EntryType>> &entries) const;
+
   [[nodiscard]] std::string fitered_tasks_info();
   [[nodiscard]] std::string sorted_tasks_info();
 
@@ -56,9 +60,7 @@ private:
   template <typename EntryType>
   [[nodiscard]] std::vector<std::shared_ptr<EntryType>>
   load_entries(const std::string &file_name) const;
-  template <typename EntryType>
-  [[nodiscard]] std::string
-  entries_info(const std::vector<std::shared_ptr<EntryType>> &entries) const;
+
   template <typename EntryType>
   [[nodiscard]] std::shared_ptr<EntryType>
   entry_by_id(const std::string &id, const std::string &path) const;

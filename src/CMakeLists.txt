@@ -8,6 +8,7 @@ add_library(mainsrc SHARED
     entry/entry_sorter.cc
     entry/entry_filter.cc
     entry/entry_formatter.cc
+    entry/entry_base_builder.cc
     syntax_analysis/lexer.cc
     syntax_analysis/token.cc
     syntax_analysis/interpreter.cc

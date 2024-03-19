@@ -1,5 +1,5 @@
-#ifndef BASE_ENTRY_HPP
-#define BASE_ENTRY_HPP
+#ifndef ENTRY_BASE_HPP
+#define ENTRY_BASE_HPP
 
 #include "../date/base_date.hpp"
 #include "../entry/entry_formatter.hpp"
@@ -7,13 +7,14 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 enum class Status { ongoing, done, canceled, undetermined };
 
 class EntryBase {
 public:
-  EntryBase(){};
+  EntryBase() = default;
   EntryBase(const std::string &line);
   virtual void tokenize(const std::string &line) = 0;
   virtual std::string info() const = 0;
@@ -41,7 +42,7 @@ protected:
 
 class EntryTask : public EntryBase {
 public:
-  EntryTask() = delete;
+  EntryTask() = default;
   EntryTask(const std::string &line) { tokenize(line); }
   void tokenize(const std::string &line) override;
   operator std::string() const override;
@@ -54,8 +55,18 @@ public:
   [[nodiscard]] BaseDate next_repetetive_deadline() const;
 
   [[nodiscard]] inline Status get_status() const { return status; }
+  void inline set_status(const Status &status_) { status = status_; }
   [[nodiscard]] inline const std::unique_ptr<BaseDate> &get_deadline() const {
     return deadline;
+  }
+  void inline set_deadline(std::unique_ptr<BaseDate> deadline_) {
+    deadline = std::move(deadline_);
+  }
+  void inline set_recursive(const uint16_t &d, const uint16_t &m,
+                            const uint16_t &y) {
+    r_days = d;
+    r_months = m;
+    r_years = y;
   }
 
 protected:
@@ -91,4 +102,4 @@ private:
   std::string content_category;
 };
 
-#endif // BASE_ENTRY_HPP
+#endif // ENTRY_BASE_HPP
