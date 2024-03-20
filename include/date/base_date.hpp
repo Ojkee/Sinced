@@ -1,7 +1,6 @@
 #ifndef BASE_DATE_HPP
 #define BASE_DATE_HPP
 
-#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <memory>

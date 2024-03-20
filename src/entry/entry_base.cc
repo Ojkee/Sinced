@@ -24,7 +24,7 @@ void EntryTask::tokenize(const std::string &line) {
   content = tokens[1];
   status = static_cast<Status>(std::stoi(tokens[2]));
   if (tokens[3] != "-1") {
-    const uint16_t int_date = (uint16_t)std::stoul(tokens[3]);
+    const uint16_t int_date = static_cast<uint16_t>(std::stoul(tokens[3]));
     deadline = std::make_optional<BaseDate>(BaseDate::days_to_date(int_date));
   }
   r_days = static_cast<uint16_t>(std::stoul(tokens[4]));
