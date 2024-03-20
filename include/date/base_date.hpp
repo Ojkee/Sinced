@@ -1,6 +1,7 @@
 #ifndef BASE_DATE_HPP
 #define BASE_DATE_HPP
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <memory>
@@ -21,7 +22,6 @@ public:
       : day(_day), month(_month), year(_year) {
     validate();
   }
-
   inline operator std::string() const noexcept {
     return formatter->get(day, month, year);
   }
@@ -40,9 +40,8 @@ public:
   inline bool operator<=(const BaseDate &other) const noexcept {
     return *this < other || *this == other;
   }
-  static inline BaseDate
-  shallow_copy_from_unique(const std::unique_ptr<BaseDate> &bd) {
-    return BaseDate::days_to_date(BaseDate::date_to_days(*bd));
+  static inline BaseDate shallow_copy(const BaseDate &bd) {
+    return BaseDate::days_to_date(BaseDate::date_to_days(bd));
   }
   void add_days(int16_t _days) noexcept;
   void add_months(int16_t _months) noexcept;
@@ -63,7 +62,7 @@ public:
   [[nodiscard]] static BaseDate today();
 
   [[nodiscard]] const FormatDate &get_formatter() const { return *formatter; }
-  void set_formatter(std::unique_ptr<FormatDate> &&_formatter) {
+  void set_formatter(std::shared_ptr<FormatDate> &&_formatter) {
     formatter = std::move(_formatter);
   }
 
@@ -77,7 +76,7 @@ private:
   constexpr static uint16_t lower_bound_year{1970};
   constexpr static uint16_t upper_bound_year{9999};
 
-  std::unique_ptr<FormatDate> formatter = std::make_unique<DDMMYYYY>();
+  std::shared_ptr<FormatDate> formatter = std::make_shared<DDMMYYYY>();
 };
 
 #endif // BASE_DATE_HPP

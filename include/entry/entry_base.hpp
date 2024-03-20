@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -50,18 +51,15 @@ public:
   [[nodiscard]] inline bool is_repetetive() const {
     return r_days || r_months || r_years;
   };
-  [[nodiscard]] bool
-  is_in_timeframe(const std::unique_ptr<BaseDate> &date_) const;
+  [[nodiscard]] bool is_in_timeframe(const BaseDate &date_) const;
   [[nodiscard]] BaseDate next_repetetive_deadline() const;
 
   [[nodiscard]] inline Status get_status() const { return status; }
   void inline set_status(const Status &status_) { status = status_; }
-  [[nodiscard]] inline const std::unique_ptr<BaseDate> &get_deadline() const {
-    return deadline;
+  [[nodiscard]] inline const std::optional<BaseDate> get_deadline() const {
+    return (deadline) ? deadline : std::nullopt;
   }
-  void inline set_deadline(std::unique_ptr<BaseDate> deadline_) {
-    deadline = std::move(deadline_);
-  }
+  void inline set_deadline(const BaseDate &deadline_) { deadline = deadline_; }
   void inline set_recursive(const uint16_t &d, const uint16_t &m,
                             const uint16_t &y) {
     r_days = d;
@@ -70,7 +68,7 @@ public:
   }
 
 protected:
-  std::unique_ptr<BaseDate> deadline = nullptr;
+  std::optional<BaseDate> deadline;
   Status status = Status::undetermined;
   uint16_t r_days{};
   uint16_t r_months{};

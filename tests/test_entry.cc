@@ -98,21 +98,21 @@ TEST_CASE("If task is in timeframe") {
 
   std::string token1 = "0 \"Title 0\" 0 19792 0 0 0";
   EntryTask et1 = EntryTask(token1);
-  REQUIRE(et1.is_in_timeframe(deadline) == false);
+  REQUIRE(et1.is_in_timeframe(*deadline) == false);
 
   std::string token2 = "1 \"Title 1\" 0 19779 0 0 0";
   EntryTask et2 = EntryTask(token2);
-  REQUIRE(et2.is_in_timeframe(deadline) == false);
+  REQUIRE(et2.is_in_timeframe(*deadline) == false);
 
   std::string token3 = "2 \"Title 2\" 0 -1 0 0 0";
   EntryTask et3 = EntryTask(token3);
-  REQUIRE(et3.is_in_timeframe(deadline) == false);
+  REQUIRE(et3.is_in_timeframe(*deadline) == false);
 
   std::string token4 = "3 \"Title 3\" 0 18331 0 0 5";
   EntryTask et4 = EntryTask(token4);
-  REQUIRE(et4.is_in_timeframe(deadline) == true);
+  REQUIRE(et4.is_in_timeframe(*deadline) == true);
 
   std::string token5 = "3 \"Title 3\" 0 18696 0 0 5";
   EntryTask et5 = EntryTask(token5);
-  REQUIRE(et5.is_in_timeframe(deadline) == false);
+  REQUIRE(et5.is_in_timeframe(*deadline) == false);
 }

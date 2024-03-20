@@ -7,15 +7,23 @@ EntryTask EntryTaskBuilder::get(const std::string &content) {
   return EntryTask(id_str + " " + content + " 0 -1 0 0 0");
 }
 
-EntryTask EntryTaskBuilder::add_recursive_days(EntryTask &task,
-                                               const std::string &d) {
+EntryTask *EntryTaskBuilder::add_recursive_days(EntryTask &task,
+                                                const std::string &d) {
   const uint16_t rd = static_cast<uint16_t>(std::stoi(d));
   task.set_recursive(rd, 0, 0);
-  return task;
+  return &task;
 }
 
-EntryTask EntryTaskBuilder::add_recursive_months(EntryTask &task,
-                                                 const std::string &m) {}
+EntryTask *EntryTaskBuilder::add_recursive_months(EntryTask &task,
+                                                  const std::string &m) {
+  const uint16_t rm = static_cast<uint16_t>(std::stoi(m));
+  task.set_recursive(0, rm, 0);
+  return &task;
+}
 
-EntryTask EntryTaskBuilder::add_recursive_years(EntryTask &task,
-                                                const std::string &y) {}
+EntryTask *EntryTaskBuilder::add_recursive_years(EntryTask &task,
+                                                 const std::string &y) {
+  const uint16_t ry = static_cast<uint16_t>(std::stoi(y));
+  task.set_recursive(0, 0, ry);
+  return &task;
+}

@@ -23,14 +23,14 @@ class EntryTaskBuilder : public EntryBuilder {
 public:
   EntryTaskBuilder() = default;
   [[nodiscard]] EntryTask get(const std::string &content);
-  [[nodiscard]] EntryTask add_deadline(EntryTask &task,
-                                       std::unique_ptr<BaseDate> deadline);
-  [[nodiscard]] EntryTask add_recursive_days(EntryTask &task,
-                                             const std::string &d);
-  [[nodiscard]] EntryTask add_recursive_months(EntryTask &task,
-                                               const std::string &m);
-  [[nodiscard]] EntryTask add_recursive_years(EntryTask &task,
-                                              const std::string &y);
+  [[nodiscard]] EntryTask *add_deadline(EntryTask &task,
+                                        std::unique_ptr<BaseDate> deadline);
+  [[nodiscard]] EntryTask *add_recursive_days(EntryTask &task,
+                                              const std::string &d);
+  [[nodiscard]] EntryTask *add_recursive_months(EntryTask &task,
+                                                const std::string &m);
+  [[nodiscard]] EntryTask *add_recursive_years(EntryTask &task,
+                                               const std::string &y);
 };
 
 #endif // ENTRY_BASE_BUILDER_HPP

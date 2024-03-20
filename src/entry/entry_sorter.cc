@@ -2,12 +2,11 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <iterator>
 #include <vector>
 
 SP_TASKS DeadlineSorter::arranged(SP_TASKS entries) const {
   std::erase_if(entries, [](const auto &entry) {
-    return !entry || entry->get_deadline() == nullptr;
+    return !entry || entry->get_deadline();
   });
   std::sort(entries.begin(), entries.end(),
             [](const auto &lhs, const auto &rhs) {
@@ -26,7 +25,7 @@ SP_TASKS StatusSorter::arranged(SP_TASKS entries) const {
   return entries;
 }
 
-[[nodiscard]] SP_TASKS AlphabeticalSorter::arranged(SP_TASKS entries) const {
+SP_TASKS AlphabeticalSorter::arranged(SP_TASKS entries) const {
   std::erase_if(entries, [](const auto &entry) { return !entry; });
   std::sort(entries.begin(), entries.end(),
             [](const auto &lhs, const auto &rhs) {
