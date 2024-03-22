@@ -17,7 +17,7 @@ class EntryBase {
 public:
   EntryBase() = default;
   EntryBase(const std::string &line);
-  virtual void tokenize(const std::string &line) = 0;
+  virtual void tokenize(const std::string &) = 0;
   virtual std::string info() const = 0;
   virtual operator std::string() const = 0;
   virtual ~EntryBase() = default;
@@ -66,6 +66,44 @@ public:
     r_months = m;
     r_years = y;
   }
+
+  class Builder {
+  public:
+    Builder() : task(std::make_unique<EntryTask>()) {}
+
+    Builder &add_id(const std::string &id_) {
+      task->id = id_;
+      return *this;
+    }
+    Builder &add_content(const std::string &content_) {
+      task->content = content_;
+      return *this;
+    }
+    Builder &add_status(const Status &status_) {
+      task->status = status_;
+      return *this;
+    }
+    Builder &add_deadline(const BaseDate &deadline_) {
+      task->set_deadline(deadline_);
+      return *this;
+    }
+    Builder &add_recursive_days(const uint16_t &rdays) {
+      task->set_recursive(rdays, 0, 0);
+      return *this;
+    }
+    Builder &add_recursive_months(const uint16_t &rmonths) {
+      task->set_recursive(0, rmonths, 0);
+      return *this;
+    }
+    Builder &add_recursive_years(const uint16_t &ryears) {
+      task->set_recursive(0, 0, ryears);
+      return *this;
+    }
+    std::shared_ptr<EntryTask> get() { return std::move(task); }
+
+  private:
+    std::unique_ptr<EntryTask> task;
+  };
 
 protected:
   std::optional<BaseDate> deadline;
