@@ -6,7 +6,7 @@
 
 SP_TASKS DeadlineSorter::arranged(SP_TASKS entries) const {
   std::erase_if(entries, [](const auto &entry) {
-    return !entry || entry->get_deadline();
+    return !entry || !entry->get_deadline();
   });
   std::sort(entries.begin(), entries.end(),
             [](const auto &lhs, const auto &rhs) {
