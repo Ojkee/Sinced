@@ -33,7 +33,7 @@ void EntryTask::tokenize(const std::string &line) {
 }
 
 EntryTask::operator std::string() const {
-  const int date_str = (deadline) ? -1 : BaseDate::date_to_days(*deadline);
+  const int date_str = (deadline) ? BaseDate::date_to_days(*deadline) : -1;
   return std::format("{} \"{}\" {} {} {} {} {}", id, content,
                      static_cast<uint16_t>(status), date_str, r_days, r_months,
                      r_years);
