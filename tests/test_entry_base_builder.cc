@@ -3,8 +3,12 @@
 #include "../include/entry/entry_base.hpp"
 #include <string>
 
-TEST_CASE("Building tasks using Builder pattern") {
-  auto task1 = EntryTask::Builder().add_id("0").add_content("cool task").get();
+TEST_CASE("Testing Task Buider pattern") {
+  auto task1 = EntryTask::Builder()
+                   .add_id("0")
+                   .add_content("cool task")
+                   .add_recursive_days(0)
+                   .get();
   std::string t1 = "0 \"cool task\" 3 -1 0 0 0";
   CHECK(std::string(*task1) == t1);
 

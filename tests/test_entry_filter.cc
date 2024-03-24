@@ -7,7 +7,7 @@
 #include <string>
 
 TEST_CASE("Filtering by category_id") {
-  std::string testing_dir = "../records/database/testing_bd/";
+  std::string testing_dir = "../records/testing_records/bd/";
   std::string tasks_path = testing_dir + "tasks_test2.mdb";
   std::string categories_path = testing_dir + "categories_test2.mdb";
   std::string relation_path = testing_dir + "relations_test2.mdb";
@@ -35,7 +35,7 @@ TEST_CASE("Filtering by category_id") {
 std::string generate_deadline_tasks();
 
 TEST_CASE("Filtering by deadline") {
-  std::string testing_dir = "../records/database/testing_bd/";
+  std::string testing_dir = "../records/testing_records/bd/";
   std::string tasks_path = testing_dir + "tasks_test_deadlines.mdb";
   std::ofstream file(tasks_path);
   file << generate_deadline_tasks();
@@ -82,7 +82,7 @@ std::string generate_deadline_tasks() {
 }
 
 TEST_CASE("Filtering by status") {
-  std::string testing_dir = "../records/database/testing_bd/";
+  std::string testing_dir = "../records/testing_records/bd/";
   std::string tasks_path = testing_dir + "tasks_test2.mdb";
   EntryHandler et1 = EntryHandler(tasks_path, "", "");
   et1.set_filter(std::make_unique<StatusFilter>(Status::ongoing));
