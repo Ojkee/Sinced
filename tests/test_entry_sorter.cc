@@ -6,7 +6,7 @@
 #include <string>
 
 TEST_CASE("Deadline sorter") {
-  std::string testing_dir = "../records/database/testing_bd/";
+  std::string testing_dir = "../records/testing_records/bd/";
   std::string tasks_path = testing_dir + "tasks_test2.mdb";
   EntryHandler et1 = EntryHandler(tasks_path, "", "");
   et1.load_db();

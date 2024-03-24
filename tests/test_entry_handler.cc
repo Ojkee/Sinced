@@ -3,7 +3,7 @@
 #include "../include/entry/entry_handler.hpp"
 
 TEST_CASE("entry handler tokenization entries from databases") {
-  std::string testing_dir = "../records/database/testing_bd/";
+  std::string testing_dir = "../records/testing_records/bd/";
   std::string tasks_path = testing_dir + "tasks_test.mdb";
   std::string categories_path = testing_dir + "categories_test.mdb";
   std::string relation_path = testing_dir + "relations_test2.mdb";
@@ -25,7 +25,7 @@ TEST_CASE("entry handler tokenization entries from databases") {
 }
 
 TEST_CASE("Getting info by id") {
-  std::string testing_dir = "../records/database/testing_bd/";
+  std::string testing_dir = "../records/testing_records/bd/";
   std::string tasks_path = testing_dir + "tasks_test2.mdb";
   std::string categories_path = testing_dir + "categories_test2.mdb";
   std::string relation_path = testing_dir + "relations_test2.mdb";

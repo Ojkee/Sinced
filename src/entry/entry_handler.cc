@@ -40,6 +40,39 @@ EntryHandler::filter_load_db(const std::string &path) noexcept {
   return entries;
 }
 
+template <>
+void EntryHandler::add_entry_to_db<EntryTask>(const EntryTask &entry) {
+  const std::string task_str = std::string(entry);
+  append_to_db(task_str, tasks_db_path);
+}
+
+template <>
+void EntryHandler::add_entry_to_db<EntryCategory>(const EntryCategory &entry) {
+  const std::string category_str = std::string(entry);
+  append_to_db(category_str, categories_db_path);
+}
+
+template <>
+void EntryHandler::add_entry_to_db<EntryRelation>(const EntryRelation &entry) {
+  const std::string relation_str = std::string(entry);
+  append_to_db(relation_str, relations_db_path);
+}
+
+void EntryHandler::clear_db() {
+  std::ofstream task_file, categories_file, relations_file;
+  task_file.open(tasks_db_path, std::ofstream::out | std::ofstream::trunc);
+  categories_file.open(categories_db_path,
+                       std::ofstream::out | std::ofstream::trunc);
+  relations_file.open(relations_db_path,
+                      std::ofstream::out | std::ofstream::trunc);
+  task_file.close();
+  categories_file.close();
+  relations_file.close();
+  tasks.clear();
+  categories.clear();
+  relations.clear();
+}
+
 std::string EntryHandler::fitered_tasks_info() {
   const auto filtered_tasks = filter_load_db<EntryTask>(tasks_db_path);
   return entries_info<EntryTask>(filtered_tasks);
@@ -66,6 +99,17 @@ EntryHandler::load_entries(const std::string &file_name) const {
     entries.push_back(entry);
   }
   return entries;
+}
+
+void EntryHandler::append_to_db(const std::string &entry_str,
+                                const std::string &path) {
+  std::fstream entry_file;
+  entry_file.open(path, std::ios_base::app);
+  if (!entry_file.is_open()) {
+    std::cerr << "Error loading file: " << path << '\n';
+    exit(EXIT_FAILURE);
+  }
+  entry_file << entry_str << '\n';
 }
 
 std::string EntryHandler::tasks_info_all() const {
