@@ -24,7 +24,7 @@ void EntryHandler::load_db() noexcept {
 template <typename EntryType>
 std::vector<std::shared_ptr<EntryType>>
 EntryHandler::filter_load_db(const std::string &path) noexcept {
-  std::fstream entry_file(path);
+  std::ifstream entry_file(path);
   if (!entry_file.is_open()) {
     std::cerr << "Error loading file: " << path << '\n';
     exit(EXIT_FAILURE);
