@@ -11,6 +11,7 @@ add_library(mainsrc SHARED
     syntax_analysis/lexer.cc
     syntax_analysis/token.cc
     syntax_analysis/interpreter.cc
+    mcg_reader/reader.cc
 )
 
 target_include_directories(mainsrc PUBLIC "${PROJECT_SOURCE_DIR}/include")

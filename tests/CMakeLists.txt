@@ -13,6 +13,7 @@ set(TARGET_SOURCES
     "test_entry_base_builder.cc"
     "test_lexer.cc"
     "test_interpreter.cc"
+    "test_mcg_reader.cc"
 )
 
 #list(TRANSFORM TARGET_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/test/")
