@@ -50,6 +50,37 @@ public:
   template <> void add_entry_to_db<EntryTask>(const EntryTask &entry);
   template <> void add_entry_to_db<EntryCategory>(const EntryCategory &entry);
   template <> void add_entry_to_db<EntryRelation>(const EntryRelation &entry);
+
+  template <typename EntryType>
+  [[nodiscard]] std::shared_ptr<EntryType>
+  get_entry_by_content([[maybe_unused]] const std::string &content) const {
+    std::cerr << "Not valid type of entry!";
+  }
+  template <>
+  [[nodiscard]] std::shared_ptr<EntryTask>
+  get_entry_by_content(const std::string &content) const;
+  template <>
+  [[nodiscard]] std::shared_ptr<EntryCategory>
+  get_entry_by_content(const std::string &content) const;
+  template <>
+  [[nodiscard]] std::shared_ptr<EntryRelation>
+  get_entry_by_content(const std::string &content) const;
+
+  template <typename EntryType>
+  int8_t replace_entry([[maybe_unused]] const EntryType &old_entry,
+                       [[maybe_unused]] const EntryType &new_entry) {
+    std::cerr << "Not valid type of entry!";
+  }
+  template <>
+  int8_t replace_entry<EntryTask>(const EntryTask &old_entry,
+                                  const EntryTask &new_entry);
+  template <>
+  int8_t replace_entry<EntryCategory>(const EntryCategory &old_entry,
+                                      const EntryCategory &new_entry);
+  template <>
+  int8_t replace_entry<EntryRelation>(const EntryRelation &old_entry,
+                                      const EntryRelation &new_entry);
+
   void clear_db();
 
   template <typename EntryType>
@@ -79,13 +110,21 @@ private:
       load_entries(const std::string &file_name) const;
 
   void append_to_db(const std::string &entry_str, const std::string &path);
-  template <typename EntryType>
 
-  [[nodiscard]] std::shared_ptr<EntryType>
-  entry_by_id(const std::string &id, const std::string &path) const;
+  template <typename EntryType>
+  int8_t replace_entry_in_db(const EntryType &old_entry,
+                             const EntryType &new_entry,
+                             const std::string &path) const;
 
   [[nodiscard]] SP_TASKS tasks_by_category_id(const std::string &id);
   [[nodiscard]] SP_TASKS tasks_by_category_id(const uint16_t &id);
+
+  template <typename EntryType>
+  [[nodiscard]] std::shared_ptr<EntryType>
+  entry_by_id(const std::string &id, const std::string &path) const;
+  template <typename EntryType>
+  [[nodiscard]] std::shared_ptr<EntryType>
+  entry_by_content(const std::string &content, const std::string &path) const;
 
   template <typename EntryType>
   [[nodiscard]] SP_T(EntryType)

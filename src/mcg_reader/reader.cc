@@ -6,6 +6,7 @@
 #include <iostream>
 #include <optional>
 #include <regex>
+#include <sstream>
 #include <tuple>
 
 std::optional<std::string>
@@ -19,7 +20,7 @@ MCGFileHandler::get_value_by_field(const std::string &field_name) const {
   while (getline(mcg_file, line)) {
     const auto [field, value] = parse_line(line);
     if (field == field_name) {
-      return value;
+      return std::optional<std::string>(value);
     }
   }
   return std::nullopt;
@@ -27,16 +28,29 @@ MCGFileHandler::get_value_by_field(const std::string &field_name) const {
 
 int8_t MCGFileHandler::set_value_by_field(const std::string &field_name,
                                           const std::string &value) const {
-  std::fstream mcg_file(path);
-  if (!mcg_file.is_open()) {
+  std::ifstream mcg_file_in(path);
+  if (!mcg_file_in.is_open()) {
     std::cerr << "Can't open file: " << path << '\n';
     exit(EXIT_FAILURE);
   }
   std::string line;
-
-  while (getline(mcg_file, line)) {
+  bool found = false;
+  std::stringstream buffr;
+  while (getline(mcg_file_in, line)) {
+    const auto [field, val] = parse_line(line);
+    if (field == field_name) {
+      line = "{" + field + "}" + " {" + value + "}";
+      found = true;
+    }
+    buffr << line << "\n";
   }
-  return -1;
+  std::ofstream mcg_file_out(path);
+  if (!mcg_file_in.is_open()) {
+    std::cerr << "Can't open file2: " << path << '\n';
+    exit(EXIT_FAILURE);
+  }
+  mcg_file_out << buffr.rdbuf();
+  return found ? 0 : -1;
 }
 
 std::tuple<std::string, std::string>
