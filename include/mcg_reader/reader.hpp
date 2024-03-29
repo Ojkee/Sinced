@@ -12,9 +12,9 @@ public:
   MCGFileHandler(const std::string path) : path(path){};
   [[nodiscard]] std::optional<std::string>
   get_value_by_field(const std::string &field_name) const;
-  int8_t set_value_by_field(
-      const std::string &field_name,
-      const std::string &value) const; // RETURNS 0 IF SET -1 IF FIELD NOT FOUND
+  int8_t set_value_by_field(const std::string &field_name,
+                            const std::string &value)
+      const; // 0 IF VALUE WAS SET -1 IF FIELD NOT FOUND
 
 private:
   std::string path;

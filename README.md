@@ -27,4 +27,5 @@ Basic todo app for Linux terminal written in C++. (Modern cpp learning phase)
 - [ ] Misspell handler
 - [ ] Better support for recursive task input 
 ("-r d5 w1 m3 y2 : recursive param with mixed options,
+- [ ] Overwriting file optimalization
 now its -rd 4 : only one option")

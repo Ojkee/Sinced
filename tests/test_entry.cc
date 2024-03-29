@@ -77,7 +77,7 @@ TEST_CASE("Testing repetetive") {
   std::string token1 = "0 \"Some Task\" 0 19778 30 0 0";
   EntryTask task1 = EntryTask(token1);
   std::string target_info1 =
-      "\"Some Task\"\n\tOngoing\n\tdeadline: 26-03-2024 every: 30 day ";
+      "\"Some Task\"\n\tOngoing\n\tdeadline: 25-04-2024 every: 30 day ";
   REQUIRE(task1.info() == target_info1);
 
   std::string token2 = "0 \"Some Task\" 0 19778 20 5 1";

@@ -70,6 +70,8 @@ public:
   class Builder {
   public:
     Builder() : task(std::make_unique<EntryTask>()) {}
+    Builder(const EntryTask &other)
+        : task(std::make_unique<EntryTask>(std::string(other))) {}
 
     Builder &add_id(const std::string &id_) {
       task->id = id_;
