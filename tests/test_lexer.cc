@@ -30,17 +30,15 @@ TEST_CASE("Utils - strings") {
 }
 
 TEST_CASE("Command tokenization") {
-  const Lexer lexer = Lexer();
-
   const std::string user_input1 = "scd add \"task title\"";
-  const auto result1 = lexer.tokenize(user_input1);
+  const auto result1 = Lexer::tokenize(user_input1, DDMMYYYY());
   const std::vector<Token> target1{Token{TokenType::TEXT, "scd"},
                                    Token{TokenType::COMMAND, "add"},
                                    Token{TokenType::TEXT, "task title"}};
   REQUIRE(result1 == target1);
 
   const std::string user_input2 = "scd add @\"Wholesome Category\"";
-  const auto result2 = lexer.tokenize(user_input2);
+  const auto result2 = Lexer::tokenize(user_input2, DDMMYYYY());
   const std::vector<Token> target2{
       Token{TokenType::TEXT, "scd"}, Token{TokenType::COMMAND, "add"},
       Token{TokenType::CATEGORY_NAME, "Wholesome Category"}};
@@ -49,7 +47,7 @@ TEST_CASE("Command tokenization") {
   const std::string user_input3 =
       "scd add \"Name with more spaces\" @\"Wholesome Category name with more "
       "spaces\"";
-  const auto result3 = lexer.tokenize(user_input3);
+  const auto result3 = Lexer::tokenize(user_input3, DDMMYYYY());
   const std::vector<Token> target3{
       Token{TokenType::TEXT, "scd"}, Token{TokenType::COMMAND, "add"},
       Token{TokenType::TEXT, "Name with more spaces"},
@@ -60,7 +58,7 @@ TEST_CASE("Command tokenization") {
   const std::string user_input4 =
       "scd add \"Name with @ spaces\" @\"Wholesome Category name with more "
       "spaces\"";
-  const auto result4 = lexer.tokenize(user_input4);
+  const auto result4 = Lexer::tokenize(user_input4, DDMMYYYY());
   const std::vector<Token> target4{
       Token{TokenType::TEXT, "scd"}, Token{TokenType::COMMAND, "add"},
       Token{TokenType::TEXT, "Name with @ spaces"},
@@ -69,7 +67,7 @@ TEST_CASE("Command tokenization") {
   REQUIRE(result4 == target4);
 
   const std::string user_input5 = "scd add Task @Category 15-03-2030 -rw";
-  const auto result5 = lexer.tokenize(user_input5);
+  const auto result5 = Lexer::tokenize(user_input5, DDMMYYYY());
   const std::vector<Token> target5{Token{TokenType::TEXT, "scd"},
                                    Token{TokenType::COMMAND, "add"},
                                    Token{TokenType::TEXT, "Task"},
@@ -79,14 +77,14 @@ TEST_CASE("Command tokenization") {
   REQUIRE(result5 == target5);
 
   const std::string user_input6 = "scd rm @Category";
-  const auto result6 = lexer.tokenize(user_input6);
+  const auto result6 = Lexer::tokenize(user_input6, DDMMYYYY());
   const std::vector<Token> target6{Token{TokenType::TEXT, "scd"},
                                    Token{TokenType::COMMAND, "rm"},
                                    Token{TokenType::CATEGORY_NAME, "Category"}};
   REQUIRE(result6 == target6);
 
   const std::string user_input7 = "scd add \"Michal 15:30-17:30\" @Korki -w";
-  const auto result7 = lexer.tokenize(user_input7);
+  const auto result7 = Lexer::tokenize(user_input7, DDMMYYYY());
   const std::vector<Token> target7{
       Token{TokenType::TEXT, "scd"}, Token{TokenType::COMMAND, "add"},
       Token{TokenType::TEXT, "Michal 15:30-17:30"},
@@ -94,27 +92,27 @@ TEST_CASE("Command tokenization") {
   REQUIRE(result7 == target7);
 
   const std::string user_input8 = "scd         a  ";
-  const auto result8 = lexer.tokenize(user_input8);
+  const auto result8 = Lexer::tokenize(user_input8, DDMMYYYY());
   const std::vector<Token> target8{Token{TokenType::TEXT, "scd"},
                                    Token{TokenType::TEXT, "a"}};
   REQUIRE(result8 == target8);
 
   const std::string user_input9 = "scd set YYYYMMDD -i";
-  const auto result9 = lexer.tokenize(user_input9);
+  const auto result9 = Lexer::tokenize(user_input9, DDMMYYYY());
   const std::vector<Token> target9{
       Token{TokenType::TEXT, "scd"}, Token{TokenType::COMMAND, "set"},
       Token{TokenType::TEXT, "YYYYMMDD"}, Token{TokenType::OPTION, "i"}};
   REQUIRE(result9 == target9);
 
-  const std::string user_input10 = "scd add \"My Awesome Task";
-  const auto result10 = lexer.tokenize(user_input10);
+  const std::string user_input10 = "scd add \"My Awesome Task\"";
+  const auto result10 = Lexer::tokenize(user_input10, DDMMYYYY());
   const std::vector<Token> target10{Token{TokenType::TEXT, "scd"},
                                     Token{TokenType::COMMAND, "add"},
                                     Token{TokenType::TEXT, "My Awesome Task"}};
   REQUIRE(result10 == target10);
 
   const std::string user_input11 = "add Task @Category 31-01-2003 -rd 6";
-  const auto result11 = lexer.tokenize(user_input11);
+  const auto result11 = Lexer::tokenize(user_input11, DDMMYYYY());
   const std::vector<Token> target11{Token{TokenType::COMMAND, "add"},
                                     Token{TokenType::TEXT, "Task"},
                                     Token{TokenType::CATEGORY_NAME, "Category"},
@@ -122,4 +120,10 @@ TEST_CASE("Command tokenization") {
                                     Token{TokenType::OPTION, "rd"},
                                     Token{TokenType::NUMBER, "6"}};
   REQUIRE(result11 == target11);
+
+  const std::string user_input12 = "add \"My taask\"";
+  const auto result12 = Lexer::tokenize(user_input12, DDMMYYYY());
+  const std::vector<Token> target12{Token{TokenType::COMMAND, "add"},
+                                    Token{TokenType::TEXT, "My taask"}};
+  REQUIRE(result12 == target12);
 }

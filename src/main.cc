@@ -4,7 +4,13 @@
 
 void compareStrings(const std::string &s1, const std::string &s2);
 
-int main() { exit(EXIT_SUCCESS); }
+int main(int argc, char **argv) {
+
+  for (int i = 0; i < argc; ++i) {
+    std::cout << argv[i] << "\n";
+  }
+  exit(EXIT_SUCCESS);
+}
 
 void compareStrings(const std::string &s1, const std::string &s2) {
   std::size_t mmin = (s1.size() < s2.size()) ? s1.size() : s2.size();
