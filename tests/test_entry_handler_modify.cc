@@ -8,7 +8,7 @@
 #define PATH_CATEGORIES                                                        \
   "../records/testing_records/bd/test_modify/categories.mdb"
 #define PATH_RELATIONS "../records/testing_records/bd/test_modify/relations.mdb"
-
+namespace RESET_EH_DB {
 void reset_tasks_db() {
   const std::string content = "0 \"T0\" 0 45300 14 0 0\n"
                               "1 \"T1\" 0 46000 0 2 0\n"
@@ -49,11 +49,12 @@ void reset_relations_db() {
   std::ofstream file(PATH_RELATIONS);
   file << content;
 }
+} // namespace RESET_EH_DB
 
 TEST_CASE("Modify tasks in db") {
-  reset_tasks_db();
-  reset_categories_db();
-  reset_relations_db();
+  RESET_EH_DB::reset_tasks_db();
+  RESET_EH_DB::reset_categories_db();
+  RESET_EH_DB::reset_relations_db();
   EntryHandler eh = EntryHandler(PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS);
 
   auto r1 = eh.get_entry_by_content<EntryTask>("T2");
@@ -65,7 +66,7 @@ TEST_CASE("Modify tasks in db") {
   int8_t flag2 = eh.replace_entry(EntryTask("12 T12 1 1 0 0 0"), *e1);
   CHECK(flag2 == -1);
 
-  reset_tasks_db();
-  reset_categories_db();
-  reset_relations_db();
+  RESET_EH_DB::reset_tasks_db();
+  RESET_EH_DB::reset_categories_db();
+  RESET_EH_DB::reset_relations_db();
 }
