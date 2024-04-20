@@ -2,6 +2,7 @@
 #define INTERPTERE_HPP
 
 #include "../entry/entry_handler.hpp"
+#include "../mcg_reader/reader.hpp"
 #include "token.hpp"
 
 #include <string>
@@ -9,22 +10,28 @@
 
 class Interpreter {
 public:
-  Interpreter() {}
+  Interpreter()
+      : entry_handler("../../records/database/tasks.mdb",
+                      "../../records/database/categories.mdb",
+                      "../../records/database/relations.mdb"),
+        tracker_handler("../../records/mcgs/tracker.mcg"),
+        settings_handler("../../records/mcgs/settings.mcg") {}
   Interpreter(const std::string &tasks_path_,
               const std::string &categories_path_,
-              const std::string &relations_path_)
-      : tasks_path(tasks_path_), categories_path(categories_path_),
-        relations_path(relations_path_){};
-  void parse(const std::string &user_input) const;
+              const std::string &relations_path_,
+              const std::string &tracker_path_,
+              const std::string &settings_path_)
+      : entry_handler(tasks_path_, categories_path_, relations_path_),
+        tracker_handler(tracker_path_), settings_handler(settings_path_){};
+
+  void parse(const std::string &user_input);
 
 private:
-  const EntryHandler entry_handler = EntryHandler();
+  EntryHandler entry_handler;
+  TrackerHandler tracker_handler;
+  SettingsHandler settings_handler;
 
-  std::string tasks_path = "../../records/database/tasks.mdb";
-  std::string categories_path = "../../records/database/categoris.mdb";
-  std::string relations_path = "../../records/database/relations.mdb";
-
-  void add_commend(const std::vector<Token> &tokens) const;
+  void add_command(const std::vector<Token> &tokens);
 };
 
 #endif // INTERPTERE_HPP

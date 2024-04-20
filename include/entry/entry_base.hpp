@@ -101,7 +101,7 @@ public:
       task->set_recursive(0, 0, ryears);
       return *this;
     }
-    std::shared_ptr<EntryTask> get() { return std::move(task); }
+    [[nodiscard]] std::shared_ptr<EntryTask> get() { return std::move(task); }
 
   private:
     std::unique_ptr<EntryTask> task;

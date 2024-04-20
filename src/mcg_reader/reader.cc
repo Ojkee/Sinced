@@ -7,6 +7,7 @@
 #include <optional>
 #include <regex>
 #include <sstream>
+#include <string>
 #include <tuple>
 
 std::optional<std::string>
@@ -65,4 +66,21 @@ MCGFileHandler::parse_line(const std::string &line) const {
     }
   }
   return std::make_tuple("", "");
+}
+
+void TrackerHandler::increment_field_value(const std::string &field_name) {
+  std::optional<std::string> val = get_value_by_field(field_name);
+  if (val) {
+    int32_t new_val = std::stoi(val.value()) + 1;
+    set_value_by_field(field_name, std::to_string(new_val));
+  }
+}
+
+std::string TrackerHandler::next_id(const std::string &field_name) {
+  std::optional<std::string> next_val = get_value_by_field(field_name);
+  if (next_val) {
+    return std::to_string(std::stoi(next_val.value()) + 1);
+  } else {
+    return "0";
+  }
 }

@@ -42,19 +42,21 @@ EntryHandler::filter_load_db(const std::string &path) noexcept {
 }
 
 template <>
-void EntryHandler::add_entry_to_db<EntryTask>(const EntryTask &entry) {
+void EntryHandler::add_entry_to_db<EntryTask>(const EntryTask &entry) const {
   const std::string task_str = std::string(entry);
   append_to_db(task_str, tasks_db_path);
 }
 
 template <>
-void EntryHandler::add_entry_to_db<EntryCategory>(const EntryCategory &entry) {
+void EntryHandler::add_entry_to_db<EntryCategory>(
+    const EntryCategory &entry) const {
   const std::string category_str = std::string(entry);
   append_to_db(category_str, categories_db_path);
 }
 
 template <>
-void EntryHandler::add_entry_to_db<EntryRelation>(const EntryRelation &entry) {
+void EntryHandler::add_entry_to_db<EntryRelation>(
+    const EntryRelation &entry) const {
   const std::string relation_str = std::string(entry);
   append_to_db(relation_str, relations_db_path);
 }
@@ -141,7 +143,7 @@ EntryHandler::load_entries(const std::string &file_name) const {
 }
 
 void EntryHandler::append_to_db(const std::string &entry_str,
-                                const std::string &path) {
+                                const std::string &path) const {
   std::fstream entry_file;
   entry_file.open(path, std::ios_base::app);
   if (!entry_file.is_open()) {

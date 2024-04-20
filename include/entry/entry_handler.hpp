@@ -44,12 +44,14 @@ public:
   }
 
   template <typename EntryType>
-  void add_entry_to_db([[maybe_unused]] const EntryType &entry) {
+  void add_entry_to_db([[maybe_unused]] const EntryType &entry) const {
     std::cerr << "Not valid type of entry!";
   }
-  template <> void add_entry_to_db<EntryTask>(const EntryTask &entry);
-  template <> void add_entry_to_db<EntryCategory>(const EntryCategory &entry);
-  template <> void add_entry_to_db<EntryRelation>(const EntryRelation &entry);
+  template <> void add_entry_to_db<EntryTask>(const EntryTask &entry) const;
+  template <>
+  void add_entry_to_db<EntryCategory>(const EntryCategory &entry) const;
+  template <>
+  void add_entry_to_db<EntryRelation>(const EntryRelation &entry) const;
 
   template <typename EntryType>
   [[nodiscard]] std::shared_ptr<EntryType>
@@ -109,7 +111,8 @@ private:
   [[nodiscard]] SP_T(EntryType)
       load_entries(const std::string &file_name) const;
 
-  void append_to_db(const std::string &entry_str, const std::string &path);
+  void append_to_db(const std::string &entry_str,
+                    const std::string &path) const;
 
   template <typename EntryType>
   int8_t replace_entry_in_db(const EntryType &old_entry,
