@@ -6,6 +6,7 @@ set(TARGET_SOURCES
     "test_cfg_main.cc"
     "test_interpreter.cc"
     "test_mcg_reader.cc"
+    "test_lexer.cc"
 )
 #[[
     "test_date.cc"
@@ -16,7 +17,6 @@ set(TARGET_SOURCES
     "test_entry_filter.cc"
     "test_entry_sorter.cc"
     "test_entry_base_builder.cc"
-    "test_lexer.cc"
     ]]
 #list(TRANSFORM TARGET_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/test/")
 target_sources("test" PUBLIC ${TARGET_SOURCES})

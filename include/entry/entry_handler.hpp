@@ -35,11 +35,13 @@ public:
   SP_T(EntryType)
   filter_load_db(const std::string &path) noexcept;
 
-  std::size_t inline number_of_tasks() const noexcept { return tasks.size(); }
-  std::size_t inline number_of_categories() const noexcept {
+  [[nodiscard]] std::size_t inline number_of_tasks() const noexcept {
+    return tasks.size();
+  }
+  [[nodiscard]] std::size_t inline number_of_categories() const noexcept {
     return categories.size();
   }
-  std::size_t inline number_of_relations() const noexcept {
+  [[nodiscard]] std::size_t inline number_of_relations() const noexcept {
     return relations.size();
   }
 

@@ -126,4 +126,11 @@ TEST_CASE("Command tokenization") {
   const std::vector<Token> target12{Token{TokenType::COMMAND, "add"},
                                     Token{TokenType::TEXT, "My taask"}};
   REQUIRE(result12 == target12);
+
+  const std::string user_input13 = "scd add @\"my category\"";
+  const auto result13 = Lexer::tokenize(user_input13, DDMMYYYY());
+  const std::vector<Token> target13{
+      Token{TokenType::TEXT, "scd"}, Token{TokenType::COMMAND, "add"},
+      Token{TokenType::CATEGORY_NAME, "my category"}};
+  REQUIRE(result13 == target13);
 }
