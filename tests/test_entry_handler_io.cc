@@ -3,10 +3,10 @@
 #include "../include/entry/entry_handler.hpp"
 
 TEST_CASE("Adding to db") {
-  std::string testing_dir = "../records/testing_records/bd/test_io/";
-  std::string tasks_path = testing_dir + "tasks.mdb";
-  std::string categories_path = testing_dir + "categories.mdb";
-  std::string relation_path = testing_dir + "relations.mdb";
+  const std::string testing_dir = "../records/testing_records/bd/test_io/";
+  const std::string tasks_path = testing_dir + "tasks.mdb";
+  const std::string categories_path = testing_dir + "categories.mdb";
+  const std::string relation_path = testing_dir + "relations.mdb";
   EntryHandler eh1 = EntryHandler(tasks_path, categories_path, relation_path);
   eh1.clear_db();
 

@@ -70,6 +70,10 @@ public:
   [[nodiscard]] std::shared_ptr<EntryRelation>
   get_entry_by_content(const std::string &content) const;
 
+  [[nodiscard]] std::shared_ptr<EntryRelation>
+  get_relation_by_ids(const std::string &task_content,
+                      const std::string category_content) const;
+
   template <typename EntryType>
   int8_t replace_entry([[maybe_unused]] const EntryType &old_entry,
                        [[maybe_unused]] const EntryType &new_entry) {

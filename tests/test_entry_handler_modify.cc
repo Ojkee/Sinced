@@ -8,6 +8,7 @@
 #define PATH_CATEGORIES                                                        \
   "../records/testing_records/bd/test_modify/categories.mdb"
 #define PATH_RELATIONS "../records/testing_records/bd/test_modify/relations.mdb"
+
 namespace RESET_EH_DB {
 void reset_tasks_db() {
   const std::string content = "0 \"T0\" 0 45300 14 0 0\n"
@@ -69,4 +70,21 @@ TEST_CASE("Modify tasks in db") {
   RESET_EH_DB::reset_tasks_db();
   RESET_EH_DB::reset_categories_db();
   RESET_EH_DB::reset_relations_db();
+}
+
+TEST_CASE("Getting relation by contents") {
+  RESET_EH_DB::reset_tasks_db();
+  RESET_EH_DB::reset_categories_db();
+  RESET_EH_DB::reset_relations_db();
+  EntryHandler eh = EntryHandler(PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS);
+
+  auto entry1 = eh.get_relation_by_ids("4", "2");
+  const std::string r1 = (entry1) ? entry1->info() : "No such relation";
+  const std::string t1 = "7 4 2";
+  CHECK(r1 == t1);
+
+  auto entry2 = eh.get_relation_by_ids("4", "4");
+  const std::string r2 = (entry2) ? entry2->info() : "No such relation";
+  const std::string t2 = "No such relation";
+  CHECK(r2 == t2);
 }

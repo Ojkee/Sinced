@@ -176,11 +176,53 @@ TEST_CASE("Test Add Command") {
   CHECK(flag3 == "Added \"new_task\" to @\"project\"");
   CHECK(tracker_result3 == tracker_target3);
 
-  const std::string user_input4 = "add takerinho @categorinho";
+  const std::string user_input4 = "add taskerinho @categorinho";
   const std::string flag4 = interpreter.parse(user_input4);
   CHECK(flag4 == "No category: @\"categorinho\"");
 
   const std::string user_input5 = "add T4 @another_category";
   const std::string flag5 = interpreter.parse(user_input5);
   CHECK(flag5 == "T4 already in @\"another_category\"");
+
+  const std::string user_input6 = "add T4 @project";
+  const std::string flag6 = interpreter.parse(user_input6);
+  const std::string result6_1 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
+  const std::string target6_1 = "0 \"T0\" 0 45300 14 0 0\n"
+                                "1 \"T1\" 0 46000 0 2 0\n"
+                                "2 \"T2\" 1 45891 0 0 0\n"
+                                "3 \"T3\" 1 46401 0 0 0\n"
+                                "4 \"T4\" 1 45500 7 0 0\n"
+                                "5 \"T5\" 0 -1 0 0 0\n"
+                                "6 \"T6\" 2 -1 0 0 0\n"
+                                "7 \"T7\" 1 3401 0 2 0\n"
+                                "8 \"T8\" 2 3401 0 0 1\n"
+                                "9 \"T9\" 3 45300 0 0 0\n"
+                                "10 \"T10\" 2 45200 0 1 0\n"
+                                "11 \"T11\" 1 -1 0 0 0\n"
+                                "12 \"my_task\" 0 -1 0 0 0\n"
+                                "13 \"new_task\" 0 -1 0 0 0\n";
+  const std::string result6_2 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_RELATIONS);
+  const std::string target6_2 = "0 2 1\n"
+                                "1 3 1\n"
+                                "2 5 2\n"
+                                "3 6 3\n"
+                                "4 7 3\n"
+                                "6 8 3\n"
+                                "6 9 3\n"
+                                "7 4 2\n"
+                                "8 10 3\n"
+                                "9 11 1\n"
+                                "10 13 3\n"
+                                "11 4 3\n";
+  const std::string tracker_result6 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_TRACKER);
+  const std::string tracker_target6 = "{last task id} {13}\n"
+                                      "{last category id} {4}\n"
+                                      "{last relation id} {11}\n";
+  CHECK(result6_1 == target6_1);
+  CHECK(result6_2 == target6_2);
+  CHECK(flag6 == "Added \"T4\" to @\"project\"");
+  CHECK(tracker_result6 == tracker_target6);
 }

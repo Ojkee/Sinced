@@ -7,13 +7,13 @@ set(TARGET_SOURCES
     "test_interpreter.cc"
     "test_mcg_reader.cc"
     "test_lexer.cc"
+    "test_entry_handler_modify.cc"
 )
 #[[
     "test_date.cc"
     "test_entry.cc"
     "test_entry_handler.cc"
     "test_entry_handler_io.cc"
-    "test_entry_handler_modify.cc"
     "test_entry_filter.cc"
     "test_entry_sorter.cc"
     "test_entry_base_builder.cc"

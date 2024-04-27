@@ -97,8 +97,8 @@ Interpreter::add_new_task_to_category(const std::vector<Token> &tokens) {
     return std::format("Added \"{}\" to @\"{}\"", tokens[1].content,
                        tokens[2].content);
   }
-  const auto relation_ptr =
-      entry_handler.get_entry_by_content<EntryRelation>(task_ptr->get_id());
+  const auto relation_ptr = entry_handler.get_relation_by_ids(
+      task_ptr->get_id(), category_ptr->get_id());
   if (!relation_ptr) {
     const std::string next_relation_id =
         tracker_handler.next_id("last relation id");
