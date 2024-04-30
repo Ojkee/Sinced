@@ -5,6 +5,8 @@
 #include "../mcg_reader/reader.hpp"
 #include "token.hpp"
 
+#include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -33,9 +35,28 @@ private:
   TrackerHandler tracker_handler;
   SettingsHandler settings_handler;
 
+  [[nodiscard]] constexpr static bool
+  contains_token_type(const std::vector<Token> &tokens,
+                      const TokenType &token_type);
+  template <typename... TokenTypes>
+  [[nodiscard]] constexpr static bool
+  contains_token_types(const std::vector<Token> &tokens, const TokenType &ttype,
+                       const TokenTypes &...ttypes) {
+    return contains_token_type(tokens, ttype) &&
+           contains_token_type(tokens, ttypes...);
+  }
+  [[nodiscard]] constexpr static std::optional<std::string>
+  get_token_content_if_contains_type(const std::vector<Token> &tokens,
+                                     const TokenType &token_type);
+  void add_new_relation(const std::string &task_id,
+                        const std::string &category_id);
+
+  [[nodiscard]] std::shared_ptr<EntryTask>
+  build_task(const std::vector<Token> &tokens);
   std::string add_command(const std::vector<Token> &tokens);
   std::string add_new_task(const std::vector<Token> &tokens);
   std::string add_new_category(const std::vector<Token> &tokens);
+  std::string add_new_task_builder(const std::vector<Token> &tokens);
   std::string add_new_task_to_category(const std::vector<Token> &tokens);
 };
 

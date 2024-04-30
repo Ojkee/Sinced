@@ -9,6 +9,17 @@
 
 #include "../../include/date/base_date.hpp"
 
+void BaseDate::initialize_from_str(const std::string &date_str) {
+  if (!formatter->is_valid(date_str)) {
+    return;
+  }
+  const auto [day_, month_, year_] = formatter->parse_from_string(date_str);
+  day = day_;
+  month = month_;
+  year = year_;
+  validate();
+}
+
 void BaseDate::add_days(int16_t _days) noexcept {
   int32_t days_since_begin = BaseDate::date_to_days(*this);
   *this = BaseDate::days_to_date(days_since_begin + _days);

@@ -14,6 +14,11 @@ public:
   [[nodiscard]] virtual bool is_valid(const std::string &text) const = 0;
   [[nodiscard]] static std::string add_leading_char(const int16_t d,
                                                     uint16_t width, char ch);
+  [[nodiscard]] std::tuple<int16_t, int16_t, int16_t>
+  string_to_date_vars(std::string data_str) const;
+
+  [[nodiscard]] virtual std::tuple<int16_t, int16_t, int16_t>
+  parse_from_string(const std::string &data_str) const = 0;
   void set_separator(std::string _separator) {
     separator = std::move(_separator);
   }
@@ -40,6 +45,8 @@ public:
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
+  std::tuple<int16_t, int16_t, int16_t>
+  parse_from_string(const std::string &data_str) const override;
 };
 
 class DDMMYY : public FormatDate {
@@ -49,6 +56,8 @@ public:
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
+  std::tuple<int16_t, int16_t, int16_t>
+  parse_from_string(const std::string &data_str) const override;
 };
 
 class DMY : public FormatDate {
@@ -58,6 +67,8 @@ public:
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
+  std::tuple<int16_t, int16_t, int16_t>
+  parse_from_string(const std::string &data_str) const override;
 };
 
 class MMDDYYYY : public FormatDate {
@@ -67,6 +78,8 @@ public:
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
+  std::tuple<int16_t, int16_t, int16_t>
+  parse_from_string(const std::string &data_str) const override;
 };
 
 class MMDDYY : public FormatDate {
@@ -76,6 +89,8 @@ public:
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
+  std::tuple<int16_t, int16_t, int16_t>
+  parse_from_string(const std::string &data_str) const override;
 };
 
 class MDY : public FormatDate {
@@ -85,6 +100,8 @@ public:
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
+  std::tuple<int16_t, int16_t, int16_t>
+  parse_from_string(const std::string &data_str) const override;
 };
 
 class YYYYMMDD : public FormatDate {
@@ -94,6 +111,8 @@ public:
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
+  std::tuple<int16_t, int16_t, int16_t>
+  parse_from_string(const std::string &data_str) const override;
 };
 
 class YYMMDD : public FormatDate {
@@ -103,6 +122,8 @@ public:
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
+  std::tuple<int16_t, int16_t, int16_t>
+  parse_from_string(const std::string &data_str) const override;
 };
 
 class MonthDY : public FormatDate {
@@ -114,6 +135,10 @@ public:
   bool is_valid([[maybe_unused]] const std::string &text) const override {
     return false;
   }
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      [[maybe_unused]] const std::string &data_str) const override {
+    return {1, 1, 1970};
+  };
 };
 
 class Roman : public FormatDate {
@@ -125,6 +150,10 @@ public:
   bool is_valid([[maybe_unused]] const std::string &text) const override {
     return false;
   }
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      [[maybe_unused]] const std::string &data_str) const override {
+    return {1, 1, 1970};
+  };
 };
 
 #endif // FORMAT_DATE_HPP

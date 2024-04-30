@@ -16,11 +16,13 @@ public:
       "Sunday",   "Monday", "Tuesday", "Wednesday",
       "Thursday", "Friday", "Saturday"};
 
-  BaseDate();
+  BaseDate() = default;
   BaseDate(int16_t _day, int16_t _month, int16_t _year)
       : day(_day), month(_month), year(_year) {
     validate();
   }
+  void initialize_from_str(const std::string &date_str);
+
   inline operator std::string() const noexcept {
     return formatter->get(day, month, year);
   }

@@ -2,6 +2,16 @@
 
 #include "../include/date/base_date.hpp"
 #include "../include/date/format_date.hpp"
+#include <memory>
+#include <string>
+
+namespace Catch {
+template <> struct StringMaker<BaseDate> {
+  static std::string convert(BaseDate const &value) {
+    return "{" + std::string(value) + "}\n";
+  }
+};
+} // namespace Catch
 
 TEST_CASE("Is leap year") {
   REQUIRE(BaseDate::is_leap(2000) == true);
@@ -483,4 +493,47 @@ TEST_CASE("comperison operators overloading") {
   BaseDate b11_2 = BaseDate(26, 2, 2024);
   const bool r11 = b11_1 <= b11_2;
   REQUIRE(r11 == false);
+}
+
+TEST_CASE("Initialization from string") {
+  BaseDate b1 = BaseDate();
+  b1.set_formatter(std::make_unique<DDMMYYYY>());
+  b1.initialize_from_str("20-04-2054");
+  const std::string t1 = "20-04-2054";
+  const std::string r1 = std::string(b1);
+  CHECK(r1 == t1);
+
+  BaseDate b2 = BaseDate();
+  b2.set_formatter(std::make_unique<DDMMYYYY>("."));
+  b2.initialize_from_str("00.04.2054");
+  const std::string t2 = "01.04.2054";
+  const std::string r2 = std::string(b2);
+  CHECK(r2 == t2);
+
+  BaseDate b3 = BaseDate();
+  b3.set_formatter(std::make_unique<DDMMYYYY>("--"));
+  b3.initialize_from_str("00--04--3054");
+  const std::string t3 = "01--04--3054";
+  const std::string r3 = std::string(b3);
+  CHECK(r3 == t3);
+
+  BaseDate b4 = BaseDate();
+  b4.set_formatter(std::make_unique<DMY>("--"));
+  b4.initialize_from_str("00--04--54");
+  const BaseDate tb4 = BaseDate(1, 4, 2054);
+  CHECK(b4 == tb4);
+
+  BaseDate b5 = BaseDate();
+  b5.set_formatter(std::make_unique<YYMMDD>("?/?"));
+  b5.initialize_from_str("30?/?05?/?55");
+  BaseDate tb5 = BaseDate(31, 5, 2030);
+  tb5.set_formatter(std::make_unique<YYMMDD>("?/?"));
+  CHECK(b5 == tb5);
+
+  BaseDate b6 = BaseDate();
+  b6.set_formatter(std::make_unique<MDY>(" "));
+  b6.initialize_from_str("4 20 69");
+  BaseDate tb6 = BaseDate(20, 4, 2069);
+  tb6.set_formatter(std::make_unique<MDY>(" "));
+  CHECK(b6 == tb6);
 }
