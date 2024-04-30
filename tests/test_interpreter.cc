@@ -277,4 +277,9 @@ TEST_CASE("Test Add Command task with deadline") {
   const std::string flag_target2 = "Added new task: \"new_task\"";
   CHECK(flag2 == flag_target2);
   CHECK(tasks_result2 == tasks_target2);
+
+  const std::string user_input3 = "add new_task 21-04-2069 -rw";
+  const std::string flag3 = interpreter.parse(user_input2);
+  const std::string flag_target3 = "Task: \"new_task\" already exists";
+  CHECK(flag3 == flag_target3);
 }

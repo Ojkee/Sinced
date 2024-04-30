@@ -189,7 +189,7 @@ Interpreter::build_task(const std::vector<Token> &tokens) {
       years_ += 1;
     }
     if (params_arg) {
-      int16_t param_val = static_cast<int16_t>(std::stoi(options_arg.value()));
+      int16_t param_val = static_cast<int16_t>(std::stoi(params_arg.value()));
       days_ *= param_val;
       months_ *= param_val;
       years_ *= param_val;

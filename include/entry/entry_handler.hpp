@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <set>
@@ -77,7 +78,8 @@ public:
   template <typename EntryType>
   int8_t replace_entry([[maybe_unused]] const EntryType &old_entry,
                        [[maybe_unused]] const EntryType &new_entry) {
-    std::cerr << "Not valid type of entry!";
+    std::cerr << "Not valid type of entry!\n";
+    exit(EXIT_FAILURE);
   }
   template <>
   int8_t replace_entry<EntryTask>(const EntryTask &old_entry,
