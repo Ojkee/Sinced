@@ -60,11 +60,11 @@ public:
     return (deadline) ? deadline : std::nullopt;
   }
   void inline set_deadline(const BaseDate &deadline_) { deadline = deadline_; }
-  void inline set_recursive(const uint16_t &d, const uint16_t &m,
+  void inline add_recursive(const uint16_t &d, const uint16_t &m,
                             const uint16_t &y) {
-    r_days = d;
-    r_months = m;
-    r_years = y;
+    r_days += d;
+    r_months += m;
+    r_years += y;
   }
 
   class Builder {
@@ -90,15 +90,15 @@ public:
       return *this;
     }
     Builder &add_recursive_days(const uint16_t &rdays) {
-      task->set_recursive(rdays, 0, 0);
+      task->add_recursive(rdays, 0, 0);
       return *this;
     }
     Builder &add_recursive_months(const uint16_t &rmonths) {
-      task->set_recursive(0, rmonths, 0);
+      task->add_recursive(0, rmonths, 0);
       return *this;
     }
     Builder &add_recursive_years(const uint16_t &ryears) {
-      task->set_recursive(0, 0, ryears);
+      task->add_recursive(0, 0, ryears);
       return *this;
     }
     [[nodiscard]] std::shared_ptr<EntryTask> get() { return std::move(task); }

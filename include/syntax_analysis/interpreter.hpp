@@ -54,8 +54,6 @@ private:
   [[nodiscard]] std::shared_ptr<EntryTask>
   build_task(const std::vector<Token> &tokens);
   std::string add_command(const std::vector<Token> &tokens);
-  std::string add_new_task(const std::vector<Token> &tokens);
-  std::string add_new_category(const std::vector<Token> &tokens);
   std::string add_new_task_builder(const std::vector<Token> &tokens);
   std::string add_new_task_to_category(const std::vector<Token> &tokens);
 };

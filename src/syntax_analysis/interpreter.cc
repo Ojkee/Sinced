@@ -128,6 +128,7 @@ Interpreter::build_task(const std::vector<Token> &tokens) {
   EntryTask::Builder task_builder = EntryTask::Builder();
   task_builder.add_id(tracker_handler.next_id("last task id"));
   tracker_handler.increment_field_value("last task id");
+  task_builder.add_status(Status::ongoing);
 
   auto task_name =
       Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
@@ -146,9 +147,9 @@ Interpreter::build_task(const std::vector<Token> &tokens) {
     deadline.initialize_from_str(deadline_arg.value());
     task_builder.add_deadline(deadline);
     if (options_arg && options_arg.value().find("r") != std::string::npos) {
-      int16_t days_{};
-      int16_t months_{};
-      int16_t years_{};
+      uint16_t days_{};
+      uint16_t months_{};
+      uint16_t years_{};
       if (options_arg->find("d") != std::string::npos) {
         days_ += 1;
       }
@@ -162,15 +163,16 @@ Interpreter::build_task(const std::vector<Token> &tokens) {
         years_ += 1;
       }
       if (params_arg) {
-        int16_t param_val =
-            static_cast<int16_t>(std::stoi(options_arg.value()));
+        uint16_t param_val =
+            static_cast<uint16_t>(std::stoi(params_arg.value()));
         days_ *= param_val;
         months_ *= param_val;
         years_ *= param_val;
       }
-      task_builder.add_recursive_days(static_cast<uint16_t>(days_));
-      task_builder.add_recursive_months(static_cast<uint16_t>(months_));
-      task_builder.add_recursive_years(static_cast<uint16_t>(years_));
+      task_builder.add_recursive_days(days_);
+      task_builder.add_recursive_months(months_);
+      task_builder.add_recursive_years(years_);
+      // TODO
     }
   } else if (!deadline_arg && options_arg) {
     int16_t days_{};
@@ -194,13 +196,16 @@ Interpreter::build_task(const std::vector<Token> &tokens) {
       months_ *= param_val;
       years_ *= param_val;
     }
-    task_builder.add_deadline(BaseDate(days_, months_, years_));
+    BaseDate deadline_ = BaseDate::today();
+    deadline_.add_days(days_);
+    deadline_.add_months(months_);
+    deadline_.add_years(years_);
+    task_builder.add_deadline(deadline_);
     if (options_arg->find("r") != std::string::npos) {
       task_builder.add_recursive_days(static_cast<uint16_t>(days_));
       task_builder.add_recursive_months(static_cast<uint16_t>(months_));
       task_builder.add_recursive_years(static_cast<uint16_t>(years_));
     }
   }
-  task_builder.add_status(Status::ongoing);
   return task_builder.get();
 }

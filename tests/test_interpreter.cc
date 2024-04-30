@@ -227,13 +227,14 @@ TEST_CASE("Test Add Command task CORRENT PROMPTS") {
   CHECK(tracker_result6 == tracker_target6);
 }
 
-TEST_CASE("Test Add Command task with deadline") {
+TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
   INTERPRETER_TEST_DB::reset_tasks_db();
   INTERPRETER_TEST_DB::reset_categories_db();
   INTERPRETER_TEST_DB::reset_relations_db();
   INTERPRETER_TEST_DB::reset_tracker();
   Interpreter interpreter = Interpreter(
       PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
+  const auto TODAY = BaseDate::today();
 
   const std::string user_input1 = "add my_cool_task 20-04-2069";
   const std::string flag1 = interpreter.parse(user_input1);
@@ -278,8 +279,171 @@ TEST_CASE("Test Add Command task with deadline") {
   CHECK(flag2 == flag_target2);
   CHECK(tasks_result2 == tasks_target2);
 
-  const std::string user_input3 = "add new_task 21-04-2069 -rw";
-  const std::string flag3 = interpreter.parse(user_input2);
-  const std::string flag_target3 = "Task: \"new_task\" already exists";
+  const std::string user_input3 = "add @project";
+  const std::string flag3 = interpreter.parse(user_input3);
+  const std::string flag_target3 = "Category: @\"project\" already exists";
   CHECK(flag3 == flag_target3);
+
+  const std::string user_input4 = "add recursive_task_with_no_deadline_arg -wr";
+  const std::string flag4 = interpreter.parse(user_input4);
+  const std::string tasks_result4 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
+  const std::string tasks_target4 =
+      std::format("0 \"T0\" 0 45300 14 0 0\n"
+                  "1 \"T1\" 0 46000 0 2 0\n"
+                  "2 \"T2\" 1 45891 0 0 0\n"
+                  "3 \"T3\" 1 46401 0 0 0\n"
+                  "4 \"T4\" 1 45500 7 0 0\n"
+                  "5 \"T5\" 0 -1 0 0 0\n"
+                  "6 \"T6\" 2 -1 0 0 0\n"
+                  "7 \"T7\" 1 3401 0 2 0\n"
+                  "8 \"T8\" 2 3401 0 0 1\n"
+                  "9 \"T9\" 3 45300 0 0 0\n"
+                  "10 \"T10\" 2 45200 0 1 0\n"
+                  "11 \"T11\" 1 -1 0 0 0\n"
+                  "12 \"my_cool_task\" 0 36269 0 0 0\n"
+                  "13 \"new_task\" 0 36270 7 0 0\n"
+                  "14 \"recursive_task_with_no_deadline_arg\" 0 {} 7 0 0\n",
+                  BaseDate::date_to_days(TODAY) + 7);
+  const std::string flag_target4 =
+      "Added new task: \"recursive_task_with_no_deadline_arg\"";
+  CHECK(flag4 == flag_target4);
+  CHECK(tasks_result4 == tasks_target4);
+
+  const std::string user_input5 =
+      "add \"deadline_option_param\" 20-04-2069 -rwd 5";
+  const std::string flag5 = interpreter.parse(user_input5);
+  const std::string tasks_result5 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
+  const std::string tasks_target5 =
+      std::format("0 \"T0\" 0 45300 14 0 0\n"
+                  "1 \"T1\" 0 46000 0 2 0\n"
+                  "2 \"T2\" 1 45891 0 0 0\n"
+                  "3 \"T3\" 1 46401 0 0 0\n"
+                  "4 \"T4\" 1 45500 7 0 0\n"
+                  "5 \"T5\" 0 -1 0 0 0\n"
+                  "6 \"T6\" 2 -1 0 0 0\n"
+                  "7 \"T7\" 1 3401 0 2 0\n"
+                  "8 \"T8\" 2 3401 0 0 1\n"
+                  "9 \"T9\" 3 45300 0 0 0\n"
+                  "10 \"T10\" 2 45200 0 1 0\n"
+                  "11 \"T11\" 1 -1 0 0 0\n"
+                  "12 \"my_cool_task\" 0 36269 0 0 0\n"
+                  "13 \"new_task\" 0 36270 7 0 0\n"
+                  "14 \"recursive_task_with_no_deadline_arg\" 0 {} 7 0 0\n"
+                  "15 \"deadline_option_param\" 0 36269 40 0 0\n",
+                  BaseDate::date_to_days(TODAY) + 7);
+  const std::string flag_target5 = "Added new task: \"deadline_option_param\"";
+  CHECK(flag5 == flag_target5);
+  CHECK(tasks_result5 == tasks_target5);
+
+  const std::string user_input6 = "add \"option_param\" -rym 5";
+  const std::string flag6 = interpreter.parse(user_input6);
+  const std::string tasks_result6 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
+  auto date_6 = TODAY;
+  date_6.add_months(5);
+  date_6.add_years(5);
+  const std::string tasks_target6 = std::format(
+      "0 \"T0\" 0 45300 14 0 0\n"
+      "1 \"T1\" 0 46000 0 2 0\n"
+      "2 \"T2\" 1 45891 0 0 0\n"
+      "3 \"T3\" 1 46401 0 0 0\n"
+      "4 \"T4\" 1 45500 7 0 0\n"
+      "5 \"T5\" 0 -1 0 0 0\n"
+      "6 \"T6\" 2 -1 0 0 0\n"
+      "7 \"T7\" 1 3401 0 2 0\n"
+      "8 \"T8\" 2 3401 0 0 1\n"
+      "9 \"T9\" 3 45300 0 0 0\n"
+      "10 \"T10\" 2 45200 0 1 0\n"
+      "11 \"T11\" 1 -1 0 0 0\n"
+      "12 \"my_cool_task\" 0 36269 0 0 0\n"
+      "13 \"new_task\" 0 36270 7 0 0\n"
+      "14 \"recursive_task_with_no_deadline_arg\" 0 {} 7 0 0\n"
+      "15 \"deadline_option_param\" 0 36269 40 0 0\n"
+      "16 \"option_param\" 0 {} 0 5 5\n",
+      BaseDate::date_to_days(TODAY) + 7, BaseDate::date_to_days(date_6));
+  const std::string flag_target6 = "Added new task: \"option_param\"";
+  CHECK(flag6 == flag_target6);
+  CHECK(tasks_result6 == tasks_target6);
+
+  const std::string user_input7 = "add \"param_no_recurs\" -w 5";
+  const std::string flag7 = interpreter.parse(user_input7);
+  const std::string tasks_result7 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
+  const std::string tasks_target7 = std::format(
+      "0 \"T0\" 0 45300 14 0 0\n"
+      "1 \"T1\" 0 46000 0 2 0\n"
+      "2 \"T2\" 1 45891 0 0 0\n"
+      "3 \"T3\" 1 46401 0 0 0\n"
+      "4 \"T4\" 1 45500 7 0 0\n"
+      "5 \"T5\" 0 -1 0 0 0\n"
+      "6 \"T6\" 2 -1 0 0 0\n"
+      "7 \"T7\" 1 3401 0 2 0\n"
+      "8 \"T8\" 2 3401 0 0 1\n"
+      "9 \"T9\" 3 45300 0 0 0\n"
+      "10 \"T10\" 2 45200 0 1 0\n"
+      "11 \"T11\" 1 -1 0 0 0\n"
+      "12 \"my_cool_task\" 0 36269 0 0 0\n"
+      "13 \"new_task\" 0 36270 7 0 0\n"
+      "14 \"recursive_task_with_no_deadline_arg\" 0 {} 7 0 0\n"
+      "15 \"deadline_option_param\" 0 36269 40 0 0\n"
+      "16 \"option_param\" 0 {} 0 5 5\n"
+      "17 \"param_no_recurs\" 0 19879 0 0 0\n",
+      BaseDate::date_to_days(TODAY) + 7, BaseDate::date_to_days(date_6));
+  const std::string flag_target7 = "Added new task: \"param_no_recurs\"";
+  CHECK(flag7 == flag_target7);
+  CHECK(tasks_result7 == tasks_target7);
+}
+
+TEST_CASE("Test Add Command task to category CORRENT PROMPTS") {
+  INTERPRETER_TEST_DB::reset_tasks_db();
+  INTERPRETER_TEST_DB::reset_categories_db();
+  INTERPRETER_TEST_DB::reset_relations_db();
+  INTERPRETER_TEST_DB::reset_tracker();
+  Interpreter interpreter = Interpreter(
+      PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
+  // const auto TODAY = BaseDate::today();
+
+  // "0 \"Uncategorized\"\n"
+  // "1 \"Some category\"\n"
+  // "2 \"another_category\"\n"
+  // "3 \"project\"\n";
+
+  const std::string user_input1 =
+      "add va_banque @\"Some category\" 20-04-2069 -rwy 3";
+  const std::string flag1 = interpreter.parse(user_input1);
+  const std::string tasks_result1 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
+  const std::string relations_result1 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_RELATIONS);
+  const std::string tasks_target1 = "0 \"T0\" 0 45300 14 0 0\n"
+                                    "1 \"T1\" 0 46000 0 2 0\n"
+                                    "2 \"T2\" 1 45891 0 0 0\n"
+                                    "3 \"T3\" 1 46401 0 0 0\n"
+                                    "4 \"T4\" 1 45500 7 0 0\n"
+                                    "5 \"T5\" 0 -1 0 0 0\n"
+                                    "6 \"T6\" 2 -1 0 0 0\n"
+                                    "7 \"T7\" 1 3401 0 2 0\n"
+                                    "8 \"T8\" 2 3401 0 0 1\n"
+                                    "9 \"T9\" 3 45300 0 0 0\n"
+                                    "10 \"T10\" 2 45200 0 1 0\n"
+                                    "11 \"T11\" 1 -1 0 0 0\n"
+                                    "12 \"va_banque\" 0 36269 21 0 3\n";
+  const std::string relations_target1 = "0 2 1\n"
+                                        "1 3 1\n"
+                                        "2 5 2\n"
+                                        "3 6 3\n"
+                                        "4 7 3\n"
+                                        "6 8 3\n"
+                                        "6 9 3\n"
+                                        "7 4 2\n"
+                                        "8 10 3\n"
+                                        "9 11 1\n"
+                                        "10 12 1\n";
+  const std::string flag_target1 =
+      "Added new task: \"va_banque\" to @\"Some category\"";
+  CHECK(flag1 == flag_target1);
+  CHECK(tasks_result1 == tasks_target1);
+  CHECK(relations_result1 == relations_target1);
 }

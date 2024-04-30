@@ -29,4 +29,14 @@ TEST_CASE("Testing Task Buider pattern") {
                    .get();
   std::string t3 = "2 \"3rd task\" 2 11279 0 0 1";
   CHECK(std::string(*task3) == t3);
+
+  auto task4 = EntryTask::Builder()
+                   .add_id("3")
+                   .add_content("4th task")
+                   .add_deadline(BaseDate(18, 11, 2000))
+                   .add_recursive_days(1)
+                   .add_recursive_months(3)
+                   .get();
+  std::string t4 = "3 \"4th task\" 3 11279 1 3 0";
+  CHECK(std::string(*task4) == t4);
 }
