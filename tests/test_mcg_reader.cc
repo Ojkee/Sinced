@@ -20,6 +20,15 @@ void reset_test_tracker() {
   file << contents;
 }
 
+void reset_test_settings() {
+  std::ofstream file(SETTINGS_PATH);
+  const std::string content = "<<{ field name } { value }>>\n\n"
+                              "{date format} {DDMMYYYY}\n"
+                              "{sort by} {DefaultSorter}\n"
+                              "{filter by} {DefaultFilter}";
+  file << content;
+}
+
 [[nodiscard]] std::string get_content(const std::string &path) {
   std::ifstream file(path);
   if (!file.is_open()) {

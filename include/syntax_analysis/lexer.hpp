@@ -90,7 +90,7 @@ public:
   }
 
 private:
-  constexpr static auto commands_set = {"add", "list", "rm",
+  constexpr static auto commands_set = {"add", "log", "rm",
                                         "set"}; // KEEP LEXICOGRAPHIC
 };
 

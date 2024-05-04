@@ -96,7 +96,7 @@ public:
   template <typename EntryType>
   [[nodiscard]] std::string entries_info(const SP_T(EntryType) & entries) const;
 
-  [[nodiscard]] std::string fitered_tasks_info();
+  [[nodiscard]] std::string filtered_tasks_info();
   [[nodiscard]] std::string sorted_tasks_info();
   [[nodiscard]] std::string tasks_info_all() const;
   [[nodiscard]] std::string categories_info_all() const;

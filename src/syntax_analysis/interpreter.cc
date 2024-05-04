@@ -7,22 +7,25 @@
 #include <string>
 #include <vector>
 
-std::string Interpreter::parse(const std::string &user_input) {
+Parsing_Data Interpreter::parse(const std::string &user_input) {
   // TODO DateFormat getter from Settings file
   const std::vector<Token> tokens = Lexer::tokenize(user_input, DDMMYYYY());
   if (tokens.size() == 0) [[unlikely]] {
-    return "No arguments";
+    return {.flag = Flag_Messages::no_args(), .out_buffer = {}};
   }
 
   if (tokens[0].type == TokenType::COMMAND) [[likely]] {
-    // "add", "list", "rm", "set"
+    // "add", "log", "rm", "set"
     if (tokens[0].content == "add") {
       return add_command(tokens);
     } else if (tokens[0].content == "rm") {
       // TODO more commads
+    } else if (tokens[0].content == "log") {
+      return log_command(tokens);
     }
   }
-  return "INTERPRETER::PARSE PLACEHOLDER RETURN VAL";
+  return {.flag = Flag_Messages::bad_return("Interpreter::parse"),
+          .out_buffer = {}};
 }
 
 bool constexpr Interpreter::contains_token_type(
@@ -52,58 +55,56 @@ void Interpreter::add_new_relation(const std::string &task_id,
   tracker_handler.increment_field_value("last relation id");
 }
 
-std::string Interpreter::add_command(const std::vector<Token> &tokens) {
-  std::string returning_flag{"PLACEHOLDER ADD COMMAND"};
+Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
   if (tokens.size() <= 1) {
-    return "No arguments provided";
+    return {.flag = Flag_Messages::no_args(), .out_buffer = {}};
   }
-  return add_new_task_builder(tokens);
-}
 
-std::string
-Interpreter::add_new_task_builder(const std::vector<Token> &tokens) {
   auto task_name =
       Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
   auto category_name = Interpreter::get_token_content_if_contains_type(
       tokens, TokenType::CATEGORY_NAME);
-
   if (!task_name && !category_name) {
-    return "Invalid arguments";
+    return {.flag = Flag_Messages::invalid_args(), .out_buffer = {}};
   }
 
   if (task_name && category_name) {
     auto category_ptr = entry_handler.get_entry_by_content<EntryCategory>(
         category_name.value());
     if (!category_ptr) {
-      return std::format("No category: @\"{}\"", category_name.value());
+      return {.flag = Flag_Messages::no_category(category_name.value()),
+              .out_buffer = {}};
     }
-
     const auto task_ptr =
         entry_handler.get_entry_by_content<EntryTask>(task_name.value());
     if (task_ptr) {
       const auto relation_ptr = entry_handler.get_relation_by_ids(
           task_ptr->get_id(), category_ptr->get_id());
       if (relation_ptr) {
-        return std::format("\"{}\" already in @\"{}\"", task_name.value(),
-                           category_name.value());
+        return {.flag = std::format("\"{}\" already in @\"{}\"",
+                                    task_name.value(), category_name.value()),
+                .out_buffer = {}};
       }
       add_new_relation(task_ptr->get_id(), category_ptr->get_id());
-      return std::format("Added: \"{}\" to @\"{}\"", task_name.value(),
-                         category_name.value());
+      return {.flag = std::format("Added: \"{}\" to @\"{}\"", task_name.value(),
+                                  category_name.value()),
+              .out_buffer = {}};
     }
     std::shared_ptr<EntryTask> new_task = build_task(tokens);
     entry_handler.add_entry_to_db(*new_task);
     add_new_relation(new_task->get_id(), category_ptr->get_id());
-    return std::format("Added new task: \"{}\" to @\"{}\"", task_name.value(),
-                       category_name.value());
+    return {.flag = std::format("Added new task: \"{}\" to @\"{}\"",
+                                task_name.value(), category_name.value()),
+            .out_buffer = {}};
   }
 
   if (!task_name && category_name) {
     auto category_ptr = entry_handler.get_entry_by_content<EntryCategory>(
         category_name.value());
     if (category_ptr) {
-      return std::format("Category: @\"{}\" already exists",
-                         category_name.value());
+      return {.flag = std::format("Category: @\"{}\" already exists",
+                                  category_name.value()),
+              .out_buffer = {}};
     }
     const std::string category_token =
         std::format("{} \"{}\"", tracker_handler.next_id("last category id"),
@@ -111,16 +112,21 @@ Interpreter::add_new_task_builder(const std::vector<Token> &tokens) {
     const auto category = EntryCategory(category_token);
     entry_handler.add_entry_to_db(category);
     tracker_handler.increment_field_value("last category id");
-    return std::format("Added new category: @\"{}\"", category_name.value());
+    return {.flag = std::format("Added new category: @\"{}\"",
+                                category_name.value()),
+            .out_buffer = {}};
   }
 
   if (task_name && !category_name) {
     std::shared_ptr<EntryTask> new_task = build_task(tokens);
     entry_handler.add_entry_to_db(*new_task);
-    return std::format("Added new task: \"{}\"", task_name.value());
+    return {.flag = std::format("Added new task: \"{}\"", task_name.value()),
+            .out_buffer = {}};
   }
 
-  return "PLACEHOLDER";
+  return {.flag =
+              Flag_Messages::bad_return("Interpreter::add_new_task_builder"),
+          .out_buffer = {}};
 }
 
 std::shared_ptr<EntryTask>
@@ -208,4 +214,54 @@ Interpreter::build_task(const std::vector<Token> &tokens) {
     }
   }
   return task_builder.get();
+}
+
+Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
+  if (tokens.size() <= 1) {
+    return {.flag = Flag_Messages::no_args(), .out_buffer = {}};
+  }
+
+  auto task_name =
+      Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
+  auto category_name = Interpreter::get_token_content_if_contains_type(
+      tokens, TokenType::CATEGORY_NAME);
+  auto options_arg = Interpreter::get_token_content_if_contains_type(
+      tokens, TokenType::OPTION);
+
+  if (!task_name && !category_name) {
+    return {.flag = Flag_Messages::invalid_args(), .out_buffer = {}};
+  }
+
+  if (task_name) {
+    std::shared_ptr<EntryTask> task_ptr =
+        entry_handler.get_entry_by_content<EntryTask>(task_name.value());
+    return {.flag = std::format("Logged: \"{}\"", task_name.value()),
+            .out_buffer = task_ptr->info()};
+  } else if (category_name) {
+    std::shared_ptr<EntryCategory> category_ptr =
+        entry_handler.get_entry_by_content<EntryCategory>(
+            category_name.value());
+    const std::string tasks_in_category_info =
+        entry_handler.tasks_info_by_category_id(category_ptr->get_id());
+    return {.flag = std::format("Logged: @\"{}\"", category_name.value()),
+            .out_buffer = tasks_in_category_info};
+  } else if (options_arg) {
+    if (options_arg.value() == "a") {
+    }
+  }
+
+  return {.flag = Flag_Messages::bad_return("Interpreter::log_command"),
+          .out_buffer = {}};
+}
+
+[[nodiscard]] std::shared_ptr<FormatDate>
+Interpreter::get_date_format_from_settings() {
+  const auto date_format_str =
+      settings_handler.get_value_by_field("date format");
+  if (date_format_str) {
+    const std::string date_key = date_format_str.value();
+    std::shared_ptr<FormatDate> d = std::move(date_formats_map.at(date_key));
+    return d;
+  }
+  return std::make_shared<DDMMYYYY>();
 }

@@ -133,7 +133,7 @@ void EntryHandler::clear_db() {
   relations.clear();
 }
 
-std::string EntryHandler::fitered_tasks_info() {
+std::string EntryHandler::filtered_tasks_info() {
   const auto filtered_tasks = filter_load_db<EntryTask>(tasks_db_path);
   return entries_info<EntryTask>(filtered_tasks);
 }

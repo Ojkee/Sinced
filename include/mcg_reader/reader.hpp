@@ -3,9 +3,9 @@
 
 #include <cstdint>
 #include <optional>
+#include <string>
 #include <tuple>
 
-#include <string>
 class MCGFileHandler {
 public:
   MCGFileHandler() = delete;

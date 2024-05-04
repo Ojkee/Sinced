@@ -65,7 +65,7 @@ MCGFileHandler::parse_line(const std::string &line) const {
       return std::make_tuple(matches[1], val);
     }
   }
-  return std::make_tuple("", "");
+  return std::make_tuple(std::string(), std::string());
 }
 
 void TrackerHandler::increment_field_value(const std::string &field_name) {

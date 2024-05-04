@@ -58,7 +58,7 @@ TEST_CASE("Filtering by deadline") {
       "\"Today repetetive\"\n\tOngoing\n\tdeadline: " +
       today_date + " every: 1 month \n";
   eh1.set_filter(std::make_unique<DeadlineFilter>(21, 2, 2026));
-  std::string result_info1 = eh1.fitered_tasks_info();
+  std::string result_info1 = eh1.filtered_tasks_info();
   REQUIRE(result_info1 == target_info1);
 }
 
@@ -86,7 +86,7 @@ TEST_CASE("Filtering by status") {
   std::string tasks_path = testing_dir + "tasks_test2.mdb";
   EntryHandler et1 = EntryHandler(tasks_path, "", "");
   et1.set_filter(std::make_unique<StatusFilter>(Status::ongoing));
-  std::string result_info1 = et1.fitered_tasks_info();
+  std::string result_info1 = et1.filtered_tasks_info();
   std::string target_info1 =
       "\"Another task title?\"\n\tOngoing\n\tdeadline: 09-01-2094 every: 14 "
       "day \n\"some_title\"\n\tOngoing\n\tdeadline: 10-12-2095 every: 2 month "
@@ -94,7 +94,7 @@ TEST_CASE("Filtering by status") {
   REQUIRE(result_info1 == target_info1);
 
   et1.set_filter(std::make_unique<StatusFilter>(Status::done));
-  std::string result_info2 = et1.fitered_tasks_info();
+  std::string result_info2 = et1.filtered_tasks_info();
   std::string target_info2 =
       "\"3nd title\"\n\tDone\n\tdeadline: 24-08-2095\n\"clever "
       "name\"\n\tDone\n\tdeadline: 15-01-2097\n\" title\"\n\tDone\n\tdeadline: "
