@@ -10,8 +10,8 @@
 #include <string>
 #include <tuple>
 
-std::optional<std::string>
-MCGFileHandler::get_value_by_field(const std::string &field_name) const {
+std::optional<std::string> MCGFileHandler::get_value_by_field(
+    const std::string &field_name) const {
   std::ifstream mcg_file(path);
   if (!mcg_file.is_open()) {
     std::cerr << "Can't open file: " << path << '\n';
@@ -54,8 +54,8 @@ int8_t MCGFileHandler::set_value_by_field(const std::string &field_name,
   return found ? 0 : -1;
 }
 
-std::tuple<std::string, std::string>
-MCGFileHandler::parse_line(const std::string &line) const {
+std::tuple<std::string, std::string> MCGFileHandler::parse_line(
+    const std::string &line) const {
   std::regex expr("\\{(.+?)\\} (.+)");
   std::smatch matches;
   if (std::regex_match(line, matches, expr)) {
@@ -83,4 +83,50 @@ std::string TrackerHandler::next_id(const std::string &field_name) {
   } else {
     return "0";
   }
+}
+
+std::shared_ptr<FormatDate> SettingsHandler::get_format_date() noexcept {
+  std::ifstream settings_file(path);
+  if (!settings_file.is_open()) {
+    std::cerr << "Can't open file: " << path << '\n';
+    exit(EXIT_FAILURE);
+  }
+  std::string line;
+  std::string separator{"-"};
+  std::string format_date_str{"DDMMYYYY"};
+  while (getline(settings_file, line)) {
+    const auto [field, val] = parse_line(line);
+    if (field == "date format") {
+      format_date_str = val;
+    } else if (field == "date format separator") {
+      separator = val;
+    }
+  }
+  return format_date_factory.get(format_date_str, separator);
+}
+
+bool SettingsHandler::set_format_date(const std::string &format_date_str,
+                                      const std::string &separator) noexcept {
+  if (format_date_factory.is_valid_format(format_date_str)) {
+    set_value_by_field("date format", format_date_str);
+    set_value_by_field("date format separator", separator);
+    return true;
+  }
+  return false;
+}
+
+bool SettingsHandler::set_filterer(const std::string &filterer_str) noexcept {
+  if (entry_filter_factory.is_valid(filterer_str)) {
+    set_value_by_field("filter by", filterer_str);
+    return true;
+  }
+  return false;
+}
+
+bool SettingsHandler::set_sorterer(const std::string &sorter_str) noexcept {
+  if (entry_sorter_factory.is_valid(sorter_str)) {
+    set_value_by_field("sort by", sorter_str);
+    return true;
+  }
+  return false;
 }

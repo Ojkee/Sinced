@@ -9,7 +9,7 @@
 #include "entry_base.hpp"
 
 class EntryFilter {
-public:
+ public:
   EntryFilter() = default;
   virtual ~EntryFilter() = default;
   virtual bool passes(const std::shared_ptr<EntryTask> &entry) const = 0;
@@ -17,8 +17,8 @@ public:
   virtual bool passes(const std::shared_ptr<EntryRelation> &entry) const = 0;
 
   template <typename EntryType>
-  std::vector<std::shared_ptr<EntryType>>
-  filtered(const std::vector<std::shared_ptr<EntryType>> &entries) const {
+  std::vector<std::shared_ptr<EntryType>> filtered(
+      const std::vector<std::shared_ptr<EntryType>> &entries) const {
     std::vector<std::shared_ptr<EntryType>> filtered_entries;
     std::copy_if(
         entries.begin(), entries.end(), std::back_inserter(filtered_entries),
@@ -28,8 +28,8 @@ public:
 };
 
 class DefaultFilter : public EntryFilter {
-public:
-  DefaultFilter() {}
+ public:
+  DefaultFilter() = default;
   bool passes(
       [[maybe_unused]] const std::shared_ptr<EntryTask> &entry) const override {
     return true;
@@ -45,7 +45,7 @@ public:
 };
 
 class CategoryIDFilter : public EntryFilter {
-public:
+ public:
   CategoryIDFilter() = delete;
   CategoryIDFilter(const std::string &category_id_)
       : category_id(category_id_) {}
@@ -59,21 +59,22 @@ public:
   }
   bool passes(const std::shared_ptr<EntryRelation> &entry) const override;
 
-  std::vector<std::shared_ptr<EntryRelation>>
-  filtered(const std::vector<std::shared_ptr<EntryRelation>> &entries) const {
+  std::vector<std::shared_ptr<EntryRelation>> filtered(
+      const std::vector<std::shared_ptr<EntryRelation>> &entries) const {
     return EntryFilter::filtered(entries);
   }
 
-private:
+ private:
   std::string category_id{0};
 };
 
 class DeadlineFilter : public EntryFilter {
-public:
+ public:
   DeadlineFilter() = delete;
   DeadlineFilter(int16_t _day, int16_t _month, int16_t _year) {
     this->deadline_ = std::make_unique<BaseDate>(_day, _month, _year);
   }
+  // DeadlineFilter(const BaseDate& db) : deadline_(std::make_unique(db)) {};
   bool passes(const std::shared_ptr<EntryTask> &entry) const override;
   bool passes([[maybe_unused]] const std::shared_ptr<EntryCategory> &entry)
       const override {
@@ -84,14 +85,14 @@ public:
     return false;
   }
 
-private:
+ private:
   std::unique_ptr<BaseDate> deadline_ = nullptr;
 };
 
 class StatusFilter : public EntryFilter {
-public:
+ public:
   StatusFilter() = delete;
-  StatusFilter(Status status) : status_(status){};
+  StatusFilter(const Status &status) : status_(status){};
   bool passes(const std::shared_ptr<EntryTask> &entry) const override;
   bool passes([[maybe_unused]] const std::shared_ptr<EntryCategory> &entry)
       const override {
@@ -102,8 +103,8 @@ public:
     return false;
   }
 
-private:
+ private:
   Status status_ = Status::undetermined;
 };
 
-#endif // !ENTRY_FILTER_HPP
+#endif  // !ENTRY_FILTER_HPP

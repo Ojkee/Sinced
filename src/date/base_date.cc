@@ -1,3 +1,5 @@
+#include "../../include/date/base_date.hpp"
+
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -6,8 +8,6 @@
 #include <ctime>
 #include <limits>
 #include <numeric>
-
-#include "../../include/date/base_date.hpp"
 
 void BaseDate::initialize_from_str(const std::string &date_str) {
   if (!formatter->is_valid(date_str)) {
@@ -27,8 +27,7 @@ void BaseDate::add_days(int16_t _days) noexcept {
 }
 
 void BaseDate::add_months(int16_t _months) noexcept {
-  if (_months == 0)
-    return;
+  if (_months == 0) return;
   const int16_t mth =
       (_months > 0) ? (_months % 12) : -static_cast<int16_t>((-_months % 12));
   month += mth;
@@ -37,10 +36,8 @@ void BaseDate::add_months(int16_t _months) noexcept {
 
 void BaseDate::add_years(int16_t _years) noexcept {
   year += _years;
-  if (year < lower_bound_year)
-    *this = BaseDate(1, 1, lower_bound_year);
-  if (year > upper_bound_year)
-    *this = BaseDate(31, 12, upper_bound_year);
+  if (year < lower_bound_year) *this = BaseDate(1, 1, lower_bound_year);
+  if (year > upper_bound_year) *this = BaseDate(31, 12, upper_bound_year);
   validate();
 }
 

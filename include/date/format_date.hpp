@@ -6,25 +6,24 @@
 #include <string>
 
 class FormatDate {
-public:
+ public:
   FormatDate() = default;
   FormatDate(std::string _separator) : separator(_separator) {}
-  [[nodiscard]] virtual std::string
-  get(const int16_t &day, const int16_t &month, const int16_t &year) const = 0;
+  [[nodiscard]] virtual std::string get(const int16_t &day,
+                                        const int16_t &month,
+                                        const int16_t &year) const = 0;
   [[nodiscard]] virtual bool is_valid(const std::string &text) const = 0;
   [[nodiscard]] static std::string add_leading_char(const int16_t d,
                                                     uint16_t width, char ch);
-  [[nodiscard]] std::tuple<int16_t, int16_t, int16_t>
-  string_to_date_vars(std::string data_str) const;
+  [[nodiscard]] std::tuple<int16_t, int16_t, int16_t> string_to_date_vars(
+      std::string data_str) const;
 
-  [[nodiscard]] virtual std::tuple<int16_t, int16_t, int16_t>
-  parse_from_string(const std::string &data_str) const = 0;
-  void set_separator(std::string _separator) {
-    separator = std::move(_separator);
-  }
+  [[nodiscard]] virtual std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      const std::string &data_str) const = 0;
+  void set_separator(const std::string &_separator) { separator = _separator; }
   virtual ~FormatDate() = default;
 
-protected:
+ protected:
   std::string separator = "-";
   constexpr static std::array<std::string, 12> months_full_name = {
       "January", "February", "March",     "April",   "May",      "June",
@@ -39,95 +38,95 @@ protected:
 };
 
 class DDMMYYYY : public FormatDate {
-public:
+ public:
   DDMMYYYY() = default;
   DDMMYYYY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
-  std::tuple<int16_t, int16_t, int16_t>
-  parse_from_string(const std::string &data_str) const override;
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      const std::string &data_str) const override;
 };
 
 class DDMMYY : public FormatDate {
-public:
+ public:
   DDMMYY() = default;
   DDMMYY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
-  std::tuple<int16_t, int16_t, int16_t>
-  parse_from_string(const std::string &data_str) const override;
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      const std::string &data_str) const override;
 };
 
 class DMY : public FormatDate {
-public:
+ public:
   DMY() = default;
   DMY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
-  std::tuple<int16_t, int16_t, int16_t>
-  parse_from_string(const std::string &data_str) const override;
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      const std::string &data_str) const override;
 };
 
 class MMDDYYYY : public FormatDate {
-public:
+ public:
   MMDDYYYY() = default;
   MMDDYYYY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
-  std::tuple<int16_t, int16_t, int16_t>
-  parse_from_string(const std::string &data_str) const override;
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      const std::string &data_str) const override;
 };
 
 class MMDDYY : public FormatDate {
-public:
+ public:
   MMDDYY() = default;
   MMDDYY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
-  std::tuple<int16_t, int16_t, int16_t>
-  parse_from_string(const std::string &data_str) const override;
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      const std::string &data_str) const override;
 };
 
 class MDY : public FormatDate {
-public:
+ public:
   MDY() = default;
   MDY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
-  std::tuple<int16_t, int16_t, int16_t>
-  parse_from_string(const std::string &data_str) const override;
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      const std::string &data_str) const override;
 };
 
 class YYYYMMDD : public FormatDate {
-public:
+ public:
   YYYYMMDD() = default;
   YYYYMMDD(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
-  std::tuple<int16_t, int16_t, int16_t>
-  parse_from_string(const std::string &data_str) const override;
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      const std::string &data_str) const override;
 };
 
 class YYMMDD : public FormatDate {
-public:
+ public:
   YYMMDD() = default;
   YYMMDD(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
                   const int16_t &year) const override;
   bool is_valid(const std::string &text) const override;
-  std::tuple<int16_t, int16_t, int16_t>
-  parse_from_string(const std::string &data_str) const override;
+  std::tuple<int16_t, int16_t, int16_t> parse_from_string(
+      const std::string &data_str) const override;
 };
 
 class MonthDY : public FormatDate {
-public:
+ public:
   MonthDY() = default;
   MonthDY(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
@@ -142,7 +141,7 @@ public:
 };
 
 class Roman : public FormatDate {
-public:
+ public:
   Roman() { separator = " "; };
   Roman(std::string _separator) : FormatDate(_separator) {}
   std::string get(const int16_t &day, const int16_t &month,
@@ -156,4 +155,4 @@ public:
   };
 };
 
-#endif // FORMAT_DATE_HPP
+#endif  // FORMAT_DATE_HPP

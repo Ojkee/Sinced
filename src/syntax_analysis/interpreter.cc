@@ -1,11 +1,12 @@
 #include "../../include/syntax_analysis/interpreter.hpp"
-#include "../../include/syntax_analysis/lexer.hpp"
 
 #include <algorithm>
 #include <format>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "../../include/syntax_analysis/lexer.hpp"
 
 Parsing_Data Interpreter::parse(const std::string &user_input) {
   // TODO DateFormat getter from Settings file
@@ -124,13 +125,13 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
             .out_buffer = {}};
   }
 
-  return {.flag =
-              Flag_Messages::bad_return("Interpreter::add_new_task_builder"),
-          .out_buffer = {}};
+  return {
+      .flag = Flag_Messages::bad_return("Interpreter::add_new_task_builder"),
+      .out_buffer = {}};
 }
 
-std::shared_ptr<EntryTask>
-Interpreter::build_task(const std::vector<Token> &tokens) {
+std::shared_ptr<EntryTask> Interpreter::build_task(
+    const std::vector<Token> &tokens) {
   EntryTask::Builder task_builder = EntryTask::Builder();
   task_builder.add_id(tracker_handler.next_id("last task id"));
   tracker_handler.increment_field_value("last task id");
@@ -254,14 +255,41 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
           .out_buffer = {}};
 }
 
-[[nodiscard]] std::shared_ptr<FormatDate>
-Interpreter::get_date_format_from_settings() {
-  const auto date_format_str =
-      settings_handler.get_value_by_field("date format");
-  if (date_format_str) {
-    const std::string date_key = date_format_str.value();
-    std::shared_ptr<FormatDate> d = std::move(date_formats_map.at(date_key));
-    return d;
+Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
+  if (tokens.size() <= 1) {
+    return {.flag = Flag_Messages::no_args(), .out_buffer = {}};
   }
-  return std::make_shared<DDMMYYYY>();
+
+  const auto setting_field_arg =
+      Interpreter::get_token_content_if_contains_type(tokens,
+                                                      TokenType::OPTION);
+  const auto new_setting_arg =
+      Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
+
+  if (!setting_field_arg || !new_setting_arg) {
+    return {.flag = Flag_Messages::invalid_args(), .out_buffer = {}};
+  }
+
+  const auto it = set_params.find(setting_field_arg.value());
+  if (it == set_params.end()) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer =
+                std::format("No such setting: {}", setting_field_arg.value())};
+  }
+
+  if (it->first == "date format") {
+    const auto sep =
+        settings_handler.get_value_by_field("date format separator");
+    settings_handler.set_format_date(new_setting_arg.value(),
+                                     (sep) ? sep.value() : "-");
+  } else if (it->first == "filter by") {
+    settings_handler.set_filterer(new_setting_arg.value());
+  } else if (it->first == "sort by") {
+    settings_handler.set_sorterer(new_setting_arg.value());
+  } else {
+    settings_handler.set_value_by_field(it->second, new_setting_arg.value());
+  }
+
+  return {.flag = Flag_Messages::bad_return("Interpreter::set_command"),
+          .out_buffer = {}};
 }

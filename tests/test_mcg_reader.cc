@@ -1,10 +1,11 @@
-#include "../extern/include/catch.hpp"
-
-#include "../include/mcg_reader/reader.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <sstream>
+
+#include "../extern/include/catch.hpp"
+#include "../include/mcg_reader/reader.hpp"
 
 #define TRACKER_PATH "../records/testing_records/mcgs/test_tracker.mcg"
 #define SETTINGS_PATH "../records/testing_records/mcgs/test_settings.mcg"
@@ -13,19 +14,22 @@ namespace MCG_TESTING {
 
 void reset_test_tracker() {
   std::ofstream file(TRACKER_PATH);
-  const std::string contents = "<<{ field name } { value }>>\n\n"
-                               "{last task id} {0}\n"
-                               "{last category id} {49}\n"
-                               "{last relation id} {0}";
+  const std::string contents =
+      "<<{ field name } { value }>>\n\n"
+      "{last task id} {0}\n"
+      "{last category id} {49}\n"
+      "{last relation id} {0}";
   file << contents;
 }
 
 void reset_test_settings() {
   std::ofstream file(SETTINGS_PATH);
-  const std::string content = "<<{ field name } { value }>>\n\n"
-                              "{date format} {DDMMYYYY}\n"
-                              "{sort by} {DefaultSorter}\n"
-                              "{filter by} {DefaultFilter}";
+  const std::string content =
+      "<<{ field name } { value }>>\n\n"
+      "{date format} {DDMMYYYY}\n"
+      "{date format separator} {-}\n"
+      "{sort by} {default}\n"
+      "{filter by} {default}";
   file << content;
 }
 
@@ -42,7 +46,7 @@ void reset_test_settings() {
   }
   return ss.str();
 }
-} // namespace MCG_TESTING
+}  // namespace MCG_TESTING
 
 TEST_CASE("Testing reading info from tracker") {
   MCG_TESTING::reset_test_tracker();
@@ -93,10 +97,45 @@ TEST_CASE("Testing Tracker") {
 
   tracker_handler.increment_field_value("last category id");
 
-  const std::string target1 = "<<{ field name } { value }>>\n\n"
-                              "{last task id} {3}\n"
-                              "{last category id} {50}\n"
-                              "{last relation id} {2}\n";
+  const std::string target1 =
+      "<<{ field name } { value }>>\n\n"
+      "{last task id} {3}\n"
+      "{last category id} {50}\n"
+      "{last relation id} {2}\n";
   const std::string result1 = MCG_TESTING::get_content(TRACKER_PATH);
   CHECK(result1 == target1);
+}
+
+TEST_CASE("Testing Settings Date") {
+  MCG_TESTING::reset_test_settings();
+  SettingsHandler settings_handler = SettingsHandler(SETTINGS_PATH);
+
+  std::shared_ptr<FormatDate> fd1 = settings_handler.get_format_date();
+  const std::string r1 = (fd1) ? fd1->get(20, 4, 2069) : "nullptr";
+  CHECK(r1 == "20-04-2069");
+
+  const bool flag2 = settings_handler.set_format_date("YYYYMMDD", "--");
+  std::shared_ptr<FormatDate> fd2 = settings_handler.get_format_date();
+  const std::string r2 = (fd2) ? fd2->get(20, 4, 2069) : "nullptr";
+  CHECK(flag2 == true);
+  CHECK(r2 == "2069--04--20");
+
+  const bool flag3 = settings_handler.set_format_date("YYYMDD", "");
+  CHECK(flag3 == false);
+}
+
+TEST_CASE("Testing Settings Filter") {
+  MCG_TESTING::reset_test_settings();
+  SettingsHandler settings_handler = SettingsHandler(SETTINGS_PATH);
+
+  const bool flag1 = settings_handler.set_filterer("deadline");
+  const std::string r1 = MCG_TESTING::get_content(SETTINGS_PATH);
+  const std::string t1 =
+      "<<{ field name } { value }>>\n\n"
+      "{date format} {DDMMYYYY}\n"
+      "{date format separator} {-}\n"
+      "{sort by} {default}\n"
+      "{filter by} {deadline}";
+  CHECK(flag1 == true);
+  CHECK(r1 == t1);
 }
