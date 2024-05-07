@@ -10,7 +10,7 @@ bool CategoryIDFilter::passes(
 }
 
 bool DeadlineFilter::passes(const std::shared_ptr<EntryTask> &entry) const {
-  return (entry) ? entry->is_in_timeframe(*deadline_) : false;
+  return (entry && deadline_) ? entry->is_in_timeframe(*deadline_) : false;
 }
 
 bool StatusFilter::passes(const std::shared_ptr<EntryTask> &entry) const {

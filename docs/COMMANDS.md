@@ -60,10 +60,8 @@ tasks can be categorized info folder-like categories with '@' at the beggining o
 
 ### Configure
 ```
-  scd set YYYYMMDD -i                       // date format date in input to program
-  scd set YYYYMMDD -o                       // date format that program displays
-  scd set -s'sep'                           // separator in date format in 
-                                            (TODO: POSSIBLE BETTER SYNTAX IDEA)
+  scd set -df YYYYMMDD                       // date format that program displays
+  scd set -s 'sep'                           // separator in date format in 
 ```
 
 

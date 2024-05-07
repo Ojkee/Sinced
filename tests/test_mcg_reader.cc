@@ -28,8 +28,7 @@ void reset_test_settings() {
       "<<{ field name } { value }>>\n\n"
       "{date format} {DDMMYYYY}\n"
       "{date format separator} {-}\n"
-      "{sort by} {default}\n"
-      "{filter by} {default}";
+      "{sort by} {default}\n";
   file << content;
 }
 
@@ -124,18 +123,20 @@ TEST_CASE("Testing Settings Date") {
   CHECK(flag3 == false);
 }
 
-TEST_CASE("Testing Settings Filter") {
+TEST_CASE("Testing Settings Sorter") {
   MCG_TESTING::reset_test_settings();
   SettingsHandler settings_handler = SettingsHandler(SETTINGS_PATH);
 
-  const bool flag1 = settings_handler.set_filterer("deadline");
+  const bool flag1 = settings_handler.set_sorterer("deadline");
   const std::string r1 = MCG_TESTING::get_content(SETTINGS_PATH);
   const std::string t1 =
       "<<{ field name } { value }>>\n\n"
       "{date format} {DDMMYYYY}\n"
       "{date format separator} {-}\n"
-      "{sort by} {default}\n"
-      "{filter by} {deadline}";
+      "{sort by} {deadline}\n";
   CHECK(flag1 == true);
   CHECK(r1 == t1);
+
+  const bool flag2 = settings_handler.set_sorterer("deadlinee");
+  CHECK(flag2 == false);
 }

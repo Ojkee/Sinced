@@ -282,8 +282,6 @@ Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
         settings_handler.get_value_by_field("date format separator");
     settings_handler.set_format_date(new_setting_arg.value(),
                                      (sep) ? sep.value() : "-");
-  } else if (it->first == "filter by") {
-    settings_handler.set_filterer(new_setting_arg.value());
   } else if (it->first == "sort by") {
     settings_handler.set_sorterer(new_setting_arg.value());
   } else {

@@ -46,7 +46,7 @@ class DefaultFilter : public EntryFilter {
 
 class CategoryIDFilter : public EntryFilter {
  public:
-  CategoryIDFilter() = delete;
+  CategoryIDFilter() = default;
   CategoryIDFilter(const std::string &category_id_)
       : category_id(category_id_) {}
   bool passes(
@@ -65,16 +65,17 @@ class CategoryIDFilter : public EntryFilter {
   }
 
  private:
-  std::string category_id{0};
+  std::string category_id{};
 };
 
 class DeadlineFilter : public EntryFilter {
  public:
-  DeadlineFilter() = delete;
+  DeadlineFilter() = default;
   DeadlineFilter(int16_t _day, int16_t _month, int16_t _year) {
-    this->deadline_ = std::make_unique<BaseDate>(_day, _month, _year);
+    deadline_ = std::make_unique<BaseDate>(_day, _month, _year);
   }
-  // DeadlineFilter(const BaseDate& db) : deadline_(std::make_unique(db)) {};
+  DeadlineFilter(const BaseDate &deadline)
+      : deadline_(std::make_unique<BaseDate>(deadline)){};
   bool passes(const std::shared_ptr<EntryTask> &entry) const override;
   bool passes([[maybe_unused]] const std::shared_ptr<EntryCategory> &entry)
       const override {
@@ -91,7 +92,7 @@ class DeadlineFilter : public EntryFilter {
 
 class StatusFilter : public EntryFilter {
  public:
-  StatusFilter() = delete;
+  StatusFilter() = default;
   StatusFilter(const Status &status) : status_(status){};
   bool passes(const std::shared_ptr<EntryTask> &entry) const override;
   bool passes([[maybe_unused]] const std::shared_ptr<EntryCategory> &entry)

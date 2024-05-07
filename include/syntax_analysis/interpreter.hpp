@@ -89,10 +89,7 @@ class Interpreter {
 
   // SET
   const std::unordered_map<std::string, std::string> set_params{
-      {"df", "date format"},
-      {"ds", "date format separator"},
-      {"s", "sort by"},
-      {"f", "filter by"}};
+      {"df", "date format"}, {"ds", "date format separator"}, {"s", "sort by"}};
 };
 
 #endif  // INTERPTERE_HPP

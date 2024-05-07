@@ -115,14 +115,6 @@ bool SettingsHandler::set_format_date(const std::string &format_date_str,
   return false;
 }
 
-bool SettingsHandler::set_filterer(const std::string &filterer_str) noexcept {
-  if (entry_filter_factory.is_valid(filterer_str)) {
-    set_value_by_field("filter by", filterer_str);
-    return true;
-  }
-  return false;
-}
-
 bool SettingsHandler::set_sorterer(const std::string &sorter_str) noexcept {
   if (entry_sorter_factory.is_valid(sorter_str)) {
     set_value_by_field("sort by", sorter_str);
