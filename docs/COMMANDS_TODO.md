@@ -16,21 +16,25 @@ scd add "Already existing task" @"Category"
 ```
 scd add "New Task" @"Category"
 ```
-- [ ] New task with deadline
+- [x] New task with deadline
 ```
 scd add "New task" 04-20-2069
 ```
-- [ ] New task with parameter
+- [x] New task with parameter
 ```
 scd add "New task" -wr
 ```
-- [ ] New task with parameter and option
+- [x] New task with parameter and option
+```
+scd add "New task" -w 2
+```
+- [x] New task with parameter and option recursive
 ```
 scd add "New task" -wr 2
 ```
-- [ ] New task with deadline and parameter
+- [x] New task with deadline and parameter recursive
 ```
-scd add "New task" 04-20-2069 -w
+scd add "New task" 04-20-2069 -wr
 ```
 - [ ] New task with deadline directly into Category
 ```
@@ -40,7 +44,11 @@ scd add "New task" @"Category" 20-04-2026
 ```
 scd add "New task" @"Category" 20-04-2069 -y
 ```
-- [ ] New task with deadline, parameter and option
+- [x] New task with deadline, parameters, option recursive directly into Category
+```
+scd add "New task" @"Category" 20-04-2069 -yr 5
+```
+- [x] New task with deadline, parameter and option
 ```
 acd add "New task" 04-20-2069 -m 3
 ```
