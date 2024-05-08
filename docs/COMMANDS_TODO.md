@@ -36,13 +36,9 @@ scd add "New task" -wr 2
 ```
 scd add "New task" 04-20-2069 -wr
 ```
-- [ ] New task with deadline directly into Category
+- [x] New task with deadline directly into Category
 ```
 scd add "New task" @"Category" 20-04-2026
-```
-- [ ] New task with deadline, parameters directly into Category
-```
-scd add "New task" @"Category" 20-04-2069 -y
 ```
 - [x] New task with deadline, parameters, option recursive directly into Category
 ```

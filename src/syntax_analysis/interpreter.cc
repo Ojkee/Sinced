@@ -23,6 +23,8 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
       // TODO more commads
     } else if (tokens[0].content == "log") {
       return log_command(tokens);
+    } else if (tokens[0].content == "set") {
+      return set_command(tokens);
     }
   }
   return {.flag = Flag_Messages::bad_return("Interpreter::parse"),
@@ -277,15 +279,26 @@ Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
                 std::format("No such setting: {}", setting_field_arg.value())};
   }
 
-  if (it->first == "date format") {
+  if (it->second == "date format") {
     const auto sep =
         settings_handler.get_value_by_field("date format separator");
-    settings_handler.set_format_date(new_setting_arg.value(),
-                                     (sep) ? sep.value() : "-");
-  } else if (it->first == "sort by") {
+    const bool set_flag = settings_handler.set_format_date(
+        new_setting_arg.value(), (sep) ? sep.value() : "-");
+    const std::string flag_msg =
+        (set_flag) ? std::format("Set \"date format\" to \"{}\"",
+                                 new_setting_arg.value())
+                   : "Invalid date format";
+    return {.flag = flag_msg, .out_buffer = {}};
+  } else if (it->second == "sort by") {
     settings_handler.set_sorterer(new_setting_arg.value());
+    return {.flag = std::format("Set \"sorter\" to \"{}\"",
+                                new_setting_arg.value()),
+            .out_buffer = {}};
   } else {
     settings_handler.set_value_by_field(it->second, new_setting_arg.value());
+    return {.flag = std::format("Set \"{}\" to \"{}\"", it->second,
+                                new_setting_arg.value()),
+            .out_buffer = {}};
   }
 
   return {.flag = Flag_Messages::bad_return("Interpreter::set_command"),
