@@ -73,6 +73,16 @@ void reset_tracker() {
   file << content;
 }
 
+void reset_test_settings() {
+  std::ofstream file(PATH_SETTINGS);
+  const std::string content =
+      "<<{ field name } { value }>>\n\n"
+      "{date format} {DDMMYYYY}\n"
+      "{date format separator} {-}\n"
+      "{sort by} {default}\n";
+  file << content;
+}
+
 const std::string get_file_content(const std::string &path) {
   std::ifstream file(path);
   if (!file.is_open()) {
@@ -94,11 +104,12 @@ TEST_CASE("Test Add Command task CORRENT PROMPTS") {
   INTERPRETER_TEST_DB::reset_categories_db();
   INTERPRETER_TEST_DB::reset_relations_db();
   INTERPRETER_TEST_DB::reset_tracker();
+  INTERPRETER_TEST_DB::reset_test_settings();
   Interpreter interpreter = Interpreter(
       PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
 
   const std::string user_input1 = "add my_task";
-  const auto [flag1, buffr1] = interpreter.parse(user_input1);
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
   const std::string target1 =
       "0 \"T0\" 0 45300 14 0 0\n"
       "1 \"T1\" 0 46000 0 2 0\n"
@@ -125,7 +136,7 @@ TEST_CASE("Test Add Command task CORRENT PROMPTS") {
   CHECK(tracker_result1 == tracker_target1);
 
   const std::string user_input2 = "add @\"my category\"";
-  const auto [flag2, buffr2] = interpreter.parse(user_input2);
+  const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
   const std::string target2 =
       "0 \"Uncategorized\"\n"
       "1 \"Some category\"\n"
@@ -145,7 +156,7 @@ TEST_CASE("Test Add Command task CORRENT PROMPTS") {
   CHECK(tracker_result2 == tracker_target2);
 
   const std::string user_input3 = "add new_task @project";
-  const auto [flag3, buffr3] = interpreter.parse(user_input3);
+  const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
   const std::string result3_1 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   const std::string target3_1 =
@@ -189,15 +200,15 @@ TEST_CASE("Test Add Command task CORRENT PROMPTS") {
   CHECK(tracker_result3 == tracker_target3);
 
   const std::string user_input4 = "add taskerinho @categorinho";
-  const auto [flag4, buffr4] = interpreter.parse(user_input4);
+  const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
   CHECK(flag4 == "No category: @\"categorinho\"");
 
   const std::string user_input5 = "add T4 @another_category";
-  const auto [flag5, buffr5] = interpreter.parse(user_input5);
+  const auto [flag5, buffr5, session5] = interpreter.parse(user_input5);
   CHECK(flag5 == "\"T4\" already in @\"another_category\"");
 
   const std::string user_input6 = "add T4 @project";
-  const auto [flag6, buffr6] = interpreter.parse(user_input6);
+  const auto [flag6, buffr6, session6] = interpreter.parse(user_input6);
   const std::string result6_1 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   const std::string target6_1 =
@@ -247,12 +258,13 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
   INTERPRETER_TEST_DB::reset_categories_db();
   INTERPRETER_TEST_DB::reset_relations_db();
   INTERPRETER_TEST_DB::reset_tracker();
+  INTERPRETER_TEST_DB::reset_test_settings();
   Interpreter interpreter = Interpreter(
       PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
   const auto TODAY = BaseDate::today();
 
   const std::string user_input1 = "add my_cool_task 20-04-2069";
-  const auto [flag1, buffr1] = interpreter.parse(user_input1);
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
   const std::string tasks_result1 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   const std::string tasks_target1 =
@@ -274,7 +286,7 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
   CHECK(tasks_result1 == tasks_target1);
 
   const std::string user_input2 = "add new_task 21-04-2069 -rw";
-  const auto [flag2, buffr2] = interpreter.parse(user_input2);
+  const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
   const std::string tasks_result2 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   const std::string tasks_target2 =
@@ -297,12 +309,12 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
   CHECK(tasks_result2 == tasks_target2);
 
   const std::string user_input3 = "add @project";
-  const auto [flag3, buffr3] = interpreter.parse(user_input3);
+  const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
   const std::string flag_target3 = "Category: @\"project\" already exists";
   CHECK(flag3 == flag_target3);
 
   const std::string user_input4 = "add recursive_task_with_no_deadline_arg -wr";
-  const auto [flag4, buffr4] = interpreter.parse(user_input4);
+  const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
   const std::string tasks_result4 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   const std::string tasks_target4 = std::format(
@@ -329,7 +341,7 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
 
   const std::string user_input5 =
       "add \"deadline_option_param\" 20-04-2069 -rwd 5";
-  const auto [flag5, buffr5] = interpreter.parse(user_input5);
+  const auto [flag5, buffr5, session5] = interpreter.parse(user_input5);
   const std::string tasks_result5 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   const std::string tasks_target5 = std::format(
@@ -355,7 +367,7 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
   CHECK(tasks_result5 == tasks_target5);
 
   const std::string user_input6 = "add \"option_param\" -rym 5";
-  const auto [flag6, buffr6] = interpreter.parse(user_input6);
+  const auto [flag6, buffr6, session6] = interpreter.parse(user_input6);
   const std::string tasks_result6 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   auto date_6 = TODAY;
@@ -385,7 +397,7 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
   CHECK(tasks_result6 == tasks_target6);
 
   const std::string user_input7 = "add \"param_no_recurs\" -w 5";
-  const auto [flag7, buffr7] = interpreter.parse(user_input7);
+  const auto [flag7, buffr7, session7] = interpreter.parse(user_input7);
   const std::string tasks_result7 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   const std::string tasks_target7 = std::format(
@@ -419,6 +431,7 @@ TEST_CASE("Test Add Command task to category CORRENT PROMPTS") {
   INTERPRETER_TEST_DB::reset_categories_db();
   INTERPRETER_TEST_DB::reset_relations_db();
   INTERPRETER_TEST_DB::reset_tracker();
+  INTERPRETER_TEST_DB::reset_test_settings();
   Interpreter interpreter = Interpreter(
       PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
   // const auto TODAY = BaseDate::today();
@@ -430,7 +443,7 @@ TEST_CASE("Test Add Command task to category CORRENT PROMPTS") {
 
   const std::string user_input1 =
       "add va_banque @\"Some category\" 20-04-2069 -rwy 3";
-  const auto [flag1, buffr1] = interpreter.parse(user_input1);
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
   const std::string tasks_result1 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   const std::string relations_result1 =
@@ -469,12 +482,12 @@ TEST_CASE("Test Add Command task to category CORRENT PROMPTS") {
 
   const std::string user_input2 =
       "add \"task in week\" @Cat_that_not_exists -w";
-  const auto [flag2, buffr2] = interpreter.parse(user_input2);
+  const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
   const std::string flag_target2 = "No category: @\"Cat_that_not_exists\"";
   CHECK(flag2 == flag_target2);
 
   const std::string user_input3 = "add tcd @another_category 20-04-2069";
-  const auto [flag3, buffr3] = interpreter.parse(user_input3);
+  const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
   const std::string tasks_result3 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
   const std::string relations_result3 =

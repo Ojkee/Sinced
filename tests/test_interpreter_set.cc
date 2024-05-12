@@ -1,6 +1,7 @@
 // SETTING
 
 #include <fstream>
+#include <string>
 
 #include "../extern/include/catch.hpp"
 #include "../include/syntax_analysis/interpreter.hpp"
@@ -48,7 +49,7 @@ TEST_CASE("Setting in setting.mcg file via interpreter") {
       PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
 
   const std::string user_input1 = "set -df YYYYMMDD";
-  const auto [flag1, buffr1] = interpreter.parse(user_input1);
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
   const std::string result1 = INTERPRETER_SET::get_content(PATH_SETTINGS);
   const std::string target1 =
       "<<{ field name } { value }>>\n\n"
@@ -59,7 +60,7 @@ TEST_CASE("Setting in setting.mcg file via interpreter") {
   CHECK(result1 == target1);
 
   const std::string user_input2 = "set -ds .";
-  const auto [flag2, buffr2] = interpreter.parse(user_input2);
+  const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
   const std::string result2 = INTERPRETER_SET::get_content(PATH_SETTINGS);
   const std::string target2 =
       "<<{ field name } { value }>>\n\n"
@@ -68,4 +69,36 @@ TEST_CASE("Setting in setting.mcg file via interpreter") {
       "{sort by} {default}\n";
   CHECK(flag2 == "Set \"date format separator\" to \".\"");
   CHECK(result2 == target2);
+
+  const std::string user_input3 = "set -s deadline";
+  const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
+  const std::string result3 = INTERPRETER_SET::get_content(PATH_SETTINGS);
+  const std::string target3 =
+      "<<{ field name } { value }>>\n\n"
+      "{date format} {YYYYMMDD}\n"
+      "{date format separator} {.}\n"
+      "{sort by} {deadline}\n";
+  CHECK(flag3 == "Set \"sorter\" to \"deadline\"");
+  CHECK(result3 == target3);
+}
+
+TEST_CASE("Reading from settings") {
+  INTERPRETER_SET::reset_test_settings();
+  SettingsHandler settings_handler = SettingsHandler(PATH_SETTINGS);
+
+  const std::shared_ptr<FormatDate> fd1 = settings_handler.get_format_date();
+  CHECK(fd1->get(20, 4, 2069) == "20-04-2069");
+
+  settings_handler.set_format_date("MMDDYYYY", "JD");
+  const std::shared_ptr<FormatDate> fd2 = settings_handler.get_format_date();
+  CHECK(fd2->get(20, 4, 2069) == "04JD20JD2069");
+
+  const auto sorter_ptr1 = settings_handler.get_value_by_field("sort by");
+  const std::string result1 = sorter_ptr1 ? sorter_ptr1.value() : "nullptr";
+  CHECK(result1 == "default");
+
+  settings_handler.set_sorterer("deadline");
+  const auto sorter_ptr2 = settings_handler.get_value_by_field("sort by");
+  const std::string result2 = sorter_ptr2 ? sorter_ptr2.value() : "nullptr";
+  CHECK(result2 == "deadline");
 }

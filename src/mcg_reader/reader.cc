@@ -115,6 +115,11 @@ bool SettingsHandler::set_format_date(const std::string &format_date_str,
   return false;
 }
 
+std::shared_ptr<EntrySorter> SettingsHandler::get_sorter() noexcept {
+  const auto sorter_str = get_value_by_field("sort by");
+  return entry_sorter_factory.get(sorter_str.value());
+}
+
 bool SettingsHandler::set_sorterer(const std::string &sorter_str) noexcept {
   if (entry_sorter_factory.is_valid(sorter_str)) {
     set_value_by_field("sort by", sorter_str);

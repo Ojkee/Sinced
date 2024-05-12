@@ -9,10 +9,11 @@
 #include "../../include/syntax_analysis/lexer.hpp"
 
 Parsing_Data Interpreter::parse(const std::string &user_input) {
-  // TODO DateFormat getter from Settings file
-  const std::vector<Token> tokens = Lexer::tokenize(user_input, DDMMYYYY());
+  const std::shared_ptr<FormatDate> fd_ptr = settings_handler.get_format_date();
+  const std::vector<Token> tokens = Lexer::tokenize(user_input, *fd_ptr);
+
   if (tokens.size() == 0) [[unlikely]] {
-    return {.flag = Flag_Messages::no_args(), .out_buffer = {}};
+    return {.flag = Flag_Messages::no_args()};
   }
 
   if (tokens[0].type == TokenType::COMMAND) [[likely]] {
@@ -27,8 +28,7 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
       return set_command(tokens);
     }
   }
-  return {.flag = Flag_Messages::bad_return("Interpreter::parse"),
-          .out_buffer = {}};
+  return {.flag = Flag_Messages::bad_return("Interpreter::parse")};
 }
 
 bool constexpr Interpreter::contains_token_type(
@@ -60,7 +60,7 @@ void Interpreter::add_new_relation(const std::string &task_id,
 
 Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
   if (tokens.size() <= 1) {
-    return {.flag = Flag_Messages::no_args(), .out_buffer = {}};
+    return {.flag = Flag_Messages::no_args()};
   }
 
   auto task_name =
@@ -68,15 +68,14 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
   auto category_name = Interpreter::get_token_content_if_contains_type(
       tokens, TokenType::CATEGORY_NAME);
   if (!task_name && !category_name) {
-    return {.flag = Flag_Messages::invalid_args(), .out_buffer = {}};
+    return {.flag = Flag_Messages::invalid_args()};
   }
 
   if (task_name && category_name) {
     auto category_ptr = entry_handler.get_entry_by_content<EntryCategory>(
         category_name.value());
     if (!category_ptr) {
-      return {.flag = Flag_Messages::no_category(category_name.value()),
-              .out_buffer = {}};
+      return {.flag = Flag_Messages::no_category(category_name.value())};
     }
     const auto task_ptr =
         entry_handler.get_entry_by_content<EntryTask>(task_name.value());
@@ -85,20 +84,17 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
           task_ptr->get_id(), category_ptr->get_id());
       if (relation_ptr) {
         return {.flag = std::format("\"{}\" already in @\"{}\"",
-                                    task_name.value(), category_name.value()),
-                .out_buffer = {}};
+                                    task_name.value(), category_name.value())};
       }
       add_new_relation(task_ptr->get_id(), category_ptr->get_id());
       return {.flag = std::format("Added: \"{}\" to @\"{}\"", task_name.value(),
-                                  category_name.value()),
-              .out_buffer = {}};
+                                  category_name.value())};
     }
     std::shared_ptr<EntryTask> new_task = build_task(tokens);
     entry_handler.add_entry_to_db(*new_task);
     add_new_relation(new_task->get_id(), category_ptr->get_id());
     return {.flag = std::format("Added new task: \"{}\" to @\"{}\"",
-                                task_name.value(), category_name.value()),
-            .out_buffer = {}};
+                                task_name.value(), category_name.value())};
   }
 
   if (!task_name && category_name) {
@@ -106,8 +102,7 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
         category_name.value());
     if (category_ptr) {
       return {.flag = std::format("Category: @\"{}\" already exists",
-                                  category_name.value()),
-              .out_buffer = {}};
+                                  category_name.value())};
     }
     const std::string category_token =
         std::format("{} \"{}\"", tracker_handler.next_id("last category id"),
@@ -116,20 +111,17 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
     entry_handler.add_entry_to_db(category);
     tracker_handler.increment_field_value("last category id");
     return {.flag = std::format("Added new category: @\"{}\"",
-                                category_name.value()),
-            .out_buffer = {}};
+                                category_name.value())};
   }
 
   if (task_name && !category_name) {
     std::shared_ptr<EntryTask> new_task = build_task(tokens);
     entry_handler.add_entry_to_db(*new_task);
-    return {.flag = std::format("Added new task: \"{}\"", task_name.value()),
-            .out_buffer = {}};
+    return {.flag = std::format("Added new task: \"{}\"", task_name.value())};
   }
 
-  return {
-      .flag = Flag_Messages::bad_return("Interpreter::add_new_task_builder"),
-      .out_buffer = {}};
+  return {.flag =
+              Flag_Messages::bad_return("Interpreter::add_new_task_builder")};
 }
 
 std::shared_ptr<EntryTask> Interpreter::build_task(
@@ -152,7 +144,6 @@ std::shared_ptr<EntryTask> Interpreter::build_task(
 
   if (deadline_arg) {
     BaseDate deadline = BaseDate();
-    deadline.set_formatter(std::make_unique<DDMMYYYY>());
     deadline.initialize_from_str(deadline_arg.value());
     task_builder.add_deadline(deadline);
     if (options_arg && options_arg.value().find("r") != std::string::npos) {
@@ -181,7 +172,6 @@ std::shared_ptr<EntryTask> Interpreter::build_task(
       task_builder.add_recursive_days(days_);
       task_builder.add_recursive_months(months_);
       task_builder.add_recursive_years(years_);
-      // TODO
     }
   } else if (!deadline_arg && options_arg) {
     int16_t days_{};
@@ -221,7 +211,7 @@ std::shared_ptr<EntryTask> Interpreter::build_task(
 
 Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
   if (tokens.size() <= 1) {
-    return {.flag = Flag_Messages::no_args(), .out_buffer = {}};
+    return {.flag = Flag_Messages::no_args()};
   }
 
   auto task_name =
@@ -232,34 +222,43 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
       tokens, TokenType::OPTION);
 
   if (!task_name && !category_name) {
-    return {.flag = Flag_Messages::invalid_args(), .out_buffer = {}};
+    return {.flag = Flag_Messages::invalid_args()};
   }
 
   if (task_name) {
     std::shared_ptr<EntryTask> task_ptr =
         entry_handler.get_entry_by_content<EntryTask>(task_name.value());
-    return {.flag = std::format("Logged: \"{}\"", task_name.value()),
-            .out_buffer = task_ptr->info()};
+    if (task_ptr) {
+      return {.flag = std::format("Logged: \"{}\"", task_name.value()),
+              .out_buffer = task_ptr->info()};
+    }
+    return {
+        .flag = Flag_Messages::no_task(task_name.value()),
+        .out_buffer = std::format("No task named: \"{}\"", task_name.value())};
   } else if (category_name) {
     std::shared_ptr<EntryCategory> category_ptr =
         entry_handler.get_entry_by_content<EntryCategory>(
             category_name.value());
-    const std::string tasks_in_category_info =
-        entry_handler.tasks_info_by_category_id(category_ptr->get_id());
-    return {.flag = std::format("Logged: @\"{}\"", category_name.value()),
-            .out_buffer = tasks_in_category_info};
+    if (category_ptr) {
+      const std::string tasks_in_category_info =
+          entry_handler.tasks_info_by_category_id(category_ptr->get_id());
+      return {.flag = std::format("Logged: @\"{}\"", category_name.value()),
+              .out_buffer = tasks_in_category_info};
+    }
+    return {.flag = Flag_Messages::no_category(category_name.value()),
+            .out_buffer = std::format("No category named: @\"{}\"",
+                                      category_name.value())};
   } else if (options_arg) {
     if (options_arg.value() == "a") {
     }
   }
 
-  return {.flag = Flag_Messages::bad_return("Interpreter::log_command"),
-          .out_buffer = {}};
+  return {.flag = Flag_Messages::bad_return("Interpreter::log_command")};
 }
 
 Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
   if (tokens.size() <= 1) {
-    return {.flag = Flag_Messages::no_args(), .out_buffer = {}};
+    return {.flag = Flag_Messages::no_args()};
   }
 
   const auto setting_field_arg =
@@ -269,14 +268,12 @@ Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
       Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
 
   if (!setting_field_arg || !new_setting_arg) {
-    return {.flag = Flag_Messages::invalid_args(), .out_buffer = {}};
+    return {.flag = Flag_Messages::invalid_args()};
   }
 
   const auto it = set_params.find(setting_field_arg.value());
   if (it == set_params.end()) {
-    return {.flag = Flag_Messages::invalid_args(),
-            .out_buffer =
-                std::format("No such setting: {}", setting_field_arg.value())};
+    return {.flag = Flag_Messages::invalid_args()};
   }
 
   if (it->second == "date format") {
@@ -288,19 +285,16 @@ Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
         (set_flag) ? std::format("Set \"date format\" to \"{}\"",
                                  new_setting_arg.value())
                    : "Invalid date format";
-    return {.flag = flag_msg, .out_buffer = {}};
+    return {.flag = flag_msg};
   } else if (it->second == "sort by") {
     settings_handler.set_sorterer(new_setting_arg.value());
     return {.flag = std::format("Set \"sorter\" to \"{}\"",
-                                new_setting_arg.value()),
-            .out_buffer = {}};
+                                new_setting_arg.value())};
   } else {
     settings_handler.set_value_by_field(it->second, new_setting_arg.value());
     return {.flag = std::format("Set \"{}\" to \"{}\"", it->second,
-                                new_setting_arg.value()),
-            .out_buffer = {}};
+                                new_setting_arg.value())};
   }
 
-  return {.flag = Flag_Messages::bad_return("Interpreter::set_command"),
-          .out_buffer = {}};
+  return {.flag = Flag_Messages::bad_return("Interpreter::set_command")};
 }

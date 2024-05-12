@@ -35,8 +35,9 @@ class Flag_Messages {
 };
 
 struct Parsing_Data {
-  std::string flag;
-  std::string out_buffer;
+  std::string flag{};
+  std::string out_buffer{};
+  bool session{false};
 };
 
 class Interpreter {

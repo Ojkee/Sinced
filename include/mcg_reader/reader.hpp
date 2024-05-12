@@ -44,6 +44,7 @@ class SettingsHandler : public MCGFileHandler {
   [[nodiscard]] std::shared_ptr<FormatDate> get_format_date() noexcept;
   bool set_format_date(const std::string &format_date_str,
                        const std::string &separator) noexcept;
+  [[nodiscard]] std::shared_ptr<EntrySorter> get_sorter() noexcept;
   bool set_sorterer(const std::string &sorter_str) noexcept;
 
  private:

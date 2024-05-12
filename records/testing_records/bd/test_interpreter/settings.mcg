@@ -1,5 +1,5 @@
 <<{ field name } { value }>>
 
-{date format} {YYYYMMDD}
-{date format separator} {.}
-{sort by} {default}
+{date format} {MMDDYYYY}
+{date format separator} {JD}
+{sort by} {deadline}

@@ -98,7 +98,29 @@ TEST_CASE("Log tasks") {
       PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
 
   const std::string user_input1 = "log T1";
-  const auto [flag1, buffr1] = interpreter.parse(user_input1);
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
+  const std::string target_buffr1 =
+      "\"T1\"\n\tOngoing\n\tdeadline: 10-12-2095 every: 2 month ";
   CHECK(flag1 == "Logged: \"T1\"");
-  CHECK(buffr1 == "\"T1\"\n\tOngoing\n\tdeadline: 10-12-2095 every: 2 month ");
+  CHECK(buffr1 == target_buffr1);
+
+  const std::string user_input2 = "log @another_category";
+  const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
+  const std::string target_buffr2 =
+      "\"T4\"\n\tDone\n\tdeadline: 29-07-2094\n\"T5\"\n\tOngoing\n\tdeadline: "
+      "None\n";
+  CHECK(flag2 == "Logged: @\"another_category\"");
+  CHECK(buffr2 == target_buffr2);
+
+  const std::string user_input3 = "log task_that_not_exists";
+  const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
+  const std::string target_buffr3 = "No task: \"task_that_not_exists\"";
+  CHECK(flag3 == target_buffr3);
+  CHECK(buffr3 == "No task named: \"task_that_not_exists\"");
+
+  const std::string user_input4 = "log @category_that_not_exists";
+  const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
+  const std::string target_buffr4 = "";
+  CHECK(flag4 == "No category: @\"category_that_not_exists\"");
+  CHECK(buffr4 == "No category named: @\"category_that_not_exists\"");
 }

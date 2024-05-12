@@ -6,7 +6,7 @@ set(TARGET_SOURCES
     "test_cfg_main.cc"
     "test_interpreter_add.cc"
     "test_interpreter_set.cc"
-    # "test_interpreter_log.cc"
+    "test_interpreter_log.cc"
     "test_mcg_reader.cc"
 )
 #[[
