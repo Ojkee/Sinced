@@ -1,10 +1,9 @@
-#include "../extern/include/catch.hpp"
-
-#include "../include/entry/entry_handler.hpp"
-
 #include <fstream>
 #include <memory>
 #include <string>
+
+#include "../extern/include/catch.hpp"
+#include "../include/entry/entry_handler.hpp"
 
 TEST_CASE("Filtering by category_id") {
   std::string testing_dir = "../records/testing_records/bd/";
@@ -15,12 +14,13 @@ TEST_CASE("Filtering by category_id") {
 
   std::string r1_1 = et1.tasks_info_by_category_id(2);
   std::string r1_2 = et1.tasks_info_by_category_id("2");
-  std::string t1 = "\" title\"\n"
-                   "\tDone\n"
-                   "\tdeadline: 29-07-2094\n"
-                   "\"asjkdbna \"\n"
-                   "\tOngoing\n"
-                   "\tdeadline: None\n";
+  std::string t1 =
+      "\" title\"\n"
+      "\tDone\n"
+      "\tdeadline: 29-07-2094\n"
+      "\"asjkdbna \"\n"
+      "\tOngoing\n"
+      "\tdeadline: None\n";
 
   REQUIRE(r1_1 == t1);
   REQUIRE(r1_2 == t1);
@@ -47,7 +47,7 @@ TEST_CASE("Filtering by deadline") {
   std::string target_info1 =
       "\"In no repetetive\"\n\tDone\n\tdeadline: 26-02-2025\n"
       "\"Deadline date no repetetive\"\n\tDone\n\tdeadline: 21-02-2026\n"
-      "\"Before repetetive in\"\n\tOngoing\n\tdeadline: 14-04-2024 every: 50 "
+      "\"Before repetetive in\"\n\tOngoing\n\tdeadline: 03-06-2024 every: 50 "
       "day \n"
       "\"In repetetive\"\n\tOngoing\n\tdeadline: 26-02-2025 every: 7 day \n"
       "\"Deadline date repetetive\"\n\tOngoing\n\tdeadline: 21-02-2026 every: "
@@ -63,16 +63,17 @@ TEST_CASE("Filtering by deadline") {
 }
 
 std::string generate_deadline_tasks() {
-  std::string tasks{"0 \"Before no repetetive\" 1 19777 0 0 0\n"
-                    "1 \"In no repetetive\" 1 20145 0 0 0\n"
-                    "2 \"After no repetetive\" 1 20510 0 0 0\n"
-                    "3 \"No deadline\" 1 -1 0 0 0\n"
-                    "4 \"Deadline date no repetetive\" 1 20505 0 0 0\n"
-                    "5 \"Before repetetive not in\" 0 19777 0 0 3\n"
-                    "6 \"Before repetetive in\" 0 19777 50 0 0\n"
-                    "7 \"In repetetive\" 0 20145 7 0 0\n"
-                    "8 \"After repetetive\" 0 20511 0 2 0\n"
-                    "9 \"Deadline date repetetive\" 0 20505 20 0 0\n"};
+  std::string tasks{
+      "0 \"Before no repetetive\" 1 19777 0 0 0\n"
+      "1 \"In no repetetive\" 1 20145 0 0 0\n"
+      "2 \"After no repetetive\" 1 20510 0 0 0\n"
+      "3 \"No deadline\" 1 -1 0 0 0\n"
+      "4 \"Deadline date no repetetive\" 1 20505 0 0 0\n"
+      "5 \"Before repetetive not in\" 0 19777 0 0 3\n"
+      "6 \"Before repetetive in\" 0 19777 50 0 0\n"
+      "7 \"In repetetive\" 0 20145 7 0 0\n"
+      "8 \"After repetetive\" 0 20511 0 2 0\n"
+      "9 \"Deadline date repetetive\" 0 20505 20 0 0\n"};
   auto today_date = BaseDate::date_to_days(BaseDate::today());
   std::string today_no_repretetive =
       "10 \"Today no repetetive\" 0 " + std::to_string(today_date) + " 0 0 0\n";

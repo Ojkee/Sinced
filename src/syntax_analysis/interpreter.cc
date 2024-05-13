@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "../../include/entry/entry_filter_factory.hpp"
 #include "../../include/syntax_analysis/lexer.hpp"
 
 Parsing_Data Interpreter::parse(const std::string &user_input) {
@@ -23,6 +24,8 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
     } else if (tokens[0].content == "rm") {
       // TODO more commads
     } else if (tokens[0].content == "log") {
+      auto sorter = settings_handler.get_sorter();
+      entry_handler.set_sorter(sorter);
       return log_command(tokens);
     } else if (tokens[0].content == "set") {
       return set_command(tokens);
@@ -214,27 +217,27 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
     return {.flag = Flag_Messages::no_args()};
   }
 
-  auto task_name =
+  auto text_arg =
       Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
   auto category_name = Interpreter::get_token_content_if_contains_type(
       tokens, TokenType::CATEGORY_NAME);
   auto options_arg = Interpreter::get_token_content_if_contains_type(
       tokens, TokenType::OPTION);
 
-  if (!task_name && !category_name) {
+  if (!(text_arg || category_name || options_arg)) {
     return {.flag = Flag_Messages::invalid_args()};
   }
 
-  if (task_name) {
+  if (text_arg && !options_arg) {
     std::shared_ptr<EntryTask> task_ptr =
-        entry_handler.get_entry_by_content<EntryTask>(task_name.value());
+        entry_handler.get_entry_by_content<EntryTask>(text_arg.value());
     if (task_ptr) {
-      return {.flag = std::format("Logged: \"{}\"", task_name.value()),
+      return {.flag = std::format("Logged: \"{}\"", text_arg.value()),
               .out_buffer = task_ptr->info()};
     }
     return {
-        .flag = Flag_Messages::no_task(task_name.value()),
-        .out_buffer = std::format("No task named: \"{}\"", task_name.value())};
+        .flag = Flag_Messages::no_task(text_arg.value()),
+        .out_buffer = std::format("No task named: \"{}\"", text_arg.value())};
   } else if (category_name) {
     std::shared_ptr<EntryCategory> category_ptr =
         entry_handler.get_entry_by_content<EntryCategory>(
@@ -250,6 +253,25 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
                                       category_name.value())};
   } else if (options_arg) {
     if (options_arg.value() == "a") {
+      entry_handler.load_filtered_tasks();
+      const std::string all_tasks_info = entry_handler.sorted_tasks_info();
+      return {.flag = "Logged all tasks", .out_buffer = all_tasks_info};
+    }
+    if (options_arg.value() == "f" && text_arg) {
+      TODO ASAP
+      // EntryFilterFactory eff = EntryFilterFactory();
+      // auto filter_ptr = eff.get(text_arg.value());
+      // if (!filter_ptr) {
+      //   return {.flag = Flag_Messages::invalid_args(),
+      //           .out_buffer =
+      //               std::format("No filter named: \"{}\"",
+      //               text_arg.value())};
+      // }
+      // entry_handler.set_filter(filter_ptr);
+      // entry_handler.load_filtered_tasks();
+      // const std::string tasks_info_filtered = entry_handler.tasks_info_all();
+      // return {.flag = "Logged filtered tasks",
+      //         .out_buffer = tasks_info_filtered};
     }
   }
 

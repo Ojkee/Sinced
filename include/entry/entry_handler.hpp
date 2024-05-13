@@ -20,7 +20,7 @@ typedef std::vector<std::shared_ptr<EntryRelation>> SP_RELATIONS;
 #define SP_T(x) std::vector<std::shared_ptr<x>>
 
 class EntryHandler {
-public:
+ public:
   EntryHandler()
       : EntryHandler("../records/database/tasks.mdb",
                      "../records/database/categories.mdb",
@@ -28,10 +28,12 @@ public:
   EntryHandler(const std::string &tasks_db_path_,
                const std::string &categories_db_path_,
                const std::string &relations_db_path_)
-      : tasks_db_path(tasks_db_path_), categories_db_path(categories_db_path_),
+      : tasks_db_path(tasks_db_path_),
+        categories_db_path(categories_db_path_),
         relations_db_path(relations_db_path_){};
 
   void load_db() noexcept;
+  void load_filtered_tasks() noexcept;
   template <typename EntryType>
   SP_T(EntryType)
   filter_load_db(const std::string &path) noexcept;
@@ -50,30 +52,31 @@ public:
   void add_entry_to_db([[maybe_unused]] const EntryType &entry) const {
     std::cerr << "Not valid type of entry!";
   }
-  template <> void add_entry_to_db<EntryTask>(const EntryTask &entry) const;
+  template <>
+  void add_entry_to_db<EntryTask>(const EntryTask &entry) const;
   template <>
   void add_entry_to_db<EntryCategory>(const EntryCategory &entry) const;
   template <>
   void add_entry_to_db<EntryRelation>(const EntryRelation &entry) const;
 
   template <typename EntryType>
-  [[nodiscard]] std::shared_ptr<EntryType>
-  get_entry_by_content([[maybe_unused]] const std::string &content) const {
+  [[nodiscard]] std::shared_ptr<EntryType> get_entry_by_content(
+      [[maybe_unused]] const std::string &content) const {
     std::cerr << "Not valid type of entry!";
   }
   template <>
-  [[nodiscard]] std::shared_ptr<EntryTask>
-  get_entry_by_content(const std::string &content) const;
+  [[nodiscard]] std::shared_ptr<EntryTask> get_entry_by_content(
+      const std::string &content) const;
   template <>
-  [[nodiscard]] std::shared_ptr<EntryCategory>
-  get_entry_by_content(const std::string &content) const;
+  [[nodiscard]] std::shared_ptr<EntryCategory> get_entry_by_content(
+      const std::string &content) const;
   template <>
-  [[nodiscard]] std::shared_ptr<EntryRelation>
-  get_entry_by_content(const std::string &content) const;
+  [[nodiscard]] std::shared_ptr<EntryRelation> get_entry_by_content(
+      const std::string &content) const;
 
-  [[nodiscard]] std::shared_ptr<EntryRelation>
-  get_relation_by_ids(const std::string &task_content,
-                      const std::string category_content) const;
+  [[nodiscard]] std::shared_ptr<EntryRelation> get_relation_by_ids(
+      const std::string &task_content,
+      const std::string category_content) const;
 
   template <typename EntryType>
   int8_t replace_entry([[maybe_unused]] const EntryType &old_entry,
@@ -107,14 +110,14 @@ public:
   [[nodiscard]] std::string tasks_info_by_category_id(const std::string &id);
   [[nodiscard]] std::string tasks_info_by_category_id(const uint16_t &id);
 
-  void set_filter(std::unique_ptr<EntryFilter> &&_filter) {
+  void set_filter(std::shared_ptr<EntryFilter> _filter) {
     filter = std::move(_filter);
   }
-  void set_sorter(std::unique_ptr<EntrySorter> &&_sorter) {
+  void set_sorter(std::shared_ptr<EntrySorter> _sorter) {
     sorter = std::move(_sorter);
   }
 
-private:
+ private:
   template <typename EntryType>
   [[nodiscard]] SP_T(EntryType)
       load_entries(const std::string &file_name) const;
@@ -131,11 +134,11 @@ private:
   [[nodiscard]] SP_TASKS tasks_by_category_id(const uint16_t &id);
 
   template <typename EntryType>
-  [[nodiscard]] std::shared_ptr<EntryType>
-  entry_by_id(const std::string &id, const std::string &path) const;
+  [[nodiscard]] std::shared_ptr<EntryType> entry_by_id(
+      const std::string &id, const std::string &path) const;
   template <typename EntryType>
-  [[nodiscard]] std::shared_ptr<EntryType>
-  entry_by_content(const std::string &content, const std::string &path) const;
+  [[nodiscard]] std::shared_ptr<EntryType> entry_by_content(
+      const std::string &content, const std::string &path) const;
 
   template <typename EntryType>
   [[nodiscard]] SP_T(EntryType)
@@ -150,8 +153,8 @@ private:
   SP_CATEGORIES categories;
   SP_RELATIONS relations;
 
-  std::unique_ptr<EntryFilter> filter = std::make_unique<DefaultFilter>();
-  std::unique_ptr<EntrySorter> sorter = std::make_unique<DefaultSorter>();
+  std::shared_ptr<EntryFilter> filter = std::make_unique<DefaultFilter>();
+  std::shared_ptr<EntrySorter> sorter = std::make_shared<DefaultSorter>();
 };
 
-#endif // ENTRY_HANDLER_HPP
+#endif  // ENTRY_HANDLER_HPP

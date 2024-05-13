@@ -22,9 +22,13 @@ void EntryHandler::load_db() noexcept {
   }
 }
 
+void EntryHandler::load_filtered_tasks() noexcept {
+  tasks = filter_load_db<EntryTask>(tasks_db_path);
+}
+
 template <typename EntryType>
-std::vector<std::shared_ptr<EntryType>>
-EntryHandler::filter_load_db(const std::string &path) noexcept {
+std::vector<std::shared_ptr<EntryType>> EntryHandler::filter_load_db(
+    const std::string &path) noexcept {
   std::ifstream entry_file(path);
   if (!entry_file.is_open()) {
     std::cerr << "Error loading file: " << path << '\n';
@@ -68,40 +72,37 @@ int8_t EntryHandler::replace_entry<EntryTask>(const EntryTask &old_entry,
 }
 
 template <>
-int8_t
-EntryHandler::replace_entry<EntryCategory>(const EntryCategory &old_entry,
-                                           const EntryCategory &new_entry) {
+int8_t EntryHandler::replace_entry<EntryCategory>(
+    const EntryCategory &old_entry, const EntryCategory &new_entry) {
   return replace_entry_in_db(old_entry, new_entry, categories_db_path);
 }
 
 template <>
-int8_t
-EntryHandler::replace_entry<EntryRelation>(const EntryRelation &old_entry,
-                                           const EntryRelation &new_entry) {
+int8_t EntryHandler::replace_entry<EntryRelation>(
+    const EntryRelation &old_entry, const EntryRelation &new_entry) {
   return replace_entry_in_db(old_entry, new_entry, relations_db_path);
 }
 
 template <>
-std::shared_ptr<EntryTask>
-EntryHandler::get_entry_by_content(const std::string &content) const {
+std::shared_ptr<EntryTask> EntryHandler::get_entry_by_content(
+    const std::string &content) const {
   return entry_by_content<EntryTask>(content, tasks_db_path);
 }
 
 template <>
-std::shared_ptr<EntryCategory>
-EntryHandler::get_entry_by_content(const std::string &content) const {
+std::shared_ptr<EntryCategory> EntryHandler::get_entry_by_content(
+    const std::string &content) const {
   return entry_by_content<EntryCategory>(content, categories_db_path);
 }
 
 template <>
-std::shared_ptr<EntryRelation>
-EntryHandler::get_entry_by_content(const std::string &content) const {
+std::shared_ptr<EntryRelation> EntryHandler::get_entry_by_content(
+    const std::string &content) const {
   return entry_by_content<EntryRelation>(content, relations_db_path);
 }
 
-std::shared_ptr<EntryRelation>
-EntryHandler::get_relation_by_ids(const std::string &task_content,
-                                  const std::string category_content) const {
+std::shared_ptr<EntryRelation> EntryHandler::get_relation_by_ids(
+    const std::string &task_content, const std::string category_content) const {
   std::ifstream relation_db(relations_db_path);
   if (!relation_db.is_open()) {
     std::cerr << "Couldn't open file: " << relations_db_path << "\n";
@@ -144,8 +145,8 @@ std::string EntryHandler::sorted_tasks_info() {
 }
 
 template <typename EntryType>
-std::vector<std::shared_ptr<EntryType>>
-EntryHandler::load_entries(const std::string &file_name) const {
+std::vector<std::shared_ptr<EntryType>> EntryHandler::load_entries(
+    const std::string &file_name) const {
   std::ifstream entry_file(file_name);
   if (!entry_file.is_open()) {
     std::cerr << "Error loading file: "
@@ -249,8 +250,8 @@ std::string EntryHandler::tasks_info_by_category_id(const uint16_t &id) {
   return tasks_info_by_category_id(std::to_string(id));
 }
 
-std::vector<std::shared_ptr<EntryTask>>
-EntryHandler::tasks_by_category_id(const std::string &id) {
+std::vector<std::shared_ptr<EntryTask>> EntryHandler::tasks_by_category_id(
+    const std::string &id) {
   relations = load_entries<EntryRelation>(relations_db_path);
   set_filter(std::make_unique<CategoryIDFilter>(id));
   auto filtered_relations = filter->filtered(relations);
@@ -262,15 +263,14 @@ EntryHandler::tasks_by_category_id(const std::string &id) {
   return entry_if_id_in_set<EntryTask>(tasks_ids, tasks_db_path);
 }
 
-std::vector<std::shared_ptr<EntryTask>>
-EntryHandler::tasks_by_category_id(const uint16_t &id) {
+std::vector<std::shared_ptr<EntryTask>> EntryHandler::tasks_by_category_id(
+    const uint16_t &id) {
   return tasks_by_category_id(std::to_string(id));
 }
 
 template <typename EntryType>
-std::shared_ptr<EntryType>
-EntryHandler::entry_by_id(const std::string &id,
-                          const std::string &path) const {
+std::shared_ptr<EntryType> EntryHandler::entry_by_id(
+    const std::string &id, const std::string &path) const {
   std::ifstream data_base(path);
   if (!data_base.is_open()) {
     std::cerr << "Error loading file: " << path << '\n';
@@ -287,9 +287,8 @@ EntryHandler::entry_by_id(const std::string &id,
 }
 
 template <typename EntryType>
-[[nodiscard]] std::shared_ptr<EntryType>
-EntryHandler::entry_by_content(const std::string &content,
-                               const std::string &path) const {
+[[nodiscard]] std::shared_ptr<EntryType> EntryHandler::entry_by_content(
+    const std::string &content, const std::string &path) const {
   std::ifstream data_base(path);
   if (!data_base.is_open()) {
     std::cerr << "Error loading file: " << path << '\n';
@@ -306,9 +305,8 @@ EntryHandler::entry_by_content(const std::string &content,
 }
 
 template <typename EntryType>
-std::vector<std::shared_ptr<EntryType>>
-EntryHandler::entry_if_id_in_set(const std::set<std::string> &ids,
-                                 const std::string &path) {
+std::vector<std::shared_ptr<EntryType>> EntryHandler::entry_if_id_in_set(
+    const std::set<std::string> &ids, const std::string &path) {
   std::vector<std::shared_ptr<EntryType>> filtered_entries;
   std::ifstream entries_db(path);
   if (!entries_db.is_open()) {

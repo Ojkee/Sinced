@@ -11,7 +11,8 @@
 ## Commands
 - **add** - adds tasks to task list and @categories to category list
 - **rm** - removes task by name or id (if number provided)
-- **list** - lists task via name/id/category
+- **set** - sets values in setting file
+- **log** - lists task via name/id/category
 - **status** - modifies status of task or whole category
 
 ## Subjects
@@ -61,15 +62,13 @@ tasks can be categorized info folder-like categories with '@' at the beggining o
 ### Configure
 ```
   scd set -df YYYYMMDD                       // date format that program displays
-  scd set -s 'sep'                           // separator in date format in 
+  scd set -s 'sep'                           // separator in date format
 ```
 
 
-### List
-- scd list
-- scd list -a
-- scd list @category
-- scd list -s
-- scd list -s 10
-- scd list -w 2
+### Log
+- scd log
+- scd log -a
+- scd log @category
+- scd log -f 
 

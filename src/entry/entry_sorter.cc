@@ -2,17 +2,20 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <iterator>
 #include <vector>
 
 SP_TASKS DeadlineSorter::arranged(SP_TASKS entries) const {
-  std::erase_if(entries, [](const auto &entry) {
-    return !entry || !entry->get_deadline();
+  SP_TASKS result;
+  std::copy_if(
+      entries.begin(), entries.end(), std::back_inserter(result),
+      [](const auto &entry) { return entry && entry->get_deadline(); });
+  std::sort(result.begin(), result.end(), [](const auto &lhs, const auto &rhs) {
+    return *lhs->get_deadline() < *rhs->get_deadline();
   });
-  std::sort(entries.begin(), entries.end(),
-            [](const auto &lhs, const auto &rhs) {
-              return *lhs->get_deadline() < *rhs->get_deadline();
-            });
-  return entries;
+  std::copy_if(entries.begin(), entries.end(), std::back_inserter(result),
+               [](const auto &entry) { return !entry->get_deadline(); });
+  return result;
 }
 
 SP_TASKS StatusSorter::arranged(SP_TASKS entries) const {

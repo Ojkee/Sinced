@@ -8,6 +8,8 @@ set(TARGET_SOURCES
     "test_interpreter_set.cc"
     "test_interpreter_log.cc"
     "test_mcg_reader.cc"
+    "test_entry_filter.cc"
+    "test_entry_sorter.cc"
 )
 #[[
     "test_date.cc"
@@ -16,8 +18,6 @@ set(TARGET_SOURCES
     "test_entry_handler.cc"
     "test_entry_handler_io.cc"
     "test_entry_handler_modify.cc"
-    "test_entry_filter.cc"
-    "test_entry_sorter.cc"
     "test_lexer.cc"
     ]]
 #list(TRANSFORM TARGET_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/test/")

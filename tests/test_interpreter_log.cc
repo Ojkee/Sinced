@@ -1,4 +1,4 @@
-// LOGING
+// LOGGING
 
 #include <cstdlib>
 #include <fstream>
@@ -73,6 +73,16 @@ void reset_tracker() {
   file << content;
 }
 
+void reset_test_settings() {
+  std::ofstream file(PATH_SETTINGS);
+  const std::string content =
+      "<<{ field name } { value }>>\n\n"
+      "{date format} {DDMMYYYY}\n"
+      "{date format separator} {-}\n"
+      "{sort by} {default}\n";
+  file << content;
+}
+
 const std::string get_file_content(const std::string &path) {
   std::ifstream file(path);
   if (!file.is_open()) {
@@ -89,11 +99,12 @@ const std::string get_file_content(const std::string &path) {
 
 }  // namespace INTERPRETER_TEST_DB_LOG
 
-TEST_CASE("Log tasks") {
+TEST_CASE("Log single argument") {
   INTERPRETER_TEST_DB_LOG::reset_tasks_db();
   INTERPRETER_TEST_DB_LOG::reset_categories_db();
   INTERPRETER_TEST_DB_LOG::reset_relations_db();
   INTERPRETER_TEST_DB_LOG::reset_tracker();
+  INTERPRETER_TEST_DB_LOG::reset_test_settings();
   Interpreter interpreter = Interpreter(
       PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
 
@@ -123,4 +134,65 @@ TEST_CASE("Log tasks") {
   const std::string target_buffr4 = "";
   CHECK(flag4 == "No category: @\"category_that_not_exists\"");
   CHECK(buffr4 == "No category named: @\"category_that_not_exists\"");
+}
+
+TEST_CASE("Log parameter argument -a") {
+  INTERPRETER_TEST_DB_LOG::reset_tasks_db();
+  INTERPRETER_TEST_DB_LOG::reset_categories_db();
+  INTERPRETER_TEST_DB_LOG::reset_relations_db();
+  INTERPRETER_TEST_DB_LOG::reset_tracker();
+  INTERPRETER_TEST_DB_LOG::reset_test_settings();
+  Interpreter interpreter = Interpreter(
+      PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
+
+  const std::string user_input1 = "log -a";
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
+  const std::string target_tasks1 =
+      "\"T0\"\n\tOngoing\n\tdeadline: 09-01-2094 every: 14 day \n"
+      "\"T1\"\n\tOngoing\n\tdeadline: 10-12-2095 every: 2 month \n"
+      "\"T2\"\n\tDone\n\tdeadline: 24-08-2095\n"
+      "\"T3\"\n\tDone\n\tdeadline: 15-01-2097\n"
+      "\"T4\"\n\tDone\n\tdeadline: 29-07-2094\n"
+      "\"T5\"\n\tOngoing\n\tdeadline: None\n"
+      "\"T6\"\n\tCanceled\n\tdeadline: None\n"
+      "\"T7\"\n\tDone\n\tdeadline: 25-04-1979\n"
+      "\"T8\"\n\tCanceled\n\tdeadline: 25-04-1979\n"
+      "\"T9\"\n\tUndetermined\n\tdeadline: 10-01-2094\n"
+      "\"T10\"\n\tCanceled\n\tdeadline: 02-10-2093\n"
+      "\"T11\"\n\tDone\n\tdeadline: None\n";
+  CHECK(flag1 == "Logged all tasks");
+  CHECK(buffr1 == target_tasks1);
+
+  const auto [flag_set_sorter1, buffr_set_sorter1, session_set_sorter1] =
+      interpreter.parse("set -s deadline");
+
+  const std::string user_input2 = "log -a";
+  const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
+  const std::string target_tasks2 =
+      "\"T7\"\n\tDone\n\tdeadline: 25-04-1979\n"
+      "\"T8\"\n\tCanceled\n\tdeadline: 25-04-1979\n"
+      "\"T10\"\n\tCanceled\n\tdeadline: 02-10-2093\n"
+      "\"T0\"\n\tOngoing\n\tdeadline: 09-01-2094 every: 14 day \n"
+      "\"T9\"\n\tUndetermined\n\tdeadline: 10-01-2094\n"
+      "\"T4\"\n\tDone\n\tdeadline: 29-07-2094\n"
+      "\"T2\"\n\tDone\n\tdeadline: 24-08-2095\n"
+      "\"T1\"\n\tOngoing\n\tdeadline: 10-12-2095 every: 2 month \n"
+      "\"T3\"\n\tDone\n\tdeadline: 15-01-2097\n"
+      "\"T5\"\n\tOngoing\n\tdeadline: None\n"
+      "\"T6\"\n\tCanceled\n\tdeadline: None\n"
+      "\"T11\"\n\tDone\n\tdeadline: None\n";
+  CHECK(flag2 == "Logged all tasks");
+  CHECK(buffr2 == target_tasks2);
+}
+
+TEST_CASE("Log parameter argument -f [filter name]") {
+  INTERPRETER_TEST_DB_LOG::reset_tasks_db();
+  INTERPRETER_TEST_DB_LOG::reset_categories_db();
+  INTERPRETER_TEST_DB_LOG::reset_relations_db();
+  INTERPRETER_TEST_DB_LOG::reset_tracker();
+  INTERPRETER_TEST_DB_LOG::reset_test_settings();
+  Interpreter interpreter = Interpreter(
+      PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
+
+  const std::string user_input1 = "log -f status";
 }
