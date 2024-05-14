@@ -19,10 +19,10 @@
 
 ### Task
 some todo task, name containing space should be written in quotation marks
-```
+ ```
   scd <command> "new task"
   scd <command> new_task
-```
+ ```
 
 ##### Additional flags
 - **@category** - \<command\> directly into/from @category
@@ -45,13 +45,13 @@ some todo task, name containing space should be written in quotation marks
   ```
 
 - **date** - adds task with deadline on specific date
-```
+  ```
   scd add task 07-05-2034
   scd add task 2034.05.07
-```
+  ```
 
 
-### Category
+### @Category
 tasks can be categorized info folder-like categories with '@' at the beggining of the name.
 ```
  scd <command> @"category name"
@@ -59,16 +59,20 @@ tasks can be categorized info folder-like categories with '@' at the beggining o
 ```
 
 
-### Configure
+### Set
 ```
-  scd set -df YYYYMMDD                       // date format that program displays
-  scd set -s 'sep'                           // separator in date format
+ scd set -df YYYYMMDD                       // date format that program displays
+ scd set -ds <sep>                          // separator in date format
+ scd set -s <sorter>                        // sorter that will sort all logged tasks
 ```
 
 
 ### Log
-- scd log
-- scd log -a
-- scd log @category
-- scd log -f 
+You can log tasks by name of the task, name of the @category or by the option.
+```
+scd log task_name                           // displays task with info
+scd log @category                           // displays all tasks from categry
+scd log -a                                  // displays all tasks
+scd log <filter>                            // displays tasks that satifies filter 
+```
 
