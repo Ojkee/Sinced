@@ -12,11 +12,11 @@
   ```
   scd log -a
   ```
-- [ ] Display filtered tasks **Deadline**
+- [x] Display filtered tasks **Deadline**
   ```
-  scd log -f deadline 20-04-2069
+  scd log -deadline 20-04-2069
   ```
-- [ ] Display filtered tasks **Status**
+- [x] Display filtered tasks **Status**
   ```
-  scd log -f status Ongoing
+  scd log -status Ongoing
   ```

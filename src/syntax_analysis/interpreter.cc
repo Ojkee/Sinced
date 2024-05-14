@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <format>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <vector>
@@ -217,11 +218,11 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
     return {.flag = Flag_Messages::no_args()};
   }
 
-  auto text_arg =
+  const auto text_arg =
       Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
-  auto category_name = Interpreter::get_token_content_if_contains_type(
+  const auto category_name = Interpreter::get_token_content_if_contains_type(
       tokens, TokenType::CATEGORY_NAME);
-  auto options_arg = Interpreter::get_token_content_if_contains_type(
+  const auto options_arg = Interpreter::get_token_content_if_contains_type(
       tokens, TokenType::OPTION);
 
   if (!(text_arg || category_name || options_arg)) {
@@ -257,25 +258,55 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
       const std::string all_tasks_info = entry_handler.sorted_tasks_info();
       return {.flag = "Logged all tasks", .out_buffer = all_tasks_info};
     }
-    if (options_arg.value() == "f" && text_arg) {
-      TODO ASAP
-      // EntryFilterFactory eff = EntryFilterFactory();
-      // auto filter_ptr = eff.get(text_arg.value());
-      // if (!filter_ptr) {
-      //   return {.flag = Flag_Messages::invalid_args(),
-      //           .out_buffer =
-      //               std::format("No filter named: \"{}\"",
-      //               text_arg.value())};
-      // }
-      // entry_handler.set_filter(filter_ptr);
-      // entry_handler.load_filtered_tasks();
-      // const std::string tasks_info_filtered = entry_handler.tasks_info_all();
-      // return {.flag = "Logged filtered tasks",
-      //         .out_buffer = tasks_info_filtered};
-    }
+    return parse_log_filter(options_arg.value(), tokens);
   }
 
   return {.flag = Flag_Messages::bad_return("Interpreter::log_command")};
+}
+
+Parsing_Data Interpreter::parse_log_filter(const std::string &option,
+                                           const std::vector<Token> &tokens) {
+  if (option == "deadline") {
+    const auto date_arg = Interpreter::get_token_content_if_contains_type(
+        tokens, TokenType::DATE);
+    if (!date_arg) {
+      return {.flag = Flag_Messages::invalid_args(),
+              .out_buffer = "Invalid argument for filter: deadline"};
+    }
+    const auto fd = settings_handler.get_format_date();
+    const auto [d, m, y] = fd->parse_from_string(date_arg.value());
+    entry_handler.set_filter(
+        std::make_shared<DeadlineFilter>(BaseDate(d, m, y)));
+  } else if (option == "status") {
+    const auto text_arg = Interpreter::get_token_content_if_contains_type(
+        tokens, TokenType::TEXT);
+    if (!text_arg) {
+      return {.flag = Flag_Messages::invalid_args(),
+              .out_buffer = "Invalid argument for filter: status"};
+    }
+    std::string lower_arg{};
+    std::transform(text_arg.value().begin(), text_arg.value().end(),
+                   std::back_inserter(lower_arg),
+                   [](const auto c) { return std::tolower(c); });
+    std::shared_ptr<StatusFilter> sf = std::make_shared<StatusFilter>();
+    if (lower_arg == "ongoing") {
+      sf->set_arg(Status::ongoing);
+    } else if (lower_arg == "done") {
+      sf->set_arg(Status::done);
+    } else if (lower_arg == "canceled") {
+      sf->set_arg(Status::canceled);
+    } else {
+      return {.flag = Flag_Messages::invalid_args(),
+              .out_buffer = std::format("No status \"{}\"", text_arg.value())};
+    }
+    entry_handler.set_filter(sf);
+  } else {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = std::format("No filter named: {}", option)};
+  }
+  entry_handler.load_filtered_tasks();
+  const std::string filtered_tasks_info = entry_handler.sorted_tasks_info();
+  return {.flag = "Logged filtered tasks", .out_buffer = filtered_tasks_info};
 }
 
 Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {

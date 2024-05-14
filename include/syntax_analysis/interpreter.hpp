@@ -68,6 +68,8 @@ class Interpreter {
 
   [[nodiscard]] Parsing_Data add_command(const std::vector<Token> &tokens);
   [[nodiscard]] Parsing_Data log_command(const std::vector<Token> &tokens);
+  [[nodiscard]] Parsing_Data parse_log_filter(const std::string &option,
+                                              const std::vector<Token> &tokens);
   [[nodiscard]] Parsing_Data set_command(const std::vector<Token> &tokens);
 
   // ADD

@@ -194,5 +194,40 @@ TEST_CASE("Log parameter argument -f [filter name]") {
   Interpreter interpreter = Interpreter(
       PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
 
-  const std::string user_input1 = "log -f status";
+  const std::string user_input1 = "log -status canceled";
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
+  const std::string target_tasks1 =
+      "\"T6\"\n\tCanceled\n\tdeadline: None\n"
+      "\"T8\"\n\tCanceled\n\tdeadline: 25-04-1979\n"
+      "\"T10\"\n\tCanceled\n\tdeadline: 02-10-2093\n";
+  CHECK(flag1 == "Logged filtered tasks");
+  CHECK(buffr1 == target_tasks1);
+
+  const std::string user_input2 = "log -deadline 14-02-2069";
+  const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
+  const std::string target_tasks2 =
+      "\"T7\"\n\tDone\n\tdeadline: 25-04-1979\n"
+      "\"T8\"\n\tCanceled\n\tdeadline: 25-04-1979\n";
+  CHECK(flag2 == "Logged filtered tasks");
+  CHECK(buffr2 == target_tasks2);
+
+  const std::string user_input3 = "log -deadline";
+  const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
+  CHECK(flag3 == "Invalid arguments");
+  CHECK(buffr3 == "Invalid argument for filter: deadline");
+
+  const std::string user_input4 = "log -status";
+  const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
+  CHECK(flag4 == "Invalid arguments");
+  CHECK(buffr4 == "Invalid argument for filter: status");
+
+  const std::string user_input5 = "log -status pyccwel";
+  const auto [flag5, buffr5, session5] = interpreter.parse(user_input5);
+  CHECK(flag5 == "Invalid arguments");
+  CHECK(buffr5 == "No status \"pyccwel\"");
+
+  const std::string user_input6 = "log -deadline 21";
+  const auto [flag6, buffr6, session6] = interpreter.parse(user_input6);
+  CHECK(flag6 == "Invalid arguments");
+  CHECK(buffr6 == "Invalid argument for filter: deadline");
 }
