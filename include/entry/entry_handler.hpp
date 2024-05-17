@@ -50,7 +50,7 @@ class EntryHandler {
 
   template <typename EntryType>
   void add_entry_to_db([[maybe_unused]] const EntryType &entry) const {
-    std::cerr << "Not valid type of entry!";
+    std::cerr << "Not valid type of entry for: " << entry;
   }
   template <>
   void add_entry_to_db<EntryTask>(const EntryTask &entry) const;
@@ -62,7 +62,7 @@ class EntryHandler {
   template <typename EntryType>
   [[nodiscard]] std::shared_ptr<EntryType> get_entry_by_content(
       [[maybe_unused]] const std::string &content) const {
-    std::cerr << "Not valid type of entry!";
+    std::cerr << "Not valid type of entry for entry named: " << content;
   }
   template <>
   [[nodiscard]] std::shared_ptr<EntryTask> get_entry_by_content(

@@ -13,7 +13,7 @@
 - **rm** - removes task by name or id (if number provided)
 - **set** - sets values in setting file
 - **log** - lists task via name/id/category
-- **status** - modifies status of task or whole category
+- **mod** - modifies status of task or whole category
 
 ## Subjects
 
@@ -75,4 +75,5 @@ scd log @category                           // displays all tasks from categry
 scd log -a                                  // displays all tasks
 scd log <filter>                            // displays tasks that satifies filter 
 ```
+
 

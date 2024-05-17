@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "../../include/entry/entry_filter_factory.hpp"
 #include "../../include/syntax_analysis/lexer.hpp"
 
 Parsing_Data Interpreter::parse(const std::string &user_input) {
@@ -30,8 +29,11 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
       return log_command(tokens);
     } else if (tokens[0].content == "set") {
       return set_command(tokens);
+    } else if (tokens[0].content == "mod") {
+      return mod_command(tokens);
     }
   }
+  // return {.flag = Flag_Messages::bad_return(tokens[0].content)};
   return {.flag = Flag_Messages::bad_return("Interpreter::parse")};
 }
 
@@ -350,4 +352,65 @@ Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
   }
 
   return {.flag = Flag_Messages::bad_return("Interpreter::set_command")};
+}
+
+Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
+  if (tokens.size() < 4) {
+    return {.flag = Flag_Messages::no_args()};
+  }
+  const auto option_arg = Interpreter::get_token_content_if_contains_type(
+      tokens, TokenType::OPTION);
+  if (!option_arg) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = "No '-' parameter provided"};
+  }
+
+  if (option_arg.value() == "name") {
+    const auto tasks_names =
+        get_token_contents_if_contains_type(tokens, TokenType::TEXT);
+    if (tasks_names.size() >= 2) {
+      const std::string old_task_name = tasks_names[0];
+      const std::string new_task_name = tasks_names[1];
+      const auto old_task_ptr =
+          entry_handler.get_entry_by_content<EntryTask>(old_task_name);
+      const auto new_task_ptr =
+          EntryTask::Builder(*old_task_ptr).add_content(new_task_name).get();
+      entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
+      return {
+          .flag = std::format("Modified task: \"{}\"", old_task_name),
+          .out_buffer = std::format("Changed task name from \"{}\" to \"{}\"",
+                                    old_task_name, new_task_name)};
+    }
+    const auto category_names =
+        get_token_contents_if_contains_type(tokens, TokenType::CATEGORY_NAME);
+    if (category_names.size() >= 2) {
+      const std::string old_category_name = category_names[0];
+      const std::string new_category_name = category_names[1];
+      const auto old_category_ptr =
+          entry_handler.get_entry_by_content<EntryCategory>(old_category_name);
+      EntryCategory new_category = EntryCategory(std::format(
+          "{} \"{}\"", old_category_ptr->get_id(), new_category_name));
+      entry_handler.replace_entry(*old_category_ptr, new_category);
+      return {
+          .flag = std::format("Modified category: @\"{}\"", old_category_name),
+          .out_buffer =
+              std::format("Changed category name from @\"{}\" to @\"{}\"",
+                          old_category_name, new_category_name)};
+    }
+  }
+
+  return {.flag = Flag_Messages::bad_return("Interpreter::mod_command")};
+}
+
+constexpr std::vector<std::string>
+Interpreter::get_token_contents_if_contains_type(
+    const std::vector<Token> &tokens, const TokenType &token_type) {
+  std::vector<std::string> result;
+  auto copy_to_result = [&token_type, &result](const Token &token) {
+    if (token.type == token_type) {
+      result.emplace_back(token.content);
+    }
+  };
+  std::for_each(tokens.begin(), tokens.end(), copy_to_result);
+  return result;
 }

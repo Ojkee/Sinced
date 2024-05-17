@@ -1,18 +1,18 @@
-#include "../extern/include/catch.hpp"
-
-#include "../include/syntax_analysis/lexer.hpp"
-
 #include <cstdint>
 #include <string>
 
+#include "../extern/include/catch.hpp"
+#include "../include/syntax_analysis/lexer.hpp"
+
 namespace Catch {
-template <> struct StringMaker<Token> {
+template <>
+struct StringMaker<Token> {
   static std::string convert(Token const &value) {
     return "{" + std::to_string(static_cast<uint16_t>(value.type)) + ": " +
            value.content + "}\n";
   }
 };
-} // namespace Catch
+}  // namespace Catch
 
 TEST_CASE("Utils - numeric") {
   REQUIRE(Lexer::is_unsigned_int("123123129") == true);
@@ -133,4 +133,16 @@ TEST_CASE("Command tokenization") {
       Token{TokenType::TEXT, "scd"}, Token{TokenType::COMMAND, "add"},
       Token{TokenType::CATEGORY_NAME, "my category"}};
   REQUIRE(result13 == target13);
+
+  const std::string user_input14 =
+      "scd mod @\"my category\" -name @\"my category1\"";
+  const auto result14 = Lexer::tokenize(user_input14, DDMMYYYY());
+  const std::vector<Token> target14{
+      Token{TokenType::TEXT, "scd"}, Token{TokenType::COMMAND, "mod"},
+      Token{TokenType::CATEGORY_NAME, "my category"},
+      Token{TokenType::OPTION, "name"},
+      Token{TokenType::CATEGORY_NAME, "my category1"}
+
+  };
+  REQUIRE(result14 == target14);
 }

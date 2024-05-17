@@ -68,9 +68,8 @@ class Interpreter {
 
   [[nodiscard]] Parsing_Data add_command(const std::vector<Token> &tokens);
   [[nodiscard]] Parsing_Data log_command(const std::vector<Token> &tokens);
-  [[nodiscard]] Parsing_Data parse_log_filter(const std::string &option,
-                                              const std::vector<Token> &tokens);
   [[nodiscard]] Parsing_Data set_command(const std::vector<Token> &tokens);
+  [[nodiscard]] Parsing_Data mod_command(const std::vector<Token> &tokens);
 
   // ADD
   template <typename... TokenTypes>
@@ -93,6 +92,15 @@ class Interpreter {
   // SET
   const std::unordered_map<std::string, std::string> set_params{
       {"df", "date format"}, {"ds", "date format separator"}, {"s", "sort by"}};
+
+  // LOG
+  [[nodiscard]] Parsing_Data parse_log_filter(const std::string &option,
+                                              const std::vector<Token> &tokens);
+
+  // MOD
+  [[nodiscard]] constexpr std::vector<std::string>
+  get_token_contents_if_contains_type(const std::vector<Token> &tokens,
+                                      const TokenType &token_type);
 };
 
 #endif  // INTERPTERE_HPP

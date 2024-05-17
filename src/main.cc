@@ -5,10 +5,10 @@
 void compareStrings(const std::string &s1, const std::string &s2);
 
 int main(int argc, char **argv) {
-
   for (int i = 0; i < argc; ++i) {
     std::cout << argv[i] << "\n";
   }
+
   exit(EXIT_SUCCESS);
 }
 

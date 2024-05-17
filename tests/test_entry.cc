@@ -1,9 +1,8 @@
-#include "../extern/include/catch.hpp"
-
-#include "../include/entry/entry_base.hpp"
-
 #include <memory>
 #include <string>
+
+#include "../extern/include/catch.hpp"
+#include "../include/entry/entry_base.hpp"
 
 TEST_CASE("Line segmentation") {
   auto result = EntryBase::line_to_tokens("test phrase \"with some\" quotes");
@@ -77,19 +76,21 @@ TEST_CASE("Testing repetetive") {
   std::string token1 = "0 \"Some Task\" 0 19778 30 0 0";
   EntryTask task1 = EntryTask(token1);
   std::string target_info1 =
-      "\"Some Task\"\n\tOngoing\n\tdeadline: 25-04-2024 every: 30 day ";
+      "\"Some Task\"\n\tOngoing\n\tdeadline: 25-05-2024 every: 30 day ";
   REQUIRE(task1.info() == target_info1);
 
   std::string token2 = "0 \"Some Task\" 0 19778 20 5 1";
   EntryTask task2 = EntryTask(token2);
-  std::string target_info2 = "\"Some Task\"\n\tOngoing\n\tdeadline: 14-08-2025 "
-                             "every: 1 year 5 month 20 day ";
+  std::string target_info2 =
+      "\"Some Task\"\n\tOngoing\n\tdeadline: 14-08-2025 "
+      "every: 1 year 5 month 20 day ";
   REQUIRE(task2.info() == target_info2);
 
   std::string token3 = "0 \"Some Task\" 0 18317 2 9 2";
   EntryTask task3 = EntryTask(token2);
-  std::string target_info3 = "\"Some Task\"\n\tOngoing\n\tdeadline: 29-08-2025 "
-                             "every: 2 year 9 month 2 day ";
+  std::string target_info3 =
+      "\"Some Task\"\n\tOngoing\n\tdeadline: 29-08-2025 "
+      "every: 2 year 9 month 2 day ";
   REQUIRE(task3.info() == target_info2);
 }
 

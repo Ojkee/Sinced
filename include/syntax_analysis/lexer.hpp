@@ -9,11 +9,11 @@
 #include "token.hpp"
 
 class Lexer {
-public:
+ public:
   Lexer() = default;
 
-  [[nodiscard]] constexpr static std::vector<Token>
-  tokenize(const std::string &line, const FormatDate &date_format) {
+  [[nodiscard]] constexpr static std::vector<Token> tokenize(
+      const std::string &line, const FormatDate &date_format) {
     std::string word;
     std::vector<Token> tokens;
     bool in_quotes = false;
@@ -43,9 +43,8 @@ public:
     return tokens;
   }
 
-  [[nodiscard]] constexpr static TokenType
-  get_token_type(const std::string &input_string,
-                 const FormatDate &format_date) {
+  [[nodiscard]] constexpr static TokenType get_token_type(
+      const std::string &input_string, const FormatDate &format_date) {
     if (input_string.empty()) {
       return TokenType::BLANK_SPACE;
     }
@@ -63,35 +62,35 @@ public:
     return TokenType::TEXT;
   }
 
-  [[nodiscard]] constexpr static std::string
-  process_content(const std::string &content) {
+  [[nodiscard]] constexpr static std::string process_content(
+      const std::string &content) {
     if (content.front() == '@' || content.front() == '-') {
       return content.substr(1);
     }
     return content;
   }
 
-  [[nodiscard]] static constexpr bool
-  is_unsigned_int(const std::string &input_string) {
+  [[nodiscard]] static constexpr bool is_unsigned_int(
+      const std::string &input_string) {
     return std::find_if(input_string.begin(), input_string.end(),
                         [](const auto &c) { return !std::isdigit(c); }) ==
            input_string.end();
   }
 
-  [[nodiscard]] static constexpr bool
-  is_command(const std::string &input_string) {
+  [[nodiscard]] static constexpr bool is_command(
+      const std::string &input_string) {
     return std::binary_search(commands_set.begin(), commands_set.end(),
                               input_string);
   }
 
-  [[nodiscard]] constexpr static bool
-  is_date(const std::string &input_string, const FormatDate &date_formatter) {
+  [[nodiscard]] constexpr static bool is_date(
+      const std::string &input_string, const FormatDate &date_formatter) {
     return date_formatter.is_valid(input_string);
   }
 
-private:
-  constexpr static auto commands_set = {"add", "log", "rm",
-                                        "set"}; // KEEP LEXICOGRAPHIC
+ private:
+  constexpr static auto commands_set = {"add", "log", "mod", "rm",
+                                        "set"};  // KEEP LEXICOGRAPHIC
 };
 
-#endif // LEXER_HPP
+#endif  // LEXER_HPP

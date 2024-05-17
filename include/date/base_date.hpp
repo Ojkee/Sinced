@@ -9,7 +9,7 @@
 #include "format_date.hpp"
 
 class BaseDate {
-public:
+ public:
   constexpr static std::array<int16_t, 12> days_in_month{
       31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   constexpr static std::array<std::string, 7> week_days{
@@ -42,7 +42,8 @@ public:
     return *this < other || *this == other;
   }
   static inline BaseDate shallow_copy(const BaseDate &bd) {
-    return BaseDate::days_to_date(BaseDate::date_to_days(bd));
+    return BaseDate::days_to_date(
+        static_cast<int32_t>(BaseDate::date_to_days(bd)));
   }
   void add_days(int16_t _days) noexcept;
   void add_months(int16_t _months) noexcept;
@@ -51,14 +52,14 @@ public:
   [[nodiscard]] std::string const day_of_week_name() const noexcept;
   [[nodiscard]] int16_t remaining_days() const noexcept;
 
-  [[nodiscard]] static constexpr inline bool
-  is_leap(const int16_t &_year) noexcept {
+  [[nodiscard]] static constexpr inline bool is_leap(
+      const int16_t &_year) noexcept {
     const bool p = _year % 4 == 0;
     const bool q = _year % 100 == 0;
     const bool t = _year % 400 == 0;
     return ((p && !q) || t);
   }
-  [[nodiscard]] static uint16_t date_to_days(const BaseDate &bd);
+  [[nodiscard]] static uint32_t date_to_days(const BaseDate &bd);
   [[nodiscard]] static BaseDate days_to_date(int32_t _days);
   [[nodiscard]] static BaseDate today();
 
@@ -67,7 +68,7 @@ public:
     formatter = std::move(_formatter);
   }
 
-private:
+ private:
   int16_t day{1};
   int16_t month{1};
   int16_t year{1970};
@@ -80,4 +81,4 @@ private:
   std::shared_ptr<FormatDate> formatter = std::make_shared<DDMMYYYY>();
 };
 
-#endif // BASE_DATE_HPP
+#endif  // BASE_DATE_HPP
