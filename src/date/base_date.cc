@@ -6,6 +6,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <ctime>
+#include <functional>
+#include <iterator>
 #include <limits>
 #include <numeric>
 
@@ -74,46 +76,17 @@ int16_t BaseDate::remaining_days() const noexcept {
 }
 
 uint32_t BaseDate::date_to_days(const BaseDate &bd) {
-  // auto begin = days_in_month.begin();
-  // auto end = days_in_month.begin() + bd.month - 1;
-  // int16_t accumulated_days =
-  //     static_cast<int16_t>(std::accumulate(begin, end, -lower_bound_day));
-  // if (BaseDate::is_leap(lower_bound_year)) {
-  //   accumulated_days++;
-  // }
-  // if (bd.month >= 3 && BaseDate::is_leap(bd.year)) {
-  //   accumulated_days++;
-  // }
-  // accumulated_days += bd.day;
-  // int16_t years_diff = bd.year - lower_bound_year;
-  // if (years_diff % 4 == 3) {
-  //   ++accumulated_days;
-  // }
-  // accumulated_days += static_cast<int16_t>(years_diff * 365 + years_diff / 4
-  // -
-  //                                          years_diff / 100 + years_diff /
-  //                                          400);
-  // return static_cast<uint16_t>(accumulated_days);
-  int32_t leap_zero{};
-  for (int i = 1; i < 1970; ++i) {
-    if (BaseDate::is_leap(i)) {
-      leap_zero++;
-    }
-  }
-  const int32_t ZERO_TO_LOWER = lower_bound_year * 365 + leap_zero;
-  int32_t sum_months{};
-  for (int i = 0; i < bd.month - 1; ++i) {
-    sum_months += days_in_month[i];
-  }
-  int32_t leap{};
-  for (int i = 1; i < bd.year; ++i) {
-    if (BaseDate::is_leap(i)) {
-      leap++;
-    }
-  }
-  if (bd.month > 2 && BaseDate::is_leap(bd.year)) sum_months++;
-  int32_t zero_to_date = bd.year * 365 + leap + sum_months - 1 + bd.day;
-  return zero_to_date - ZERO_TO_LOWER;
+  uint32_t sum_months = static_cast<uint32_t>(std::accumulate(
+      days_in_month.begin(), days_in_month.begin() + bd.month - 1, 0));
+  std::vector<uint32_t> years_range(
+      static_cast<std::size_t>(bd.year - lower_bound_year));
+  std::iota(years_range.begin(), years_range.end(), lower_bound_year);
+  auto is_leap_ = [](const auto y) { return BaseDate::is_leap(y); };
+  uint32_t leap = static_cast<uint32_t>(
+      std::count_if(years_range.begin(), years_range.end(), is_leap_));
+  leap += (bd.month > 2 && BaseDate::is_leap(bd.year)) ? 1 : 0;
+  return static_cast<uint32_t>((bd.year - lower_bound_year)) * 365 + leap +
+         sum_months - 1 + static_cast<uint32_t>(bd.day);
 }
 
 BaseDate BaseDate::days_to_date(int32_t _days) {

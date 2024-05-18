@@ -89,8 +89,8 @@ TEST_CASE("Filtering by status") {
   et1.set_filter(std::make_unique<StatusFilter>(Status::ongoing));
   std::string result_info1 = et1.filtered_tasks_info();
   std::string target_info1 =
-      "\"Another task title?\"\n\tOngoing\n\tdeadline: 09-01-2094 every: 14 "
-      "day \n\"some_title\"\n\tOngoing\n\tdeadline: 10-12-2095 every: 2 month "
+      "\"Another task title?\"\n\tOngoing\n\tdeadline: 10-01-2094 every: 14 "
+      "day \n\"some_title\"\n\tOngoing\n\tdeadline: 11-12-2095 every: 2 month "
       "\n\"asjkdbna \"\n\tOngoing\n\tdeadline: None\n";
   REQUIRE(result_info1 == target_info1);
 

@@ -23,7 +23,7 @@ TEST_CASE("Deadline sorter") {
       "\n\tdeadline: 02-10-2093"
       "\n\"Another task title?\""
       "\n\tOngoing"
-      "\n\tdeadline: 09-01-2094 every: 14 day "
+      "\n\tdeadline: 10-01-2094 every: 14 day "
       "\n\"some_other title\""
       "\n\tUndetermined"
       "\n\tdeadline: 10-01-2094"
@@ -35,7 +35,7 @@ TEST_CASE("Deadline sorter") {
       "\n\tdeadline: 24-08-2095"
       "\n\"some_title\""
       "\n\tOngoing"
-      "\n\tdeadline: 10-12-2095 every: 2 month "
+      "\n\tdeadline: 11-12-2095 every: 2 month "
       "\n\"clever name\""
       "\n\tDone"
       "\n\tdeadline: 15-01-2097"
@@ -55,10 +55,10 @@ TEST_CASE("Deadline sorter") {
   std::string t2 =
       "\"Another task title?\""
       "\n\tOngoing"
-      "\n\tdeadline: 09-01-2094 every: 14 day "
+      "\n\tdeadline: 10-01-2094 every: 14 day "
       "\n\"some_title\""
       "\n\tOngoing"
-      "\n\tdeadline: 10-12-2095 every: 2 month "
+      "\n\tdeadline: 11-12-2095 every: 2 month "
       "\n\"asjkdbna \""
       "\n\tOngoing"
       "\n\tdeadline: None"
@@ -102,7 +102,7 @@ TEST_CASE("Deadline sorter") {
       "\n\tdeadline: 24-08-2095"
       "\n\"Another task title?\""
       "\n\tOngoing"
-      "\n\tdeadline: 09-01-2094 every: 14 day "
+      "\n\tdeadline: 10-01-2094 every: 14 day "
       "\n\"asjkdbna \""
       "\n\tOngoing"
       "\n\tdeadline: None"
@@ -129,7 +129,7 @@ TEST_CASE("Deadline sorter") {
       "\n\tdeadline: None"
       "\n\"some_title\""
       "\n\tOngoing"
-      "\n\tdeadline: 10-12-2095 every: 2 month \n";
+      "\n\tdeadline: 11-12-2095 every: 2 month \n";
   REQUIRE(r3 == t3);
 }
 

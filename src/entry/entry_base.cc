@@ -1,3 +1,5 @@
+#include "../../include/entry/entry_base.hpp"
+
 #include <cstddef>
 #include <cstdint>
 #include <format>
@@ -5,10 +7,8 @@
 #include <sstream>
 #include <vector>
 
-#include "../../include/entry/entry_base.hpp"
-
-[[nodiscard]] std::vector<std::string>
-EntryBase::line_to_tokens(const std::string &line) {
+[[nodiscard]] std::vector<std::string> EntryBase::line_to_tokens(
+    const std::string &line) {
   std::vector<std::string> tokens;
   std::istringstream iss(line);
   std::string token;
@@ -33,7 +33,8 @@ void EntryTask::tokenize(const std::string &line) {
 }
 
 EntryTask::operator std::string() const {
-  const int date_str = (deadline) ? BaseDate::date_to_days(*deadline) : -1;
+  const int64_t date_str =
+      (deadline) ? static_cast<int64_t>(BaseDate::date_to_days(*deadline)) : -1;
   return std::format("{} \"{}\" {} {} {} {} {}", id, content,
                      static_cast<uint16_t>(status), date_str, r_days, r_months,
                      r_years);
@@ -42,14 +43,14 @@ EntryTask::operator std::string() const {
 std::string EntryTask::info() const {
   auto status_to_str = [](Status _status) -> std::string {
     switch (_status) {
-    case Status::ongoing:
-      return "Ongoing";
-    case Status::done:
-      return "Done";
-    case Status::canceled:
-      return "Canceled";
-    default:
-      return "Undetermined";
+      case Status::ongoing:
+        return "Ongoing";
+      case Status::done:
+        return "Done";
+      case Status::canceled:
+        return "Canceled";
+      default:
+        return "Undetermined";
     }
   };
   std::string status_str = status_to_str(status);

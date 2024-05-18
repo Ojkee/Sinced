@@ -10,10 +10,10 @@
 
 ## Commands
 - **add** - adds tasks to task list and @categories to category list
-- **rm** - removes task by name or id (if number provided)
+- **rm** - removes task by name
 - **set** - sets values in setting file
 - **log** - lists task via name/id/category
-- **mod** - modifies status of task or whole category
+- **mod** - modifies task, @category or task @category
 
 ## Subjects
 

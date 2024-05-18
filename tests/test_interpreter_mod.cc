@@ -116,8 +116,8 @@ TEST_CASE("Modify tasks and categories names") {
       "0 \"T0\" 0 45300 14 0 0\n"
       "1 \"T1\" 0 46000 0 2 0\n"
       "2 \"T2\" 1 45891 0 0 0\n"
-      "3 \"T3\" 1 46401 0 0 0\n"
-      "4 \"NEW_NAME_TEST\" 1 45500 7 0 0\n"
+      "3 \"NEW_NAME_TEST\" 1 46401 0 0 0\n"
+      "4 \"T4\" 1 45500 7 0 0\n"
       "5 \"T5\" 0 -1 0 0 0\n"
       "6 \"T6\" 2 -1 0 0 0\n"
       "7 \"T7\" 1 3401 0 2 0\n"
@@ -125,6 +125,38 @@ TEST_CASE("Modify tasks and categories names") {
       "9 \"T9\" 3 45300 0 0 0\n"
       "10 \"T10\" 2 45200 0 1 0\n"
       "11 \"T11\" 1 -1 0 0 0\n";
-  CHECK(flag1 == "");
+  CHECK(flag1 == "Modified task: \"T3\"");
   CHECK(tasks_result1 == tasks_target1);
+
+  const std::string user_input2 =
+      "mod @\"Some category\" -name @\"NEW NAME CATEGORY\"";
+  const auto [flag2, buffr2, sess2] = interpreter.parse(user_input2);
+  const std::string tasks_result2 =
+      INTERPRETER_MOD::get_file_content(PATH_CATEGORIES);
+  const std::string tasks_target2 =
+      "0 \"Uncategorized\"\n"
+      "1 \"NEW NAME CATEGORY\"\n"
+      "2 \"another_category\"\n"
+      "3 \"project\"\n";
+  CHECK(flag2 == "Modified category: @\"Some category\"");
+  CHECK(tasks_result2 == tasks_target2);
+
+  const std::string user_input3 = "mod task_that_not_exists -name newname";
+  const auto [flag3, buffr3, sess3] = interpreter.parse(user_input3);
+  CHECK(flag3 == "Invalid arguments");
+
+  const std::string user_input4 = "mod @category_that_not_exists -name newname";
+  const auto [flag4, buffr4, sess4] = interpreter.parse(user_input4);
+  CHECK(flag4 == "Invalid arguments");
+
+  const std::string user_input5 = "mod task_that_not_exists -name @newname";
+  const auto [flag5, buffr5, sess5] = interpreter.parse(user_input5);
+  CHECK(flag5 == "Invalid arguments");
+
+  const std::string user_input6 =
+      "mod @category_that_not_exists -name @newname";
+  const auto [flag6, buffr6, sess6] = interpreter.parse(user_input6);
+  CHECK(flag6 == "Invalid arguments");
 }
+
+// BRB

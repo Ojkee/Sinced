@@ -5,8 +5,12 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include "format_date.hpp"
+
+template <typename T>
+concept Integral = std::is_integral_v<T>;
 
 class BaseDate {
  public:
@@ -53,11 +57,15 @@ class BaseDate {
   [[nodiscard]] int16_t remaining_days() const noexcept;
 
   [[nodiscard]] static constexpr inline bool is_leap(
-      const int16_t &_year) noexcept {
+      const Integral auto &_year) noexcept {
+    constexpr Integral auto FIRST_GREGORIAN = 1582;
+    if (_year < FIRST_GREGORIAN) {
+      return false;
+    }
     const bool p = _year % 4 == 0;
     const bool q = _year % 100 == 0;
     const bool t = _year % 400 == 0;
-    return ((p && !q) || t);
+    return (p && !q) || t;
   }
   [[nodiscard]] static uint32_t date_to_days(const BaseDate &bd);
   [[nodiscard]] static BaseDate days_to_date(int32_t _days);

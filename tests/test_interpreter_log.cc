@@ -111,7 +111,7 @@ TEST_CASE("Log single argument") {
   const std::string user_input1 = "log T1";
   const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
   const std::string target_buffr1 =
-      "\"T1\"\n\tOngoing\n\tdeadline: 10-12-2095 every: 2 month ";
+      "\"T1\"\n\tOngoing\n\tdeadline: 11-12-2095 every: 2 month ";
   CHECK(flag1 == "Logged: \"T1\"");
   CHECK(buffr1 == target_buffr1);
 
@@ -148,8 +148,8 @@ TEST_CASE("Log parameter argument -a") {
   const std::string user_input1 = "log -a";
   const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
   const std::string target_tasks1 =
-      "\"T0\"\n\tOngoing\n\tdeadline: 09-01-2094 every: 14 day \n"
-      "\"T1\"\n\tOngoing\n\tdeadline: 10-12-2095 every: 2 month \n"
+      "\"T0\"\n\tOngoing\n\tdeadline: 10-01-2094 every: 14 day \n"
+      "\"T1\"\n\tOngoing\n\tdeadline: 11-12-2095 every: 2 month \n"
       "\"T2\"\n\tDone\n\tdeadline: 24-08-2095\n"
       "\"T3\"\n\tDone\n\tdeadline: 15-01-2097\n"
       "\"T4\"\n\tDone\n\tdeadline: 29-07-2094\n"
@@ -172,11 +172,11 @@ TEST_CASE("Log parameter argument -a") {
       "\"T7\"\n\tDone\n\tdeadline: 25-04-1979\n"
       "\"T8\"\n\tCanceled\n\tdeadline: 25-04-1979\n"
       "\"T10\"\n\tCanceled\n\tdeadline: 02-10-2093\n"
-      "\"T0\"\n\tOngoing\n\tdeadline: 09-01-2094 every: 14 day \n"
+      "\"T0\"\n\tOngoing\n\tdeadline: 10-01-2094 every: 14 day \n"
       "\"T9\"\n\tUndetermined\n\tdeadline: 10-01-2094\n"
       "\"T4\"\n\tDone\n\tdeadline: 29-07-2094\n"
       "\"T2\"\n\tDone\n\tdeadline: 24-08-2095\n"
-      "\"T1\"\n\tOngoing\n\tdeadline: 10-12-2095 every: 2 month \n"
+      "\"T1\"\n\tOngoing\n\tdeadline: 11-12-2095 every: 2 month \n"
       "\"T3\"\n\tDone\n\tdeadline: 15-01-2097\n"
       "\"T5\"\n\tOngoing\n\tdeadline: None\n"
       "\"T6\"\n\tCanceled\n\tdeadline: None\n"

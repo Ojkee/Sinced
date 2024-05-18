@@ -65,7 +65,7 @@ TEST_CASE("Modify tasks in db") {
   auto e1 = EntryTask::Builder(*r1).add_content("CHANGED").get();
   int8_t flag1 = eh.replace_entry(*r1, *e1);
   CHECK(flag1 == 0);
-  CHECK(eh.task_info_by_id(2) == "\"CHANGED\"\n\tDone\n\tdeadline: 22-08-2095");
+  CHECK(eh.task_info_by_id(2) == "\"CHANGED\"\n\tDone\n\tdeadline: 24-08-2095");
 
   int8_t flag2 = eh.replace_entry(EntryTask("12 T12 1 1 0 0 0"), *e1);
   CHECK(flag2 == -1);

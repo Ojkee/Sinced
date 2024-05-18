@@ -366,37 +366,57 @@ Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
   }
 
   if (option_arg.value() == "name") {
-    const auto tasks_names =
-        get_token_contents_if_contains_type(tokens, TokenType::TEXT);
-    if (tasks_names.size() >= 2) {
-      const std::string old_task_name = tasks_names[0];
-      const std::string new_task_name = tasks_names[1];
-      const auto old_task_ptr =
-          entry_handler.get_entry_by_content<EntryTask>(old_task_name);
-      const auto new_task_ptr =
-          EntryTask::Builder(*old_task_ptr).add_content(new_task_name).get();
-      entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
-      return {
-          .flag = std::format("Modified task: \"{}\"", old_task_name),
-          .out_buffer = std::format("Changed task name from \"{}\" to \"{}\"",
-                                    old_task_name, new_task_name)};
+    {
+      const auto tasks_names =
+          get_token_contents_if_contains_type(tokens, TokenType::TEXT);
+      if (tasks_names.size() >= 2) {
+        const std::string old_task_name = tasks_names[0];
+        const std::string new_task_name = tasks_names[1];
+        const auto old_task_ptr =
+            entry_handler.get_entry_by_content<EntryTask>(old_task_name);
+        if (!old_task_ptr) {
+          return {.flag = Flag_Messages::invalid_args(),
+                  .out_buffer =
+                      std::format("No task named: \"{}\"", old_task_name)};
+        }
+        const auto new_task_ptr =
+            EntryTask::Builder(*old_task_ptr).add_content(new_task_name).get();
+        entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
+        return {
+            .flag = std::format("Modified task: \"{}\"", old_task_name),
+            .out_buffer = std::format("Changed task name from \"{}\" to \"{}\"",
+                                      old_task_name, new_task_name)};
+      }
     }
-    const auto category_names =
-        get_token_contents_if_contains_type(tokens, TokenType::CATEGORY_NAME);
-    if (category_names.size() >= 2) {
-      const std::string old_category_name = category_names[0];
-      const std::string new_category_name = category_names[1];
-      const auto old_category_ptr =
-          entry_handler.get_entry_by_content<EntryCategory>(old_category_name);
-      EntryCategory new_category = EntryCategory(std::format(
-          "{} \"{}\"", old_category_ptr->get_id(), new_category_name));
-      entry_handler.replace_entry(*old_category_ptr, new_category);
-      return {
-          .flag = std::format("Modified category: @\"{}\"", old_category_name),
-          .out_buffer =
-              std::format("Changed category name from @\"{}\" to @\"{}\"",
-                          old_category_name, new_category_name)};
+    {
+      const auto category_names =
+          get_token_contents_if_contains_type(tokens, TokenType::CATEGORY_NAME);
+      if (category_names.size() >= 2) {
+        const std::string old_category_name = category_names[0];
+        const std::string new_category_name = category_names[1];
+        const auto old_category_ptr =
+            entry_handler.get_entry_by_content<EntryCategory>(
+                old_category_name);
+        if (!old_category_ptr) {
+          return {.flag = Flag_Messages::invalid_args(),
+                  .out_buffer = std::format("No category named: @\"{}\"",
+                                            old_category_name)};
+        }
+        EntryCategory new_category = EntryCategory(std::format(
+            "{} \"{}\"", old_category_ptr->get_id(), new_category_name));
+        entry_handler.replace_entry(*old_category_ptr, new_category);
+        return {.flag = std::format("Modified category: @\"{}\"",
+                                    old_category_name),
+                .out_buffer =
+                    std::format("Changed category name from @\"{}\" to @\"{}\"",
+                                old_category_name, new_category_name)};
+      }
     }
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer =
+                "Invalid agruments provided. Propper syntax: \n\tscd mod "
+                "task_name -name new_task_name\nor\n\tscd mod @category_name "
+                "-name @new_category_name"};
   }
 
   return {.flag = Flag_Messages::bad_return("Interpreter::mod_command")};
