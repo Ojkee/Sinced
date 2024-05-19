@@ -90,9 +90,12 @@ class Interpreter {
       const std::vector<std::string> &tasks_names);
   [[nodiscard]] Parsing_Data modify_category_name(
       const std::vector<std::string> &category_names);
-
   [[nodiscard]] Parsing_Data modify_task_status(
       const std::vector<std::string> &task_status_texts);
+  [[nodiscard]] Parsing_Data modify_task_deadline(
+      const std::string &task_name, const std::string &deadline_str);
+  [[nodiscard]] Parsing_Data modify_task_recursive(
+      const std::vector<std::string> &task_recursive_args);
 
   // UTILS
   template <typename... TokenTypes>

@@ -525,4 +525,8 @@ TEST_CASE("Test Add Command task to category CORRENT PROMPTS") {
   CHECK(flag3 == flag_target3);
   CHECK(tasks_result3 == tasks_target3);
   CHECK(relations_result3 == relations_target3);
+
+  const std::string user_input4 = "add T0";
+  const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
+  CHECK(flag4 == "Invalid arguments");
 }

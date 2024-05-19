@@ -16,9 +16,9 @@ scd mod task_name -status Ongoing
 ```
 scd mod task_name -deadline 20.04.2069
 ```
-- [ ] Modify task recursive params 
+- [x] Modify task recursive params 
 ```
-scd mod task_name -rw 1
+scd mod task_name -r w1
 ```
 - [ ] Modify task to other category
 ```

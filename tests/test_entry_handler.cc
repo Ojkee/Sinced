@@ -1,5 +1,4 @@
 #include "../extern/include/catch.hpp"
-
 #include "../include/entry/entry_handler.hpp"
 
 TEST_CASE("Entry handler tokenization entries from databases") {
@@ -18,9 +17,10 @@ TEST_CASE("Entry handler tokenization entries from databases") {
   REQUIRE(target_tasks == result_tasks);
 
   const std::string result_categories = et1.categories_info_all();
-  const std::string target_categories = "\"Category\"\n\tid: 0\n"
-                                        "\"Some category\"\n\tid: 1\n"
-                                        "\"another_category\"\n\tid: 2\n";
+  const std::string target_categories =
+      "\"Category\"\n\tid: 0\n"
+      "\"Some category\"\n\tid: 1\n"
+      "\"another_category\"\n\tid: 2\n";
   REQUIRE(target_categories == result_categories);
 }
 

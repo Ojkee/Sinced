@@ -1,9 +1,6 @@
 #ifndef ENTRY_BASE_HPP
 #define ENTRY_BASE_HPP
 
-#include "../date/base_date.hpp"
-#include "../entry/entry_formatter.hpp"
-
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -11,18 +8,21 @@
 #include <utility>
 #include <vector>
 
+#include "../date/base_date.hpp"
+#include "../entry/entry_formatter.hpp"
+
 enum class Status { ongoing, done, canceled, undetermined };
 
 class EntryBase {
-public:
+ public:
   EntryBase() = default;
   EntryBase(const std::string &line);
   virtual void tokenize(const std::string &) = 0;
   virtual std::string info() const = 0;
   virtual operator std::string() const = 0;
   virtual ~EntryBase() = default;
-  [[nodiscard]] static std::vector<std::string>
-  line_to_tokens(const std::string &line);
+  [[nodiscard]] static std::vector<std::string> line_to_tokens(
+      const std::string &line);
 
   [[nodiscard]] std::string get_id() const { return id; }
   [[nodiscard]] std::string get_content() const { return content; }
@@ -34,7 +34,7 @@ public:
     info_formatter = std::move(_formatter);
   }
 
-protected:
+ protected:
   std::string id{};
   std::string content{};
 
@@ -42,7 +42,7 @@ protected:
 };
 
 class EntryTask : public EntryBase {
-public:
+ public:
   EntryTask() = default;
   EntryTask(const std::string &line) { tokenize(line); }
   void tokenize(const std::string &line) override;
@@ -67,8 +67,14 @@ public:
     r_years += y;
   }
 
+  void inline set_recursive(const uint16_t &d, const uint16_t &m,
+                            const uint16_t &y) {
+    r_days = d;
+    r_months = m;
+    r_years = y;
+  }
   class Builder {
-  public:
+   public:
     Builder() : task(std::make_unique<EntryTask>()) {}
     Builder(const EntryTask &other)
         : task(std::make_unique<EntryTask>(std::string(other))) {}
@@ -101,13 +107,18 @@ public:
       task->add_recursive(0, 0, ryears);
       return *this;
     }
+    Builder &add_set_recurcive(const uint16_t &rdays, const uint16_t &rmonths,
+                               const uint16_t &ryears) {
+      task->set_recursive(rdays, rmonths, ryears);
+      return *this;
+    }
     [[nodiscard]] std::shared_ptr<EntryTask> get() { return std::move(task); }
 
-  private:
+   private:
     std::unique_ptr<EntryTask> task;
   };
 
-protected:
+ protected:
   std::optional<BaseDate> deadline;
   Status status = Status::undetermined;
   uint16_t r_days{};
@@ -116,7 +127,7 @@ protected:
 };
 
 class EntryCategory : public EntryBase {
-public:
+ public:
   EntryCategory() = delete;
   EntryCategory(const std::string &line) { tokenize(line); }
   void tokenize(const std::string &line) override;
@@ -125,7 +136,7 @@ public:
 };
 
 class EntryRelation : public EntryBase {
-public:
+ public:
   EntryRelation() = delete;
   EntryRelation(const std::string &line) { tokenize(line); }
   void tokenize(const std::string &line) override;
@@ -136,8 +147,8 @@ public:
     return content_category;
   }
 
-private:
+ private:
   std::string content_category;
 };
 
-#endif // ENTRY_BASE_HPP
+#endif  // ENTRY_BASE_HPP

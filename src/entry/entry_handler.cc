@@ -119,6 +119,23 @@ std::shared_ptr<EntryRelation> EntryHandler::get_relation_by_ids(
   return nullptr;
 }
 
+std::shared_ptr<EntryRelation> EntryHandler::get_task_relation_by_id(
+    const std::string &task_id) const {
+  std::ifstream relation_db(relations_db_path);
+  if (!relation_db.is_open()) {
+    std::cerr << "Couldn't open file: " << relations_db_path << "\n";
+  }
+  std::string line;
+  while (getline(relation_db, line)) {
+    std::shared_ptr<EntryRelation> entry =
+        std::make_shared<EntryRelation>(line);
+    if (entry->get_content() == task_id) {
+      return entry;
+    }
+  }
+  return nullptr;
+}
+
 void EntryHandler::clear_db() {
   std::ofstream task_file, categories_file, relations_file;
   task_file.open(tasks_db_path, std::ofstream::out | std::ofstream::trunc);

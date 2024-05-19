@@ -77,7 +77,8 @@ class EntryHandler {
   [[nodiscard]] std::shared_ptr<EntryRelation> get_relation_by_ids(
       const std::string &task_content,
       const std::string category_content) const;
-
+  [[nodiscard]] std::shared_ptr<EntryRelation> get_task_relation_by_id(
+      const std::string &task_id) const;
   template <typename EntryType>
   int8_t replace_entry([[maybe_unused]] const EntryType &old_entry,
                        [[maybe_unused]] const EntryType &new_entry) {

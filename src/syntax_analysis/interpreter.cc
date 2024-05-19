@@ -5,6 +5,7 @@
 #include <format>
 #include <iterator>
 #include <memory>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -95,6 +96,13 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
   }
 
   if (task_name && !category_name) {
+    const auto task_ptr =
+        entry_handler.get_entry_by_content<EntryTask>(task_name.value());
+    if (task_ptr) {
+      return {.flag = Flag_Messages::invalid_args(),
+              .out_buffer = std::format("Task: \"{}\" already exists",
+                                        task_name.value())};
+    }
     std::shared_ptr<EntryTask> new_task = build_task(tokens);
     entry_handler.add_entry_to_db(*new_task);
     return {.flag = std::format("Added new task: \"{}\"", task_name.value())};
@@ -367,7 +375,7 @@ Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
     return {
         .flag = Flag_Messages::invalid_args(),
         .out_buffer =
-            "Invalid agruments provided. Propper syntax: \n\tscd mod "
+            "Invalid arguments provided. Propper syntax: \n\tscd mod "
             "<task_name> -name <new_task_name>\nor\n\tscd mod @<category_name> "
             "-name @<new_category_name>"};
   } else if (option_arg.value() == "status") {
@@ -384,29 +392,20 @@ Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
     if (!(deadline_arg && text_arg)) {
       return {.flag = Flag_Messages::invalid_args(),
               .out_buffer =
-                  "Invalid agruments provided. Propper syntax: \n\tscd mod "
+                  "Invalid arguments provided. Propper syntax: \n\tscd mod "
                   "<task_name> -deadline <deadline in format>"};
     }
-    const auto old_task_ptr =
-        entry_handler.get_entry_by_content<EntryTask>(text_arg.value());
-    if (!old_task_ptr) {
-      return {
-          .flag = Flag_Messages::invalid_args(),
-          .out_buffer = std::format("No task named: \"{}\"", text_arg.value())};
-    }
-    BaseDate new_deadline = BaseDate();
-    new_deadline.initialize_from_str(deadline_arg.value());
-    if (new_deadline < BaseDate::lower_bound_date()) {
+    return modify_task_deadline(text_arg.value(), deadline_arg.value());
+  } else if (option_arg.value() == "r") {
+    const auto task_recursive_args =
+        get_token_contents_if_contains_type(tokens, TokenType::TEXT);
+    if (task_recursive_args.size() < 2) {
       return {.flag = Flag_Messages::invalid_args(),
-              .out_buffer = "Invalid deadline"};
+              .out_buffer =
+                  "Invalid arguments provided. Propper syntax: \n\tscd mod "
+                  "<task_name> -r <d/w/m/y number>"};
     }
-    const auto new_task_ptr =
-        EntryTask::Builder(*old_task_ptr).add_deadline(new_deadline).get();
-    entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
-    return {
-        .flag = std::format("Modified task: \"{}\"", text_arg.value()),
-        .out_buffer = std::format("Deadline for task: \"{}\" has been changed",
-                                  text_arg.value())};
+    return modify_task_recursive(task_recursive_args);
   }
 
   return {.flag = Flag_Messages::bad_return("Interpreter::mod_command")};
@@ -475,6 +474,77 @@ Parsing_Data Interpreter::modify_task_status(
   return {.flag = std::format("Modified task: \"{}\"", task_name),
           .out_buffer = std::format("Status for task: \"{}\" has been changed",
                                     task_name)};
+}
+
+Parsing_Data Interpreter::modify_task_deadline(
+    const std::string &task_name, const std::string &deadline_str) {
+  const auto old_task_ptr =
+      entry_handler.get_entry_by_content<EntryTask>(task_name);
+  if (!old_task_ptr) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = std::format("No task named: \"{}\"", task_name)};
+  }
+  BaseDate new_deadline = BaseDate();
+  new_deadline.initialize_from_str(deadline_str);
+  if (new_deadline < BaseDate::lower_bound_date()) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = "Invalid deadline"};
+  }
+  const auto new_task_ptr =
+      EntryTask::Builder(*old_task_ptr).add_deadline(new_deadline).get();
+  entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
+  return {.flag = std::format("Modified task: \"{}\"", task_name),
+          .out_buffer = std::format(
+              "Deadline for task: \"{}\" has been changed", task_name)};
+}
+
+Parsing_Data Interpreter::modify_task_recursive(
+    const std::vector<std::string> &task_recursive_args) {
+  const std::string task_name = task_recursive_args[0];
+  std::string recursive_str = task_recursive_args[1];
+  const auto old_task_ptr =
+      entry_handler.get_entry_by_content<EntryTask>(task_name);
+  if (!old_task_ptr) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = std::format("No task named: \"{}\"", task_name)};
+  } else if (!old_task_ptr->get_deadline()) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer =
+                "Can't change recursive parameters for task without deadline"};
+  }
+
+  bool found = false;
+  std::vector<uint16_t> cals(3, 0);
+  std::regex numb_expr("([dwmy])(\\d+)");
+  for (std::smatch m; std::regex_search(recursive_str, m, numb_expr);
+       recursive_str = m.suffix()) {
+    found = true;
+    std::string letter = m[1].str();
+    uint16_t number = static_cast<uint16_t>(std::stoi(m[2].str()));
+    if (letter == "d") {
+      cals[0] += number;
+    } else if (letter == "w") {
+      cals[0] += number * 7;
+    } else if (letter == "m") {
+      cals[1] += number;
+    } else {
+      cals[2] += number;
+    }
+  }
+  if (!found) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer =
+                "Invalid arguments provided. Propper syntax: \n\tscd mod "
+                "<task_name> -r <d/w/m/y number>"};
+  }
+  const auto new_task_ptr = EntryTask::Builder(*old_task_ptr)
+                                .add_set_recurcive(cals[0], cals[1], cals[2])
+                                .get();
+  entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
+  return {.flag = std::format("Modified task: \"{}\"", task_name),
+          .out_buffer = std::format(
+              "Recursive deadline parameter for task: \"{}\" has been changed",
+              task_name)};
 }
 
 bool constexpr Interpreter::contains_token_type(
