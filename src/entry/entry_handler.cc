@@ -101,8 +101,14 @@ std::shared_ptr<EntryRelation> EntryHandler::get_entry_by_content(
   return entry_by_content<EntryRelation>(content, relations_db_path);
 }
 
+std::shared_ptr<EntryCategory> EntryHandler::get_entry_by_id(
+    const std::string &entry_id) const {
+  return entry_by_id<EntryCategory>(entry_id, categories_db_path);
+}
+
 std::shared_ptr<EntryRelation> EntryHandler::get_relation_by_ids(
-    const std::string &task_content, const std::string category_content) const {
+    const std::string &task_content,
+    const std::string &category_content) const {
   std::ifstream relation_db(relations_db_path);
   if (!relation_db.is_open()) {
     std::cerr << "Couldn't open file: " << relations_db_path << "\n";

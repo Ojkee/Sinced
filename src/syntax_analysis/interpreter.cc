@@ -20,22 +20,23 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
   }
 
   if (tokens[0].type == TokenType::COMMAND) [[likely]] {
-    // "add", "log", "rm", "set"
-    if (tokens[0].content == "add") {
+    // "add", "log", "mod", "rm", "set"
+    const std::string command_str = tokens.begin()->content;
+    if (command_str == "add") {
       return add_command(tokens);
-    } else if (tokens[0].content == "rm") {
-      // TODO more commads
-    } else if (tokens[0].content == "log") {
+    } else if (command_str == "log") {
       auto sorter = settings_handler.get_sorter();
       entry_handler.set_sorter(sorter);
       return log_command(tokens);
-    } else if (tokens[0].content == "set") {
+    } else if (command_str == "set") {
       return set_command(tokens);
-    } else if (tokens[0].content == "mod") {
+    } else if (command_str == "mod") {
       return mod_command(tokens);
+    } else if (command_str == "rm") {
+      // TODO more commads
     }
   }
-  // return {.flag = Flag_Messages::bad_return(tokens[0].content)};
+
   return {.flag = Flag_Messages::bad_return("Interpreter::parse")};
 }
 
@@ -61,11 +62,14 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
     const auto task_ptr =
         entry_handler.get_entry_by_content<EntryTask>(task_name.value());
     if (task_ptr) {
-      const auto relation_ptr = entry_handler.get_relation_by_ids(
-          task_ptr->get_id(), category_ptr->get_id());
+      const auto relation_ptr =
+          entry_handler.get_task_relation_by_id(task_ptr->get_id());
       if (relation_ptr) {
+        const auto category_ =
+            entry_handler.get_entry_by_id(relation_ptr->get_content_category())
+                ->get_content();
         return {.flag = std::format("\"{}\" already in @\"{}\"",
-                                    task_name.value(), category_name.value())};
+                                    task_name.value(), category_)};
       }
       add_new_relation(task_ptr->get_id(), category_ptr->get_id());
       return {.flag = std::format("Added: \"{}\" to @\"{}\"", task_name.value(),

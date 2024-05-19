@@ -239,17 +239,16 @@ TEST_CASE("Test Add Command task CORRENT PROMPTS") {
       "7 4 2\n"
       "8 10 3\n"
       "9 11 1\n"
-      "10 13 3\n"
-      "11 4 3\n";
+      "10 13 3\n";
   const std::string tracker_result6 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TRACKER);
   const std::string tracker_target6 =
       "{last task id} {13}\n"
       "{last category id} {4}\n"
-      "{last relation id} {11}\n";
+      "{last relation id} {10}\n";
   CHECK(result6_1 == target6_1);
   CHECK(result6_2 == target6_2);
-  CHECK(flag6 == "Added: \"T4\" to @\"project\"");
+  CHECK(flag6 == "\"T4\" already in @\"another_category\"");
   CHECK(tracker_result6 == tracker_target6);
 }
 
