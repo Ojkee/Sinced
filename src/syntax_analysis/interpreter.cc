@@ -45,75 +45,80 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
     return {.flag = Flag_Messages::no_args()};
   }
 
-  auto task_name =
+  auto task_arg =
       Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
-  auto category_name = Interpreter::get_token_content_if_contains_type(
+  auto category_arg = Interpreter::get_token_content_if_contains_type(
       tokens, TokenType::CATEGORY_NAME);
-  if (!task_name && !category_name) {
+  if (!task_arg && !category_arg) {
     return {.flag = Flag_Messages::invalid_args()};
+  } else if (task_arg && category_arg) {
+    return add_task_to_category(tokens, task_arg.value(), category_arg.value());
+  } else if (!task_arg && category_arg) {
+    return add_new_category(category_arg.value());
+  } else if (task_arg && !category_arg) {
+    return add_new_task(tokens, task_arg.value());
   }
-
-  if (task_name && category_name) {
-    auto category_ptr = entry_handler.get_entry_by_content<EntryCategory>(
-        category_name.value());
-    if (!category_ptr) {
-      return {.flag = Flag_Messages::no_category(category_name.value())};
-    }
-    const auto task_ptr =
-        entry_handler.get_entry_by_content<EntryTask>(task_name.value());
-    if (task_ptr) {
-      const auto relation_ptr =
-          entry_handler.get_task_relation_by_id(task_ptr->get_id());
-      if (relation_ptr) {
-        const auto category_ =
-            entry_handler.get_entry_by_id(relation_ptr->get_content_category())
-                ->get_content();
-        return {.flag = std::format("\"{}\" already in @\"{}\"",
-                                    task_name.value(), category_)};
-      }
-      add_new_relation(task_ptr->get_id(), category_ptr->get_id());
-      return {.flag = std::format("Added: \"{}\" to @\"{}\"", task_name.value(),
-                                  category_name.value())};
-    }
-    std::shared_ptr<EntryTask> new_task = build_task(tokens);
-    entry_handler.add_entry_to_db(*new_task);
-    add_new_relation(new_task->get_id(), category_ptr->get_id());
-    return {.flag = std::format("Added new task: \"{}\" to @\"{}\"",
-                                task_name.value(), category_name.value())};
-  }
-
-  if (!task_name && category_name) {
-    auto category_ptr = entry_handler.get_entry_by_content<EntryCategory>(
-        category_name.value());
-    if (category_ptr) {
-      return {.flag = std::format("Category: @\"{}\" already exists",
-                                  category_name.value())};
-    }
-    const std::string category_token =
-        std::format("{} \"{}\"", tracker_handler.next_id("last category id"),
-                    category_name.value());
-    const auto category = EntryCategory(category_token);
-    entry_handler.add_entry_to_db(category);
-    tracker_handler.increment_field_value("last category id");
-    return {.flag = std::format("Added new category: @\"{}\"",
-                                category_name.value())};
-  }
-
-  if (task_name && !category_name) {
-    const auto task_ptr =
-        entry_handler.get_entry_by_content<EntryTask>(task_name.value());
-    if (task_ptr) {
-      return {.flag = Flag_Messages::invalid_args(),
-              .out_buffer = std::format("Task: \"{}\" already exists",
-                                        task_name.value())};
-    }
-    std::shared_ptr<EntryTask> new_task = build_task(tokens);
-    entry_handler.add_entry_to_db(*new_task);
-    return {.flag = std::format("Added new task: \"{}\"", task_name.value())};
-  }
-
   return {.flag =
               Flag_Messages::bad_return("Interpreter::add_new_task_builder")};
+}
+
+Parsing_Data Interpreter::add_task_to_category(
+    const std::vector<Token> &tokens, const std::string &task_name,
+    const std::string &category_name) {
+  auto category_ptr =
+      entry_handler.get_entry_by_content<EntryCategory>(category_name);
+  if (!category_ptr) {
+    return {.flag = Flag_Messages::invalid_args()};
+  }
+  const auto task_ptr =
+      entry_handler.get_entry_by_content<EntryTask>(task_name);
+  if (task_ptr) {
+    const auto relation_ptr =
+        entry_handler.get_task_relation_by_id(task_ptr->get_id());
+    if (relation_ptr) {
+      const auto category_relation_ptr =
+          entry_handler.get_entry_by_id(relation_ptr->get_content_category());
+      return {.flag = std::format("\"{}\" already in @\"{}\"", task_name,
+                                  category_relation_ptr->get_content())};
+    }
+    add_new_relation(task_ptr->get_id(), category_ptr->get_id());
+    return {.flag = std::format("Added: \"{}\" to @\"{}\"", task_name,
+                                category_name)};
+  }
+  std::shared_ptr<EntryTask> new_task = build_task(tokens);
+  entry_handler.add_entry_to_db(*new_task);
+  add_new_relation(new_task->get_id(), category_ptr->get_id());
+  return {.flag = std::format("Added new task: \"{}\" to @\"{}\"", task_name,
+                              category_name)};
+}
+
+Parsing_Data Interpreter::add_new_category(const std::string &category_name) {
+  auto category_ptr =
+      entry_handler.get_entry_by_content<EntryCategory>(category_name);
+  if (category_ptr) {
+    return {.flag =
+                std::format("Category: @\"{}\" already exists", category_name)};
+  }
+  const std::string category_token = std::format(
+      "{} \"{}\"", tracker_handler.next_id("last category id"), category_name);
+  const auto category = EntryCategory(category_token);
+  entry_handler.add_entry_to_db(category);
+  tracker_handler.increment_field_value("last category id");
+  return {.flag = std::format("Added new category: @\"{}\"", category_name)};
+}
+
+Parsing_Data Interpreter::add_new_task(const std::vector<Token> &tokens,
+                                       const std::string &task_name) {
+  const auto task_ptr =
+      entry_handler.get_entry_by_content<EntryTask>(task_name);
+  if (task_ptr) {
+    return {
+        .flag = Flag_Messages::invalid_args(),
+        .out_buffer = std::format("Task: \"{}\" already exists", task_name)};
+  }
+  std::shared_ptr<EntryTask> new_task = build_task(tokens);
+  entry_handler.add_entry_to_db(*new_task);
+  return {.flag = std::format("Added new task: \"{}\"", task_name)};
 }
 
 std::shared_ptr<EntryTask> Interpreter::build_task(
@@ -235,7 +240,7 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
               .out_buffer = task_ptr->info()};
     }
     return {
-        .flag = Flag_Messages::no_task(text_arg.value()),
+        .flag = Flag_Messages::invalid_args(),
         .out_buffer = std::format("No task named: \"{}\"", text_arg.value())};
   } else if (category_name) {
     std::shared_ptr<EntryCategory> category_ptr =
@@ -247,7 +252,7 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
       return {.flag = std::format("Logged: @\"{}\"", category_name.value()),
               .out_buffer = tasks_in_category_info};
     }
-    return {.flag = Flag_Messages::no_category(category_name.value()),
+    return {.flag = Flag_Messages::invalid_args(),
             .out_buffer = std::format("No category named: @\"{}\"",
                                       category_name.value())};
   } else if (options_arg) {

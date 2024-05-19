@@ -24,14 +24,6 @@ class Flag_Messages {
       const std::string &func_name) {
     return std::format("Bad return in: \"{}\"", func_name);
   }
-  [[nodiscard]] constexpr static inline std::string no_task(
-      const std::string &task_name) {
-    return std::format("No task: \"{}\"", task_name);
-  }
-  [[nodiscard]] constexpr static inline std::string no_category(
-      const std::string &category_name) {
-    return std::format("No category: @\"{}\"", category_name);
-  }
 };
 
 struct Parsing_Data {
@@ -72,6 +64,12 @@ class Interpreter {
   [[nodiscard]] Parsing_Data mod_command(const std::vector<Token> &tokens);
 
   // ADD
+  [[nodiscard]] Parsing_Data add_task_to_category(
+      const std::vector<Token> &tokens, const std::string &task_name,
+      const std::string &category_name);
+  [[nodiscard]] Parsing_Data add_new_category(const std::string &category_name);
+  [[nodiscard]] Parsing_Data add_new_task(const std::vector<Token> &tokens,
+                                          const std::string &task_name);
   [[nodiscard]] std::shared_ptr<EntryTask> build_task(
       const std::vector<Token> &tokens);
   void add_new_relation(const std::string &task_id,

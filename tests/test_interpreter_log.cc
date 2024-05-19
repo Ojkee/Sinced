@@ -125,14 +125,13 @@ TEST_CASE("Log single argument") {
 
   const std::string user_input3 = "log task_that_not_exists";
   const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
-  const std::string target_buffr3 = "No task: \"task_that_not_exists\"";
-  CHECK(flag3 == target_buffr3);
+  CHECK(flag3 == "Invalid arguments");
   CHECK(buffr3 == "No task named: \"task_that_not_exists\"");
 
   const std::string user_input4 = "log @category_that_not_exists";
   const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
   const std::string target_buffr4 = "";
-  CHECK(flag4 == "No category: @\"category_that_not_exists\"");
+  CHECK(flag4 == "Invalid arguments");
   CHECK(buffr4 == "No category named: @\"category_that_not_exists\"");
 }
 

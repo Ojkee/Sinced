@@ -201,7 +201,7 @@ TEST_CASE("Test Add Command task CORRENT PROMPTS") {
 
   const std::string user_input4 = "add taskerinho @categorinho";
   const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
-  CHECK(flag4 == "No category: @\"categorinho\"");
+  CHECK(flag4 == "Invalid arguments");
 
   const std::string user_input5 = "add T4 @another_category";
   const auto [flag5, buffr5, session5] = interpreter.parse(user_input5);
@@ -482,8 +482,7 @@ TEST_CASE("Test Add Command task to category CORRENT PROMPTS") {
   const std::string user_input2 =
       "add \"task in week\" @Cat_that_not_exists -w";
   const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
-  const std::string flag_target2 = "No category: @\"Cat_that_not_exists\"";
-  CHECK(flag2 == flag_target2);
+  CHECK(flag2 == "Invalid arguments");
 
   const std::string user_input3 = "add tcd @another_category 20-04-2069";
   const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
