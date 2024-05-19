@@ -72,6 +72,29 @@ class Interpreter {
   [[nodiscard]] Parsing_Data mod_command(const std::vector<Token> &tokens);
 
   // ADD
+  [[nodiscard]] std::shared_ptr<EntryTask> build_task(
+      const std::vector<Token> &tokens);
+  void add_new_relation(const std::string &task_id,
+                        const std::string &category_id);
+
+  // SET
+  const std::unordered_map<std::string, std::string> set_params{
+      {"df", "date format"}, {"ds", "date format separator"}, {"s", "sort by"}};
+
+  // LOG
+  [[nodiscard]] Parsing_Data parse_log_filter(const std::string &option,
+                                              const std::vector<Token> &tokens);
+
+  // MOD
+  [[nodiscard]] Parsing_Data modify_task_name(
+      const std::vector<std::string> &tasks_names);
+  [[nodiscard]] Parsing_Data modify_category_name(
+      const std::vector<std::string> &category_names);
+
+  [[nodiscard]] Parsing_Data modify_task_status(
+      const std::vector<std::string> &task_status_texts);
+
+  // UTILS
   template <typename... TokenTypes>
   [[nodiscard]] constexpr static bool contains_token_types(
       const std::vector<Token> &tokens, const TokenType &ttype,
@@ -84,20 +107,6 @@ class Interpreter {
   [[nodiscard]] constexpr static std::optional<std::string>
   get_token_content_if_contains_type(const std::vector<Token> &tokens,
                                      const TokenType &token_type);
-  void add_new_relation(const std::string &task_id,
-                        const std::string &category_id);
-  [[nodiscard]] std::shared_ptr<EntryTask> build_task(
-      const std::vector<Token> &tokens);
-
-  // SET
-  const std::unordered_map<std::string, std::string> set_params{
-      {"df", "date format"}, {"ds", "date format separator"}, {"s", "sort by"}};
-
-  // LOG
-  [[nodiscard]] Parsing_Data parse_log_filter(const std::string &option,
-                                              const std::vector<Token> &tokens);
-
-  // MOD
   [[nodiscard]] constexpr std::vector<std::string>
   get_token_contents_if_contains_type(const std::vector<Token> &tokens,
                                       const TokenType &token_type);

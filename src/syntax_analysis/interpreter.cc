@@ -1,6 +1,7 @@
 #include "../../include/syntax_analysis/interpreter.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <format>
 #include <iterator>
 #include <memory>
@@ -35,33 +36,6 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
   }
   // return {.flag = Flag_Messages::bad_return(tokens[0].content)};
   return {.flag = Flag_Messages::bad_return("Interpreter::parse")};
-}
-
-bool constexpr Interpreter::contains_token_type(
-    const std::vector<Token> &tokens, const TokenType &token_type) {
-  auto has_type = [&token_type](const Token t) { return t.type == token_type; };
-  return std::find_if(tokens.begin(), tokens.end(), has_type) != tokens.end();
-}
-
-constexpr std::optional<std::string>
-Interpreter::get_token_content_if_contains_type(
-    const std::vector<Token> &tokens, const TokenType &token_type) {
-  auto has_type = [&token_type](const Token t) { return t.type == token_type; };
-  const auto token_iterator =
-      std::find_if(tokens.begin(), tokens.end(), has_type);
-  return (token_iterator == tokens.end())
-             ? std::nullopt
-             : std::optional(token_iterator->content);
-}
-
-void Interpreter::add_new_relation(const std::string &task_id,
-                                   const std::string &category_id) {
-  const std::string relation_token =
-      std::format("{} {} {}", tracker_handler.next_id("last relation id"),
-                  task_id, category_id);
-  const EntryRelation relation = EntryRelation(relation_token);
-  entry_handler.add_entry_to_db(relation);
-  tracker_handler.increment_field_value("last relation id");
 }
 
 Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
@@ -213,6 +187,16 @@ std::shared_ptr<EntryTask> Interpreter::build_task(
     }
   }
   return task_builder.get();
+}
+
+void Interpreter::add_new_relation(const std::string &task_id,
+                                   const std::string &category_id) {
+  const std::string relation_token =
+      std::format("{} {} {}", tracker_handler.next_id("last relation id"),
+                  task_id, category_id);
+  const EntryRelation relation = EntryRelation(relation_token);
+  entry_handler.add_entry_to_db(relation);
+  tracker_handler.increment_field_value("last relation id");
 }
 
 Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
@@ -370,56 +354,144 @@ Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
       const auto tasks_names =
           get_token_contents_if_contains_type(tokens, TokenType::TEXT);
       if (tasks_names.size() >= 2) {
-        const std::string old_task_name = tasks_names[0];
-        const std::string new_task_name = tasks_names[1];
-        const auto old_task_ptr =
-            entry_handler.get_entry_by_content<EntryTask>(old_task_name);
-        if (!old_task_ptr) {
-          return {.flag = Flag_Messages::invalid_args(),
-                  .out_buffer =
-                      std::format("No task named: \"{}\"", old_task_name)};
-        }
-        const auto new_task_ptr =
-            EntryTask::Builder(*old_task_ptr).add_content(new_task_name).get();
-        entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
-        return {
-            .flag = std::format("Modified task: \"{}\"", old_task_name),
-            .out_buffer = std::format("Changed task name from \"{}\" to \"{}\"",
-                                      old_task_name, new_task_name)};
+        return modify_task_name(tasks_names);
       }
     }
     {
       const auto category_names =
           get_token_contents_if_contains_type(tokens, TokenType::CATEGORY_NAME);
       if (category_names.size() >= 2) {
-        const std::string old_category_name = category_names[0];
-        const std::string new_category_name = category_names[1];
-        const auto old_category_ptr =
-            entry_handler.get_entry_by_content<EntryCategory>(
-                old_category_name);
-        if (!old_category_ptr) {
-          return {.flag = Flag_Messages::invalid_args(),
-                  .out_buffer = std::format("No category named: @\"{}\"",
-                                            old_category_name)};
-        }
-        EntryCategory new_category = EntryCategory(std::format(
-            "{} \"{}\"", old_category_ptr->get_id(), new_category_name));
-        entry_handler.replace_entry(*old_category_ptr, new_category);
-        return {.flag = std::format("Modified category: @\"{}\"",
-                                    old_category_name),
-                .out_buffer =
-                    std::format("Changed category name from @\"{}\" to @\"{}\"",
-                                old_category_name, new_category_name)};
+        return modify_category_name(category_names);
       }
     }
-    return {.flag = Flag_Messages::invalid_args(),
-            .out_buffer =
-                "Invalid agruments provided. Propper syntax: \n\tscd mod "
-                "task_name -name new_task_name\nor\n\tscd mod @category_name "
-                "-name @new_category_name"};
+    return {
+        .flag = Flag_Messages::invalid_args(),
+        .out_buffer =
+            "Invalid agruments provided. Propper syntax: \n\tscd mod "
+            "<task_name> -name <new_task_name>\nor\n\tscd mod @<category_name> "
+            "-name @<new_category_name>"};
+  } else if (option_arg.value() == "status") {
+    const auto task_status_texts =
+        get_token_contents_if_contains_type(tokens, TokenType::TEXT);
+    if (task_status_texts.size() >= 2) {
+      return modify_task_status(task_status_texts);
+    }
+  } else if (option_arg.value() == "deadline") {
+    const auto text_arg = Interpreter::get_token_content_if_contains_type(
+        tokens, TokenType::TEXT);
+    const auto deadline_arg = Interpreter::get_token_content_if_contains_type(
+        tokens, TokenType::DATE);
+    if (!(deadline_arg && text_arg)) {
+      return {.flag = Flag_Messages::invalid_args(),
+              .out_buffer =
+                  "Invalid agruments provided. Propper syntax: \n\tscd mod "
+                  "<task_name> -deadline <deadline in format>"};
+    }
+    const auto old_task_ptr =
+        entry_handler.get_entry_by_content<EntryTask>(text_arg.value());
+    if (!old_task_ptr) {
+      return {
+          .flag = Flag_Messages::invalid_args(),
+          .out_buffer = std::format("No task named: \"{}\"", text_arg.value())};
+    }
+    BaseDate new_deadline = BaseDate();
+    new_deadline.initialize_from_str(deadline_arg.value());
+    if (new_deadline < BaseDate::lower_bound_date()) {
+      return {.flag = Flag_Messages::invalid_args(),
+              .out_buffer = "Invalid deadline"};
+    }
+    const auto new_task_ptr =
+        EntryTask::Builder(*old_task_ptr).add_deadline(new_deadline).get();
+    entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
+    return {
+        .flag = std::format("Modified task: \"{}\"", text_arg.value()),
+        .out_buffer = std::format("Deadline for task: \"{}\" has been changed",
+                                  text_arg.value())};
   }
 
   return {.flag = Flag_Messages::bad_return("Interpreter::mod_command")};
+}
+
+Parsing_Data Interpreter::modify_task_name(
+    const std::vector<std::string> &tasks_names) {
+  const std::string old_task_name = tasks_names[0];
+  const std::string new_task_name = tasks_names[1];
+  const auto old_task_ptr =
+      entry_handler.get_entry_by_content<EntryTask>(old_task_name);
+  if (!old_task_ptr) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = std::format("No task named: \"{}\"", old_task_name)};
+  }
+  const auto new_task_ptr =
+      EntryTask::Builder(*old_task_ptr).add_content(new_task_name).get();
+  entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
+  return {.flag = std::format("Modified task: \"{}\"", old_task_name),
+          .out_buffer = std::format("Changed task name from \"{}\" to \"{}\"",
+                                    old_task_name, new_task_name)};
+}
+
+Parsing_Data Interpreter::modify_category_name(
+    const std::vector<std::string> &category_names) {
+  const std::string old_category_name = category_names[0];
+  const std::string new_category_name = category_names[1];
+  const auto old_category_ptr =
+      entry_handler.get_entry_by_content<EntryCategory>(old_category_name);
+  if (!old_category_ptr) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer =
+                std::format("No category named: @\"{}\"", old_category_name)};
+  }
+  EntryCategory new_category = EntryCategory(
+      std::format("{} \"{}\"", old_category_ptr->get_id(), new_category_name));
+  entry_handler.replace_entry(*old_category_ptr, new_category);
+  return {
+      .flag = std::format("Modified category: @\"{}\"", old_category_name),
+      .out_buffer = std::format("Changed category name from @\"{}\" to @\"{}\"",
+                                old_category_name, new_category_name)};
+}
+
+Parsing_Data Interpreter::modify_task_status(
+    const std::vector<std::string> &task_status_texts) {
+  const std::string task_name = task_status_texts[0];
+  std::string status_str = task_status_texts[1];
+  std::transform(status_str.begin(), status_str.end(), status_str.begin(),
+                 ::tolower);
+  Status _status;
+  if (status_str == "ongoing") {
+    _status = Status::ongoing;
+  } else if (status_str == "done") {
+    _status = Status::done;
+  } else if (status_str == "canceled") {
+    _status = Status::canceled;
+  } else {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = "Invalid status provided"};
+  }
+  const auto task_ptr =
+      entry_handler.get_entry_by_content<EntryTask>(task_name);
+  const auto new_task_ptr =
+      EntryTask::Builder(*task_ptr).add_status(_status).get();
+  entry_handler.replace_entry(*task_ptr, *new_task_ptr);
+  return {.flag = std::format("Modified task: \"{}\"", task_name),
+          .out_buffer = std::format("Status for task: \"{}\" has been changed",
+                                    task_name)};
+}
+
+bool constexpr Interpreter::contains_token_type(
+    const std::vector<Token> &tokens, const TokenType &token_type) {
+  auto has_type = [&token_type](const Token t) { return t.type == token_type; };
+  return std::find_if(tokens.begin(), tokens.end(), has_type) != tokens.end();
+}
+
+constexpr std::optional<std::string>
+Interpreter::get_token_content_if_contains_type(
+    const std::vector<Token> &tokens, const TokenType &token_type) {
+  auto has_type = [&token_type](const Token t) { return t.type == token_type; };
+  const auto token_iterator =
+      std::find_if(tokens.begin(), tokens.end(), has_type);
+  return (token_iterator == tokens.end())
+             ? std::nullopt
+             : std::optional(token_iterator->content);
 }
 
 constexpr std::vector<std::string>

@@ -1,18 +1,18 @@
 ## MOD
 
-- [ ] Modify category name
+- [x] Modify category name
 ```
 scd mod @category -name @new_category_name
 ```
-- [ ] Modify task name
+- [x] Modify task name
 ```
 scd mod task_name -name new_task_name
 ```
-- [ ] Modify task status
+- [x] Modify task status
 ```
 scd mod task_name -status Ongoing
 ```
-- [ ] Modify task deadline
+- [x] Modify task deadline
 ```
 scd mod task_name -deadline 20.04.2069
 ```

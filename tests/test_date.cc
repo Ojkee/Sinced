@@ -479,6 +479,11 @@ TEST_CASE("Day of week from date") {
 //   CHECK(b4.remaining_days() == 14);
 // }
 
+TEST_CASE("Lower bound date") {
+  BaseDate b1 = BaseDate::lower_bound_date();
+  CHECK(std::string(b1) == "01-01-1970");
+}
+
 TEST_CASE("comperison operators overloading") {
   BaseDate b1_1 = BaseDate(18, 11, 2000);
   BaseDate b1_2 = BaseDate(3, 11, 2001);

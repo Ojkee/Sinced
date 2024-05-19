@@ -70,7 +70,9 @@ class BaseDate {
   [[nodiscard]] static uint32_t date_to_days(const BaseDate &bd);
   [[nodiscard]] static BaseDate days_to_date(int32_t _days);
   [[nodiscard]] static BaseDate today();
-
+  [[nodiscard]] static BaseDate lower_bound_date() {
+    return BaseDate(lower_bound_day, lower_bound_month, lower_bound_year);
+  }
   [[nodiscard]] const FormatDate &get_formatter() const { return *formatter; }
   void set_formatter(std::shared_ptr<FormatDate> &&_formatter) {
     formatter = std::move(_formatter);
