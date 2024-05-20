@@ -432,3 +432,178 @@ TEST_CASE("Modifying task recursive") {
   CHECK(flag9 == "No arguments provided");
   CHECK(tasks_result9 == tasks_target9);
 }
+
+TEST_CASE("Modifying task relation") {
+  INTERPRETER_MOD::reset_tasks_db();
+  INTERPRETER_MOD::reset_categories_db();
+  INTERPRETER_MOD::reset_relations_db();
+  INTERPRETER_MOD::reset_tracker();
+  INTERPRETER_MOD::reset_test_settings();
+  Interpreter interpreter = Interpreter(
+      PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
+
+  // const std::string content =
+  //     "0 \"T0\" 0 45300 14 0 0\n"
+  //     "1 \"T1\" 0 46000 0 2 0\n"
+  //     "2 \"T2\" 1 45891 0 0 0\n"
+  //     "3 \"T3\" 1 46401 0 0 0\n"
+  //     "4 \"T4\" 1 45500 7 0 0\n"
+  //     "5 \"T5\" 0 -1 0 0 0\n"
+  //     "6 \"T6\" 2 -1 0 0 0\n"
+  //     "7 \"T7\" 1 3401 0 2 0\n"
+  //     "8 \"T8\" 2 3401 0 0 1\n"
+  //     "9 \"T9\" 3 45300 0 0 0\n"
+  //     "10 \"T10\" 2 45200 0 1 0\n"
+  //     "11 \"T11\" 1 -1 0 0 0\n";
+  //
+  // const std::string content =
+  //     "0 \"Uncategorized\"\n"
+  //     "1 \"Some category\"\n"
+  //     "2 \"another_category\"\n"
+  //     "3 \"project\"\n";
+  //
+  // const std::string content =
+  //     "0 2 1\n"
+  //     "1 3 1\n"
+  //     "2 5 2\n"
+  //     "3 6 3\n"
+  //     "4 7 3\n"
+  //     "6 8 3\n"
+  //     "6 9 3\n"
+  //     "7 4 2\n"
+  //     "8 10 3\n"
+  //     "9 11 1\n";
+
+  const std::string user_input1 = "mod T1 -to @another_category";
+  const auto [flag1, buffr1, sess1] = interpreter.parse(user_input1);
+  const std::string relations_result1 =
+      INTERPRETER_MOD::get_file_content(PATH_RELATIONS);
+  const std::string relations_target1 =
+      "0 2 1\n"
+      "1 3 1\n"
+      "2 5 2\n"
+      "3 6 3\n"
+      "4 7 3\n"
+      "6 8 3\n"
+      "6 9 3\n"
+      "7 4 2\n"
+      "8 10 3\n"
+      "9 11 1\n"
+      "10 1 2\n";
+  CHECK(flag1 == "Modified task relation");
+  CHECK(relations_result1 == relations_target1);
+
+  const std::string user_input2 = "mod T6 -to @\"Some category\"";
+  const auto [flag2, buffr2, sess2] = interpreter.parse(user_input2);
+  const std::string relations_result2 =
+      INTERPRETER_MOD::get_file_content(PATH_RELATIONS);
+  const std::string relations_target2 =
+      "0 2 1\n"
+      "1 3 1\n"
+      "2 5 2\n"
+      "4 7 3\n"
+      "6 8 3\n"
+      "6 9 3\n"
+      "7 4 2\n"
+      "8 10 3\n"
+      "9 11 1\n"
+      "10 1 2\n"
+      "11 6 1\n";
+  CHECK(flag2 == "Modified task relation");
+  CHECK(relations_result2 == relations_target2);
+
+  const std::string user_input3 = "mod T6 -to @\"Some category\"";
+  const auto [flag3, buffr3, sess3] = interpreter.parse(user_input3);
+  const std::string relations_result3 =
+      INTERPRETER_MOD::get_file_content(PATH_RELATIONS);
+  const std::string relations_target3 =
+      "0 2 1\n"
+      "1 3 1\n"
+      "2 5 2\n"
+      "4 7 3\n"
+      "6 8 3\n"
+      "6 9 3\n"
+      "7 4 2\n"
+      "8 10 3\n"
+      "9 11 1\n"
+      "10 1 2\n"
+      "11 6 1\n";
+  CHECK(flag3 == "Task already in category");
+  CHECK(relations_result3 == relations_target3);
+
+  const std::string user_input4 = "mod T18 -to @\"Some category\"";
+  const auto [flag4, buffr4, sess4] = interpreter.parse(user_input4);
+  const std::string relations_result4 =
+      INTERPRETER_MOD::get_file_content(PATH_RELATIONS);
+  const std::string relations_target4 =
+      "0 2 1\n"
+      "1 3 1\n"
+      "2 5 2\n"
+      "4 7 3\n"
+      "6 8 3\n"
+      "6 9 3\n"
+      "7 4 2\n"
+      "8 10 3\n"
+      "9 11 1\n"
+      "10 1 2\n"
+      "11 6 1\n";
+  CHECK(flag4 == "Invalid arguments");
+  CHECK(relations_result4 == relations_target4);
+
+  const std::string user_input5 = "mod T1 -to @CategoryThatNotExists";
+  const auto [flag5, buffr5, sess5] = interpreter.parse(user_input5);
+  const std::string relations_result5 =
+      INTERPRETER_MOD::get_file_content(PATH_RELATIONS);
+  const std::string relations_target5 =
+      "0 2 1\n"
+      "1 3 1\n"
+      "2 5 2\n"
+      "4 7 3\n"
+      "6 8 3\n"
+      "6 9 3\n"
+      "7 4 2\n"
+      "8 10 3\n"
+      "9 11 1\n"
+      "10 1 2\n"
+      "11 6 1\n";
+  CHECK(flag5 == "Invalid arguments");
+  CHECK(relations_result5 == relations_target5);
+
+  const std::string user_input6 = "mod -to @CategoryThatNotExists";
+  const auto [flag6, buffr6, sess6] = interpreter.parse(user_input6);
+  const std::string relations_result6 =
+      INTERPRETER_MOD::get_file_content(PATH_RELATIONS);
+  const std::string relations_target6 =
+      "0 2 1\n"
+      "1 3 1\n"
+      "2 5 2\n"
+      "4 7 3\n"
+      "6 8 3\n"
+      "6 9 3\n"
+      "7 4 2\n"
+      "8 10 3\n"
+      "9 11 1\n"
+      "10 1 2\n"
+      "11 6 1\n";
+  CHECK(flag6 == "No arguments provided");
+  CHECK(relations_result6 == relations_target6);
+
+  const std::string user_input7 = "mod T10 -to";
+  const auto [flag7, buffr7, sess7] = interpreter.parse(user_input7);
+  const std::string relations_result7 =
+      INTERPRETER_MOD::get_file_content(PATH_RELATIONS);
+  const std::string relations_target7 =
+      "0 2 1\n"
+      "1 3 1\n"
+      "2 5 2\n"
+      "4 7 3\n"
+      "6 8 3\n"
+      "6 9 3\n"
+      "7 4 2\n"
+      "8 10 3\n"
+      "9 11 1\n"
+      "10 1 2\n"
+      "11 6 1\n";
+  CHECK(flag7 == "No arguments provided");
+  CHECK(relations_result7 == relations_target7);
+}

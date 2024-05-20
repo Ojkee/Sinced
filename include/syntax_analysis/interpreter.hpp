@@ -62,6 +62,7 @@ class Interpreter {
   [[nodiscard]] Parsing_Data log_command(const std::vector<Token> &tokens);
   [[nodiscard]] Parsing_Data set_command(const std::vector<Token> &tokens);
   [[nodiscard]] Parsing_Data mod_command(const std::vector<Token> &tokens);
+  [[nodiscard]] Parsing_Data rm_command(const std::vector<Token> &tokens);
 
   // ADD
   [[nodiscard]] Parsing_Data add_task_to_category(
@@ -94,6 +95,10 @@ class Interpreter {
       const std::string &task_name, const std::string &deadline_str);
   [[nodiscard]] Parsing_Data modify_task_recursive(
       const std::vector<std::string> &task_recursive_args);
+  [[nodiscard]] Parsing_Data modify_task_relation(
+      const std::string &task_name, const std::string &category_name);
+
+  // RM
 
   // UTILS
   template <typename... TokenTypes>

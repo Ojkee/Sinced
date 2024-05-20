@@ -10,6 +10,7 @@
 #include <iterator>
 #include <limits>
 #include <numeric>
+#include <ranges>
 
 void BaseDate::initialize_from_str(const std::string &date_str) {
   if (!formatter->is_valid(date_str)) {

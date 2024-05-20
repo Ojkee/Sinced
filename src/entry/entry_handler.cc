@@ -84,6 +84,21 @@ int8_t EntryHandler::replace_entry<EntryRelation>(
 }
 
 template <>
+int8_t EntryHandler::remove_entry<EntryTask>(const EntryTask &entry) {
+  return remove_entry_from_db(entry, tasks_db_path);
+}
+
+template <>
+int8_t EntryHandler::remove_entry<EntryCategory>(const EntryCategory &entry) {
+  return remove_entry_from_db(entry, categories_db_path);
+}
+
+template <>
+int8_t EntryHandler::remove_entry<EntryRelation>(const EntryRelation &entry) {
+  return remove_entry_from_db(entry, relations_db_path);
+}
+
+template <>
 std::shared_ptr<EntryTask> EntryHandler::get_entry_by_content(
     const std::string &content) const {
   return entry_by_content<EntryTask>(content, tasks_db_path);
@@ -227,6 +242,34 @@ int8_t EntryHandler::replace_entry_in_db(const EntryType &old_entry,
 
 std::string EntryHandler::tasks_info_all() const {
   return entries_info<EntryTask>(tasks);
+}
+
+template <typename EntryType>
+int8_t EntryHandler::remove_entry_from_db(const EntryType &entry,
+                                          const std::string &path) const {
+  std::ifstream file_in(path);
+  if (!file_in.is_open()) {
+    std::cerr << "Can't open file: " << path << "\n";
+    exit(EXIT_FAILURE);
+  }
+  std::string line;
+  std::stringstream buffr;
+  bool found = false;
+  while (getline(file_in, line)) {
+    if (line != std::string(entry)) {
+      buffr << line << "\n";
+    } else {
+      found = true;
+    }
+  }
+  file_in.close();
+  std::ofstream file_out(path);
+  if (!file_out.is_open()) {
+    std::cerr << "Can't open file : " << path << "\n";
+    exit(EXIT_FAILURE);
+  }
+  file_out << buffr.rdbuf();
+  return found ? 0 : -1;
 }
 
 std::string EntryHandler::categories_info_all() const {

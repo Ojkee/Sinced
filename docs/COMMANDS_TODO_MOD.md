@@ -20,7 +20,7 @@ scd mod task_name -deadline 20.04.2069
 ```
 scd mod task_name -r w1
 ```
-- [ ] Modify task to other category
+- [x] Modify task to other category
 ```
 scd mod task -to @category
 ```

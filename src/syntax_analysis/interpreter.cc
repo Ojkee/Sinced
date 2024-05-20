@@ -33,7 +33,10 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
     } else if (command_str == "mod") {
       return mod_command(tokens);
     } else if (command_str == "rm") {
-      // TODO more commads
+      return rm_command(tokens);
+    } else {
+      return {.flag = "Command not implemented",
+              .out_buffer = "Command not implemented"};
     }
   }
 
@@ -49,6 +52,7 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
       Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
   auto category_arg = Interpreter::get_token_content_if_contains_type(
       tokens, TokenType::CATEGORY_NAME);
+
   if (!task_arg && !category_arg) {
     return {.flag = Flag_Messages::invalid_args()};
   } else if (task_arg && category_arg) {
@@ -415,6 +419,18 @@ Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
                   "<task_name> -r <d/w/m/y number>"};
     }
     return modify_task_recursive(task_recursive_args);
+  } else if (option_arg.value() == "to") {
+    const auto text_arg = Interpreter::get_token_content_if_contains_type(
+        tokens, TokenType::TEXT);
+    const auto category_arg = Interpreter::get_token_content_if_contains_type(
+        tokens, TokenType::CATEGORY_NAME);
+    if (!text_arg || !category_arg) {
+      return {.flag = Flag_Messages::no_args(),
+              .out_buffer =
+                  "Invalid arguments provided. Propper syntax: \n\tscd mod "
+                  "<task_name> -to <@category_name>"};
+    }
+    return modify_task_relation(text_arg.value(), category_arg.value());
   }
 
   return {.flag = Flag_Messages::bad_return("Interpreter::mod_command")};
@@ -554,6 +570,45 @@ Parsing_Data Interpreter::modify_task_recursive(
           .out_buffer = std::format(
               "Recursive deadline parameter for task: \"{}\" has been changed",
               task_name)};
+}
+
+Parsing_Data Interpreter::modify_task_relation(
+    const std::string &task_name, const std::string &category_name) {
+  const auto task_ptr =
+      entry_handler.get_entry_by_content<EntryTask>(task_name);
+  const auto category_ptr =
+      entry_handler.get_entry_by_content<EntryCategory>(category_name);
+  if (!task_ptr) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = std::format("No task named: \"{}\"", task_name)};
+  } else if (!category_ptr) {
+    return {
+        .flag = Flag_Messages::invalid_args(),
+        .out_buffer = std::format("No category named: @\"{}\"", category_name)};
+  } else {
+    const auto relation_ptr =
+        entry_handler.get_task_relation_by_id(task_ptr->get_id());
+    if (relation_ptr &&
+        relation_ptr->get_content_category() == category_ptr->get_id()) {
+      return {.flag = "Task already in category",
+              .out_buffer = std::format("Task: \"{}\" already in @\"{}\"",
+                                        task_name, category_name)};
+    } else if (relation_ptr) {
+      entry_handler.remove_entry(*relation_ptr);
+    }
+    add_new_relation(task_ptr->get_id(), category_ptr->get_id());
+    return {.flag = "Modified task relation",
+            .out_buffer = std::format("Added task: \"{}\" to @\"{}\"",
+                                      task_name, category_name)};
+  }
+}
+
+Parsing_Data Interpreter::rm_command(const std::vector<Token> &tokens) {
+  if (tokens.size() < 2) {
+    return {.flag = Flag_Messages::no_args()};
+  }
+
+  return {.flag = Flag_Messages::bad_return("Interpreter::rm")};
 }
 
 bool constexpr Interpreter::contains_token_type(

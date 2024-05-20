@@ -83,6 +83,7 @@ class EntryHandler {
   [[nodiscard]] std::shared_ptr<EntryRelation> get_task_relation_by_id(
       const std::string &task_id) const;
   template <typename EntryType>
+
   int8_t replace_entry([[maybe_unused]] const EntryType &old_entry,
                        [[maybe_unused]] const EntryType &new_entry) {
     std::cerr << "Not valid type of entry!\n";
@@ -97,6 +98,18 @@ class EntryHandler {
   template <>
   int8_t replace_entry<EntryRelation>(const EntryRelation &old_entry,
                                       const EntryRelation &new_entry);
+
+  template <typename EntryType>
+  int8_t remove_entry([[maybe_unused]] const EntryType &entry) {
+    std::cerr << "Not valid type of entry!\n";
+    exit(EXIT_FAILURE);
+  }
+  template <>
+  int8_t remove_entry<EntryTask>(const EntryTask &entry);
+  template <>
+  int8_t remove_entry<EntryCategory>(const EntryCategory &entry);
+  template <>
+  int8_t remove_entry<EntryRelation>(const EntryRelation &entry);
 
   void clear_db();
 
@@ -133,6 +146,10 @@ class EntryHandler {
   int8_t replace_entry_in_db(const EntryType &old_entry,
                              const EntryType &new_entry,
                              const std::string &path) const;
+
+  template <typename EntryType>
+  int8_t remove_entry_from_db(const EntryType &old_entry,
+                              const std::string &path) const;
 
   [[nodiscard]] SP_TASKS tasks_by_category_id(const std::string &id);
   [[nodiscard]] SP_TASKS tasks_by_category_id(const uint16_t &id);
