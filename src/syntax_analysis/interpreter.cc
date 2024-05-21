@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "../../include/syntax_analysis/help_messages.hpp"
 #include "../../include/syntax_analysis/lexer.hpp"
 
 Parsing_Data Interpreter::parse(const std::string &user_input) {
@@ -35,8 +36,7 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
     } else if (command_str == "rm") {
       return rm_command(tokens);
     } else {
-      return {.flag = "Command not implemented",
-              .out_buffer = "Command not implemented"};
+      return {.flag = "No Command", .out_buffer = "No such command"};
     }
   }
 
@@ -45,7 +45,8 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
 
 Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
   if (tokens.size() <= 1) {
-    return {.flag = Flag_Messages::no_args()};
+    return {.flag = Flag_Messages::no_args(),
+            .out_buffer = Help_Messages::add_syntax()};
   }
 
   auto task_arg =
@@ -62,8 +63,8 @@ Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
   } else if (task_arg && !category_arg) {
     return add_new_task(tokens, task_arg.value());
   }
-  return {.flag =
-              Flag_Messages::bad_return("Interpreter::add_new_task_builder")};
+  return {.flag = Flag_Messages::bad_return("Interpreter::add_command"),
+          .out_buffer = Help_Messages::add_syntax()};
 }
 
 Parsing_Data Interpreter::add_task_to_category(
@@ -72,7 +73,8 @@ Parsing_Data Interpreter::add_task_to_category(
   auto category_ptr =
       entry_handler.get_entry_by_content<EntryCategory>(category_name);
   if (!category_ptr) {
-    return {.flag = Flag_Messages::invalid_args()};
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = Help_Messages::add_syntax()};
   }
   const auto task_ptr =
       entry_handler.get_entry_by_content<EntryTask>(task_name);
@@ -83,24 +85,31 @@ Parsing_Data Interpreter::add_task_to_category(
       const auto category_relation_ptr =
           entry_handler.get_entry_by_id(relation_ptr->get_content_category());
       return {.flag = std::format("\"{}\" already in @\"{}\"", task_name,
-                                  category_relation_ptr->get_content())};
+                                  category_relation_ptr->get_content()),
+              .out_buffer = std::format("\"{}\" already in @\"{}\"", task_name,
+                                        category_relation_ptr->get_content())};
     }
     add_new_relation(task_ptr->get_id(), category_ptr->get_id());
     return {.flag = std::format("Added: \"{}\" to @\"{}\"", task_name,
-                                category_name)};
+                                category_name),
+            .out_buffer = std::format("Added: \"{}\" to @\"{}\"", task_name,
+                                      category_name)};
   }
   std::shared_ptr<EntryTask> new_task = build_task(tokens);
   entry_handler.add_entry_to_db(*new_task);
   add_new_relation(new_task->get_id(), category_ptr->get_id());
   return {.flag = std::format("Added new task: \"{}\" to @\"{}\"", task_name,
-                              category_name)};
+                              category_name),
+          .out_buffer = std::format("Added new task: \"{}\" to @\"{}\"",
+                                    task_name, category_name)};
 }
 
 Parsing_Data Interpreter::add_new_category(const std::string &category_name) {
   auto category_ptr =
       entry_handler.get_entry_by_content<EntryCategory>(category_name);
   if (category_ptr) {
-    return {.flag =
+    return {.flag = std::format("Category already exists", category_name),
+            .out_buffer =
                 std::format("Category: @\"{}\" already exists", category_name)};
   }
   const std::string category_token = std::format(
@@ -108,7 +117,9 @@ Parsing_Data Interpreter::add_new_category(const std::string &category_name) {
   const auto category = EntryCategory(category_token);
   entry_handler.add_entry_to_db(category);
   tracker_handler.increment_field_value("last category id");
-  return {.flag = std::format("Added new category: @\"{}\"", category_name)};
+  return {
+      .flag = std::format("Added new category", category_name),
+      .out_buffer = std::format("Added new category: @\"{}\"", category_name)};
 }
 
 Parsing_Data Interpreter::add_new_task(const std::vector<Token> &tokens,
@@ -117,12 +128,13 @@ Parsing_Data Interpreter::add_new_task(const std::vector<Token> &tokens,
       entry_handler.get_entry_by_content<EntryTask>(task_name);
   if (task_ptr) {
     return {
-        .flag = Flag_Messages::invalid_args(),
+        .flag = "Task already exists",
         .out_buffer = std::format("Task: \"{}\" already exists", task_name)};
   }
   std::shared_ptr<EntryTask> new_task = build_task(tokens);
   entry_handler.add_entry_to_db(*new_task);
-  return {.flag = std::format("Added new task: \"{}\"", task_name)};
+  return {.flag = "Added new task",
+          .out_buffer = std::format("Added new task: \"{}\"", task_name)};
 }
 
 std::shared_ptr<EntryTask> Interpreter::build_task(
@@ -222,7 +234,8 @@ void Interpreter::add_new_relation(const std::string &task_id,
 
 Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
   if (tokens.size() <= 1) {
-    return {.flag = Flag_Messages::no_args()};
+    return {.flag = Flag_Messages::no_args(),
+            .out_buffer = Help_Messages::log_syntax()};
   }
 
   const auto text_arg =
@@ -233,15 +246,15 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
       tokens, TokenType::OPTION);
 
   if (!(text_arg || category_name || options_arg)) {
-    return {.flag = Flag_Messages::invalid_args()};
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = Help_Messages::log_syntax()};
   }
 
   if (text_arg && !options_arg) {
     std::shared_ptr<EntryTask> task_ptr =
         entry_handler.get_entry_by_content<EntryTask>(text_arg.value());
     if (task_ptr) {
-      return {.flag = std::format("Logged: \"{}\"", text_arg.value()),
-              .out_buffer = task_ptr->info()};
+      return {.flag = "Logged task", .out_buffer = task_ptr->info()};
     }
     return {
         .flag = Flag_Messages::invalid_args(),
@@ -253,8 +266,7 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
     if (category_ptr) {
       const std::string tasks_in_category_info =
           entry_handler.tasks_info_by_category_id(category_ptr->get_id());
-      return {.flag = std::format("Logged: @\"{}\"", category_name.value()),
-              .out_buffer = tasks_in_category_info};
+      return {.flag = "Logged category", .out_buffer = tasks_in_category_info};
     }
     return {.flag = Flag_Messages::invalid_args(),
             .out_buffer = std::format("No category named: @\"{}\"",
@@ -268,7 +280,8 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
     return parse_log_filter(options_arg.value(), tokens);
   }
 
-  return {.flag = Flag_Messages::bad_return("Interpreter::log_command")};
+  return {.flag = Flag_Messages::bad_return("Interpreter::log_command"),
+          .out_buffer = Help_Messages::log_syntax()};
 }
 
 Parsing_Data Interpreter::parse_log_filter(const std::string &option,
@@ -318,7 +331,8 @@ Parsing_Data Interpreter::parse_log_filter(const std::string &option,
 
 Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
   if (tokens.size() <= 1) {
-    return {.flag = Flag_Messages::no_args()};
+    return {.flag = Flag_Messages::no_args(),
+            .out_buffer = Help_Messages::set_syntax()};
   }
 
   const auto setting_field_arg =
@@ -328,12 +342,14 @@ Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
       Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
 
   if (!setting_field_arg || !new_setting_arg) {
-    return {.flag = Flag_Messages::invalid_args()};
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = Help_Messages::set_syntax()};
   }
 
   const auto it = set_params.find(setting_field_arg.value());
   if (it == set_params.end()) {
-    return {.flag = Flag_Messages::invalid_args()};
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = "No such parameter"};
   }
 
   if (it->second == "date format") {
@@ -345,29 +361,33 @@ Parsing_Data Interpreter::set_command(const std::vector<Token> &tokens) {
         (set_flag) ? std::format("Set \"date format\" to \"{}\"",
                                  new_setting_arg.value())
                    : "Invalid date format";
-    return {.flag = flag_msg};
+    return {.flag = flag_msg, .out_buffer = flag_msg};
   } else if (it->second == "sort by") {
     settings_handler.set_sorterer(new_setting_arg.value());
-    return {.flag = std::format("Set \"sorter\" to \"{}\"",
-                                new_setting_arg.value())};
+    return {.flag = "Set sorter",
+            .out_buffer = std::format("Set \"sorter\" to \"{}\"",
+                                      new_setting_arg.value())};
   } else {
     settings_handler.set_value_by_field(it->second, new_setting_arg.value());
-    return {.flag = std::format("Set \"{}\" to \"{}\"", it->second,
-                                new_setting_arg.value())};
+    return {.flag = std::format("Set \"{}\"", it->second),
+            .out_buffer = std::format("Set \"{}\" to \"{}\"", it->second,
+                                      new_setting_arg.value())};
   }
 
-  return {.flag = Flag_Messages::bad_return("Interpreter::set_command")};
+  return {.flag = Flag_Messages::bad_return("Interpreter::set_command"),
+          .out_buffer = Help_Messages::set_syntax()};
 }
 
 Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
-  if (tokens.size() < 4) {
-    return {.flag = Flag_Messages::no_args()};
+  if (tokens.size() < 3) {
+    return {.flag = Flag_Messages::no_args(),
+            .out_buffer = Help_Messages::mod_syntax()};
   }
   const auto option_arg = Interpreter::get_token_content_if_contains_type(
       tokens, TokenType::OPTION);
   if (!option_arg) {
     return {.flag = Flag_Messages::invalid_args(),
-            .out_buffer = "No '-' parameter provided"};
+            .out_buffer = Help_Messages::mod_syntax()};
   }
 
   if (option_arg.value() == "name") {
@@ -385,18 +405,16 @@ Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
         return modify_category_name(category_names);
       }
     }
-    return {
-        .flag = Flag_Messages::invalid_args(),
-        .out_buffer =
-            "Invalid arguments provided. Propper syntax: \n\tscd mod "
-            "<task_name> -name <new_task_name>\nor\n\tscd mod @<category_name> "
-            "-name @<new_category_name>"};
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = Help_Messages::mod_syntax()};
   } else if (option_arg.value() == "status") {
     const auto task_status_texts =
         get_token_contents_if_contains_type(tokens, TokenType::TEXT);
-    if (task_status_texts.size() >= 2) {
-      return modify_task_status(task_status_texts);
+    if (task_status_texts.size() < 2) {
+      return {.flag = Flag_Messages::invalid_args(),
+              .out_buffer = Help_Messages::mod_syntax()};
     }
+    return modify_task_status(task_status_texts);
   } else if (option_arg.value() == "deadline") {
     const auto text_arg = Interpreter::get_token_content_if_contains_type(
         tokens, TokenType::TEXT);
@@ -404,9 +422,7 @@ Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
         tokens, TokenType::DATE);
     if (!(deadline_arg && text_arg)) {
       return {.flag = Flag_Messages::invalid_args(),
-              .out_buffer =
-                  "Invalid arguments provided. Propper syntax: \n\tscd mod "
-                  "<task_name> -deadline <deadline in format>"};
+              .out_buffer = Help_Messages::mod_syntax()};
     }
     return modify_task_deadline(text_arg.value(), deadline_arg.value());
   } else if (option_arg.value() == "r") {
@@ -414,9 +430,7 @@ Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
         get_token_contents_if_contains_type(tokens, TokenType::TEXT);
     if (task_recursive_args.size() < 2) {
       return {.flag = Flag_Messages::invalid_args(),
-              .out_buffer =
-                  "Invalid arguments provided. Propper syntax: \n\tscd mod "
-                  "<task_name> -r <d/w/m/y number>"};
+              .out_buffer = Help_Messages::mod_syntax()};
     }
     return modify_task_recursive(task_recursive_args);
   } else if (option_arg.value() == "to") {
@@ -426,14 +440,32 @@ Parsing_Data Interpreter::mod_command(const std::vector<Token> &tokens) {
         tokens, TokenType::CATEGORY_NAME);
     if (!text_arg || !category_arg) {
       return {.flag = Flag_Messages::no_args(),
-              .out_buffer =
-                  "Invalid arguments provided. Propper syntax: \n\tscd mod "
-                  "<task_name> -to <@category_name>"};
+              .out_buffer = Help_Messages::mod_syntax()};
     }
     return modify_task_relation(text_arg.value(), category_arg.value());
+  } else if (option_arg.value() == "x") {
+    const auto text_arg = Interpreter::get_token_content_if_contains_type(
+        tokens, TokenType::TEXT);
+    if (!text_arg) {
+      return {.flag = Flag_Messages::no_args(),
+              .out_buffer = Help_Messages::mod_syntax()};
+    }
+    const auto task_ptr =
+        entry_handler.get_entry_by_content<EntryTask>(text_arg.value());
+    if (!task_ptr) {
+      return {
+          .flag = Flag_Messages::invalid_args(),
+          .out_buffer = std::format("No task named: \"{}\"", text_arg.value())};
+    }
+    const auto relation_ptr =
+        entry_handler.get_task_relation_by_id(task_ptr->get_id());
+    entry_handler.remove_entry(*relation_ptr);
+    return {.flag = "Modified task relation",
+            .out_buffer = std::format("Removed task: \"{}\" from category",
+                                      text_arg.value())};
   }
-
-  return {.flag = Flag_Messages::bad_return("Interpreter::mod_command")};
+  return {.flag = Flag_Messages::bad_return("Interpreter::mod_command"),
+          .out_buffer = Help_Messages::mod_syntax()};
 }
 
 Parsing_Data Interpreter::modify_task_name(
@@ -469,7 +501,7 @@ Parsing_Data Interpreter::modify_category_name(
       std::format("{} \"{}\"", old_category_ptr->get_id(), new_category_name));
   entry_handler.replace_entry(*old_category_ptr, new_category);
   return {
-      .flag = std::format("Modified category: @\"{}\"", old_category_name),
+      .flag = "Modified category",
       .out_buffer = std::format("Changed category name from @\"{}\" to @\"{}\"",
                                 old_category_name, new_category_name)};
 }
@@ -496,7 +528,7 @@ Parsing_Data Interpreter::modify_task_status(
   const auto new_task_ptr =
       EntryTask::Builder(*task_ptr).add_status(_status).get();
   entry_handler.replace_entry(*task_ptr, *new_task_ptr);
-  return {.flag = std::format("Modified task: \"{}\"", task_name),
+  return {.flag = "Modified task",
           .out_buffer = std::format("Status for task: \"{}\" has been changed",
                                     task_name)};
 }
@@ -518,7 +550,7 @@ Parsing_Data Interpreter::modify_task_deadline(
   const auto new_task_ptr =
       EntryTask::Builder(*old_task_ptr).add_deadline(new_deadline).get();
   entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
-  return {.flag = std::format("Modified task: \"{}\"", task_name),
+  return {.flag = "Modified task",
           .out_buffer = std::format(
               "Deadline for task: \"{}\" has been changed", task_name)};
 }
@@ -558,15 +590,13 @@ Parsing_Data Interpreter::modify_task_recursive(
   }
   if (!found) {
     return {.flag = Flag_Messages::invalid_args(),
-            .out_buffer =
-                "Invalid arguments provided. Propper syntax: \n\tscd mod "
-                "<task_name> -r <d/w/m/y number>"};
+            .out_buffer = Help_Messages::mod_syntax()};
   }
   const auto new_task_ptr = EntryTask::Builder(*old_task_ptr)
                                 .add_set_recurcive(cals[0], cals[1], cals[2])
                                 .get();
   entry_handler.replace_entry(*old_task_ptr, *new_task_ptr);
-  return {.flag = std::format("Modified task: \"{}\"", task_name),
+  return {.flag = "Modified task",
           .out_buffer = std::format(
               "Recursive deadline parameter for task: \"{}\" has been changed",
               task_name)};
@@ -605,7 +635,8 @@ Parsing_Data Interpreter::modify_task_relation(
 
 Parsing_Data Interpreter::rm_command(const std::vector<Token> &tokens) {
   if (tokens.size() < 2) {
-    return {.flag = Flag_Messages::no_args()};
+    return {.flag = Flag_Messages::no_args(),
+            .out_buffer = Help_Messages::rm_syntax()};
   }
 
   const auto text_arg =
@@ -640,30 +671,29 @@ Parsing_Data Interpreter::rm_command(const std::vector<Token> &tokens) {
     const auto option_arg = Interpreter::get_token_content_if_contains_type(
         tokens, TokenType::OPTION);
     entry_handler.remove_entry(*category_ptr);
-    entry_handler.remove_relations_by_category_id(category_ptr->get_id());
     if (option_arg && option_arg.value() == "a") {
       const auto tasks_ptrs =
           entry_handler.tasks_by_category_id(category_ptr->get_id());
-      return {.flag = std::format("{}", tasks_ptrs.size())};  /// DEBUG
+      entry_handler.remove_relations_by_category_id(category_ptr->get_id());
       for (std::shared_ptr<EntryTask> task_ptr : tasks_ptrs) {
         entry_handler.remove_entry(*task_ptr);
       }
+      entry_handler.remove_relations_by_category_id(category_ptr->get_id());
       return {.flag = "Removed category with tasks",
               .out_buffer = std::format("Removed @\"{}\" with all tasks",
                                         category_arg.value())};
     }
+    entry_handler.remove_relations_by_category_id(category_ptr->get_id());
     return {.flag = "Removed category",
             .out_buffer =
                 std::format("Removed category: @\"{}\"", category_arg.value())};
   } else {
     return {.flag = Flag_Messages::invalid_args(),
-            .out_buffer =
-                "Invalid arguments provided. Propper syntax: \n\tscd rm "
-                "<task_name> \nor\n\tscd rm <@castegory_name> [-a optional: "
-                "removes all tasks from tat @category]"};
+            .out_buffer = Help_Messages::rm_syntax()};
   }
 
-  return {.flag = Flag_Messages::bad_return("Interpreter::rm")};
+  return {.flag = Flag_Messages::bad_return("Interpreter::rm"),
+          .out_buffer = Help_Messages::rm_syntax()};
 }
 
 bool constexpr Interpreter::contains_token_type(

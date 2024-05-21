@@ -67,7 +67,7 @@ TEST_CASE("Setting in setting.mcg file via interpreter") {
       "{date format} {YYYYMMDD}\n"
       "{date format separator} {.}\n"
       "{sort by} {default}\n";
-  CHECK(flag2 == "Set \"date format separator\" to \".\"");
+  CHECK(flag2 == "Set \"date format separator\"");
   CHECK(result2 == target2);
 
   const std::string user_input3 = "set -s deadline";
@@ -78,7 +78,7 @@ TEST_CASE("Setting in setting.mcg file via interpreter") {
       "{date format} {YYYYMMDD}\n"
       "{date format separator} {.}\n"
       "{sort by} {deadline}\n";
-  CHECK(flag3 == "Set \"sorter\" to \"deadline\"");
+  CHECK(flag3 == "Set sorter");
   CHECK(result3 == target3);
 }
 

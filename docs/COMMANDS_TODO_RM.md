@@ -1,14 +1,14 @@
 ## RM
 
-- [ ] Removing task 
+- [x] Removing task 
 ```
 scd rm <task_name>
 ```
-- [ ] Removing category
+- [x] Removing category
 ```
 scd rm <@category_name>
 ```
-- [ ] Removing category with tasks
+- [x] Removing category with tasks
 ```
 scd rm <@category_name> -a
 ```

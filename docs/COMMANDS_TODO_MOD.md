@@ -24,4 +24,7 @@ scd mod task_name -r w1
 ```
 scd mod task -to @category
 ```
-
+- [x] Modify task: e'x'cludig from any category
+```
+scd mod task -x
+```

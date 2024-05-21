@@ -164,6 +164,24 @@ TEST_CASE("Removing tasks") {
       "11 \"T11\" 1 -1 0 0 0\n";
   CHECK(flag3 == "No arguments provided");
   CHECK(result_tasks3 == target_tasks3);
+
+  const std::string user_input4 = "rm T5 -a";
+  const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
+  const std::string result_tasks4 =
+      INTERPRETER_RM::get_file_content(PATH_TASKS);
+  const std::string target_tasks4 =
+      "1 \"T1\" 0 46000 0 2 0\n"
+      "2 \"T2\" 1 45891 0 0 0\n"
+      "3 \"T3\" 1 46401 0 0 0\n"
+      "4 \"T4\" 1 45500 7 0 0\n"
+      "6 \"T6\" 2 -1 0 0 0\n"
+      "7 \"T7\" 1 3401 0 2 0\n"
+      "8 \"T8\" 2 3401 0 0 1\n"
+      "9 \"T9\" 3 45300 0 0 0\n"
+      "10 \"T10\" 2 45200 0 1 0\n"
+      "11 \"T11\" 1 -1 0 0 0\n";
+  CHECK(flag4 == "Removed task");
+  CHECK(result_tasks4 == target_tasks4);
 }
 
 TEST_CASE("Removing category, but not tasks") {
@@ -230,6 +248,7 @@ TEST_CASE("Removing category with tasks") {
       "1 \"T1\" 0 46000 0 2 0\n"
       "4 \"T4\" 1 45500 7 0 0\n"
       "5 \"T5\" 0 -1 0 0 0\n"
+      "6 \"T6\" 2 -1 0 0 0\n"
       "7 \"T7\" 1 3401 0 2 0\n"
       "8 \"T8\" 2 3401 0 0 1\n"
       "9 \"T9\" 3 45300 0 0 0\n"
@@ -254,4 +273,83 @@ TEST_CASE("Removing category with tasks") {
   CHECK(result_tasks1 == target_tasks1);
   CHECK(result_categories1 == target_categories1);
   CHECK(result_relations1 == target_relations1);
+}
+
+TEST_CASE("Invalid prompts") {
+  INTERPRETER_RM::reset_tasks_db();
+  INTERPRETER_RM::reset_categories_db();
+  INTERPRETER_RM::reset_relations_db();
+  INTERPRETER_RM::reset_tracker();
+  INTERPRETER_RM::reset_test_settings();
+  Interpreter interpreter = Interpreter(
+      PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
+
+  const std::string target_tasks =
+      "0 \"T0\" 0 45300 14 0 0\n"
+      "1 \"T1\" 0 46000 0 2 0\n"
+      "2 \"T2\" 1 45891 0 0 0\n"
+      "3 \"T3\" 1 46401 0 0 0\n"
+      "4 \"T4\" 1 45500 7 0 0\n"
+      "5 \"T5\" 0 -1 0 0 0\n"
+      "6 \"T6\" 2 -1 0 0 0\n"
+      "7 \"T7\" 1 3401 0 2 0\n"
+      "8 \"T8\" 2 3401 0 0 1\n"
+      "9 \"T9\" 3 45300 0 0 0\n"
+      "10 \"T10\" 2 45200 0 1 0\n"
+      "11 \"T11\" 1 -1 0 0 0\n";
+  const std::string target_categories =
+      "0 \"Uncategorized\"\n"
+      "1 \"Some category\"\n"
+      "2 \"another_category\"\n"
+      "3 \"project\"\n";
+  const std::string target_relations =
+      "0 2 1\n"
+      "1 3 1\n"
+      "2 5 2\n"
+      "3 6 3\n"
+      "4 7 3\n"
+      "6 8 3\n"
+      "6 9 3\n"
+      "7 4 2\n"
+      "8 10 3\n"
+      "9 11 1\n";
+
+  const std::string user_input1 = "rm @no_such_cat";
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
+  const std::string result_tasks1 =
+      INTERPRETER_RM::get_file_content(PATH_TASKS);
+  const std::string result_categories1 =
+      INTERPRETER_RM::get_file_content(PATH_CATEGORIES);
+  const std::string result_relations1 =
+      INTERPRETER_RM::get_file_content(PATH_RELATIONS);
+  CHECK(flag1 == "Invalid arguments");
+  CHECK(result_tasks1 == target_tasks);
+  CHECK(result_categories1 == target_categories);
+  CHECK(result_relations1 == target_relations);
+
+  const std::string user_input2 = "rm @no_such_cat -a";
+  const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
+  const std::string result_tasks2 =
+      INTERPRETER_RM::get_file_content(PATH_TASKS);
+  const std::string result_categories2 =
+      INTERPRETER_RM::get_file_content(PATH_CATEGORIES);
+  const std::string result_relations2 =
+      INTERPRETER_RM::get_file_content(PATH_RELATIONS);
+  CHECK(flag2 == "Invalid arguments");
+  CHECK(result_tasks2 == target_tasks);
+  CHECK(result_categories2 == target_categories);
+  CHECK(result_relations2 == target_relations);
+
+  const std::string user_input3 = "rm no_such_task -a";
+  const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
+  const std::string result_tasks3 =
+      INTERPRETER_RM::get_file_content(PATH_TASKS);
+  const std::string result_categories3 =
+      INTERPRETER_RM::get_file_content(PATH_CATEGORIES);
+  const std::string result_relations3 =
+      INTERPRETER_RM::get_file_content(PATH_RELATIONS);
+  CHECK(flag3 == "Invalid arguments");
+  CHECK(result_tasks3 == target_tasks);
+  CHECK(result_categories3 == target_categories);
+  CHECK(result_relations3 == target_relations);
 }

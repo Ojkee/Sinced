@@ -132,7 +132,7 @@ TEST_CASE("Test Add Command task CORRENT PROMPTS") {
   const std::string tracker_result1 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TRACKER);
   CHECK(result1 == target1);
-  CHECK(flag1 == "Added new task: \"my_task\"");
+  CHECK(flag1 == "Added new task");
   CHECK(tracker_result1 == tracker_target1);
 
   const std::string user_input2 = "add @\"my category\"";
@@ -152,7 +152,7 @@ TEST_CASE("Test Add Command task CORRENT PROMPTS") {
   const std::string tracker_result2 =
       INTERPRETER_TEST_DB::get_file_content(PATH_TRACKER);
   CHECK(result2 == target2);
-  CHECK(flag2 == "Added new category: @\"my category\"");
+  CHECK(flag2 == "Added new category");
   CHECK(tracker_result2 == tracker_target2);
 
   const std::string user_input3 = "add new_task @project";
@@ -280,8 +280,7 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
       "10 \"T10\" 2 45200 0 1 0\n"
       "11 \"T11\" 1 -1 0 0 0\n"
       "12 \"my_cool_task\" 0 36269 0 0 0\n";
-  const std::string flag_target1 = "Added new task: \"my_cool_task\"";
-  CHECK(flag1 == flag_target1);
+  CHECK(flag1 == "Added new task");
   CHECK(tasks_result1 == tasks_target1);
 
   const std::string user_input2 = "add new_task 21-04-2069 -rw";
@@ -303,14 +302,12 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
       "11 \"T11\" 1 -1 0 0 0\n"
       "12 \"my_cool_task\" 0 36269 0 0 0\n"
       "13 \"new_task\" 0 36270 7 0 0\n";
-  const std::string flag_target2 = "Added new task: \"new_task\"";
-  CHECK(flag2 == flag_target2);
+  CHECK(flag2 == "Added new task");
   CHECK(tasks_result2 == tasks_target2);
 
   const std::string user_input3 = "add @project";
   const auto [flag3, buffr3, session3] = interpreter.parse(user_input3);
-  const std::string flag_target3 = "Category: @\"project\" already exists";
-  CHECK(flag3 == flag_target3);
+  CHECK(flag3 == "Category already exists");
 
   const std::string user_input4 = "add recursive_task_with_no_deadline_arg -wr";
   const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
@@ -333,9 +330,7 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
       "13 \"new_task\" 0 36270 7 0 0\n"
       "14 \"recursive_task_with_no_deadline_arg\" 0 {} 7 0 0\n",
       BaseDate::date_to_days(TODAY) + 7);
-  const std::string flag_target4 =
-      "Added new task: \"recursive_task_with_no_deadline_arg\"";
-  CHECK(flag4 == flag_target4);
+  CHECK(flag4 == "Added new task");
   CHECK(tasks_result4 == tasks_target4);
 
   const std::string user_input5 =
@@ -361,8 +356,7 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
       "14 \"recursive_task_with_no_deadline_arg\" 0 {} 7 0 0\n"
       "15 \"deadline_option_param\" 0 36269 40 0 0\n",
       BaseDate::date_to_days(TODAY) + 7);
-  const std::string flag_target5 = "Added new task: \"deadline_option_param\"";
-  CHECK(flag5 == flag_target5);
+  CHECK(flag5 == "Added new task");
   CHECK(tasks_result5 == tasks_target5);
 
   const std::string user_input6 = "add \"option_param\" -rym 5";
@@ -391,8 +385,7 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
       "15 \"deadline_option_param\" 0 36269 40 0 0\n"
       "16 \"option_param\" 0 {} 0 5 5\n",
       BaseDate::date_to_days(TODAY) + 7, BaseDate::date_to_days(date_6));
-  const std::string flag_target6 = "Added new task: \"option_param\"";
-  CHECK(flag6 == flag_target6);
+  CHECK(flag6 == "Added new task");
   CHECK(tasks_result6 == tasks_target6);
 
   const std::string user_input7 = "add \"param_no_recurs\" -w 5";
@@ -420,8 +413,7 @@ TEST_CASE("Test Add Command task with deadline CORRECT PROMPTS") {
       "17 \"param_no_recurs\" 0 {} 0 0 0\n",
       BaseDate::date_to_days(TODAY) + 7, BaseDate::date_to_days(date_6),
       BaseDate::date_to_days(TODAY) + 7 * 5);
-  const std::string flag_target7 = "Added new task: \"param_no_recurs\"";
-  CHECK(flag7 == flag_target7);
+  CHECK(flag7 == "Added new task");
   CHECK(tasks_result7 == tasks_target7);
 }
 
@@ -526,5 +518,5 @@ TEST_CASE("Test Add Command task to category CORRENT PROMPTS") {
 
   const std::string user_input4 = "add T0";
   const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
-  CHECK(flag4 == "Invalid arguments");
+  CHECK(flag4 == "Task already exists");
 }

@@ -112,7 +112,7 @@ TEST_CASE("Log single argument") {
   const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
   const std::string target_buffr1 =
       "\"T1\"\n\tOngoing\n\tdeadline: 11-12-2095 every: 2 month ";
-  CHECK(flag1 == "Logged: \"T1\"");
+  CHECK(flag1 == "Logged task");
   CHECK(buffr1 == target_buffr1);
 
   const std::string user_input2 = "log @another_category";
@@ -120,7 +120,7 @@ TEST_CASE("Log single argument") {
   const std::string target_buffr2 =
       "\"T4\"\n\tDone\n\tdeadline: 29-07-2094\n\"T5\"\n\tOngoing\n\tdeadline: "
       "None\n";
-  CHECK(flag2 == "Logged: @\"another_category\"");
+  CHECK(flag2 == "Logged category");
   CHECK(buffr2 == target_buffr2);
 
   const std::string user_input3 = "log task_that_not_exists";
