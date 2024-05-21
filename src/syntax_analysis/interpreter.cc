@@ -608,6 +608,61 @@ Parsing_Data Interpreter::rm_command(const std::vector<Token> &tokens) {
     return {.flag = Flag_Messages::no_args()};
   }
 
+  const auto text_arg =
+      Interpreter::get_token_content_if_contains_type(tokens, TokenType::TEXT);
+  const auto category_arg = Interpreter::get_token_content_if_contains_type(
+      tokens, TokenType::CATEGORY_NAME);
+  if (text_arg) {
+    const auto task_ptr =
+        entry_handler.get_entry_by_content<EntryTask>(text_arg.value());
+    if (!task_ptr) {
+      return {
+          .flag = Flag_Messages::invalid_args(),
+          .out_buffer = std::format("No task named: \"{}\"", text_arg.value())};
+    }
+    entry_handler.remove_entry(*task_ptr);
+    const auto relation_ptr =
+        entry_handler.get_task_relation_by_id(task_ptr->get_id());
+    if (relation_ptr) {
+      entry_handler.remove_entry(*relation_ptr);
+    }
+    return {
+        .flag = "Removed task",
+        .out_buffer = std::format("Removed task: \"{}\"", text_arg.value())};
+  } else if (category_arg) {
+    const auto category_ptr =
+        entry_handler.get_entry_by_content<EntryCategory>(category_arg.value());
+    if (!category_ptr) {
+      return {.flag = Flag_Messages::invalid_args(),
+              .out_buffer = std::format("No category named: @\"{}\"",
+                                        category_arg.value())};
+    }
+    const auto option_arg = Interpreter::get_token_content_if_contains_type(
+        tokens, TokenType::OPTION);
+    entry_handler.remove_entry(*category_ptr);
+    entry_handler.remove_relations_by_category_id(category_ptr->get_id());
+    if (option_arg && option_arg.value() == "a") {
+      const auto tasks_ptrs =
+          entry_handler.tasks_by_category_id(category_ptr->get_id());
+      return {.flag = std::format("{}", tasks_ptrs.size())};  /// DEBUG
+      for (std::shared_ptr<EntryTask> task_ptr : tasks_ptrs) {
+        entry_handler.remove_entry(*task_ptr);
+      }
+      return {.flag = "Removed category with tasks",
+              .out_buffer = std::format("Removed @\"{}\" with all tasks",
+                                        category_arg.value())};
+    }
+    return {.flag = "Removed category",
+            .out_buffer =
+                std::format("Removed category: @\"{}\"", category_arg.value())};
+  } else {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer =
+                "Invalid arguments provided. Propper syntax: \n\tscd rm "
+                "<task_name> \nor\n\tscd rm <@castegory_name> [-a optional: "
+                "removes all tasks from tat @category]"};
+  }
+
   return {.flag = Flag_Messages::bad_return("Interpreter::rm")};
 }
 

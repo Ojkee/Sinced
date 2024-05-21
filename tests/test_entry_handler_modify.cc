@@ -219,3 +219,21 @@ TEST_CASE("Remove relations from db") {
   CHECK(flag2 == -1);
   CHECK(result_relation2 == tareget_relation2);
 }
+
+TEST_CASE("Removing relations by category id") {
+  RESET_EH_DB::reset_tasks_db();
+  RESET_EH_DB::reset_categories_db();
+  RESET_EH_DB::reset_relations_db();
+  EntryHandler eh = EntryHandler(PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS);
+
+  eh.remove_relations_by_category_id("3");
+  const std::string result_relation1 =
+      RESET_EH_DB::get_file_content(PATH_RELATIONS);
+  const std::string target_relations1 =
+      "0 2 1\n"
+      "1 3 1\n"
+      "2 5 2\n"
+      "7 4 2\n"
+      "9 11 1\n";
+  CHECK(result_relation1 == target_relations1);
+}

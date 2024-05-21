@@ -111,6 +111,11 @@ class EntryHandler {
   template <>
   int8_t remove_entry<EntryRelation>(const EntryRelation &entry);
 
+  void remove_relations_by_category_id(const std::string &category_id);
+
+  [[nodiscard]] SP_TASKS tasks_by_category_id(const std::string &id);
+  [[nodiscard]] SP_TASKS tasks_by_category_id(const uint16_t &id);
+
   void clear_db();
 
   template <typename EntryType>
@@ -150,9 +155,6 @@ class EntryHandler {
   template <typename EntryType>
   int8_t remove_entry_from_db(const EntryType &old_entry,
                               const std::string &path) const;
-
-  [[nodiscard]] SP_TASKS tasks_by_category_id(const std::string &id);
-  [[nodiscard]] SP_TASKS tasks_by_category_id(const uint16_t &id);
 
   template <typename EntryType>
   [[nodiscard]] std::shared_ptr<EntryType> entry_by_id(

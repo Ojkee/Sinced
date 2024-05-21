@@ -98,6 +98,29 @@ int8_t EntryHandler::remove_entry<EntryRelation>(const EntryRelation &entry) {
   return remove_entry_from_db(entry, relations_db_path);
 }
 
+void EntryHandler::remove_relations_by_category_id(
+    const std::string &category_id) {
+  std::ifstream file_in(relations_db_path);
+  if (!file_in.is_open()) {
+    std::cerr << "Can't open file: " << relations_db_path << "\n";
+    exit(EXIT_FAILURE);
+  }
+  std::string line;
+  std::stringstream buffr;
+  while (getline(file_in, line)) {
+    if (EntryRelation(line).get_content_category() != category_id) {
+      buffr << line << "\n";
+    }
+  }
+  file_in.close();
+  std::ofstream file_out(relations_db_path);
+  if (!file_out.is_open()) {
+    std::cerr << "Can't open file : " << relations_db_path << "\n";
+    exit(EXIT_FAILURE);
+  }
+  file_out << buffr.rdbuf();
+}
+
 template <>
 std::shared_ptr<EntryTask> EntryHandler::get_entry_by_content(
     const std::string &content) const {
