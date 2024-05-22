@@ -2,13 +2,15 @@
 
 Basic todo app for Linux terminal written in C++. (Modern cpp learning phase)
 
-# Compatibility
+# Dependencies
 
-Works only with clang with cpp std=20 for now
+- clang that compiles cpp20
 
 # Installation
 
-HERE
+```
+sudo git pull --depth 1 https://github.com/Ojkee/Sinced.git && chmod +x setup.sh && ./setup.sh
+```
 
 # Syntax
 ```
@@ -23,13 +25,3 @@ HERE
 #### ***More Commands [here](docs/COMMANDS.md)***
 
 
-# TODO
-- [x] Date format  
-- [x] Categorized tasks
-- [x] Writing/Reading file:
-    - [x] database
-    - [x] config file
-- [ ] Calendar Terminal-GUI
-- [ ] Autocompletion
-- [ ] Help Command
-- [ ] Misspell handler

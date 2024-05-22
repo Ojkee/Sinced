@@ -1,6 +1,10 @@
 #ifndef INTERPTERE_HPP
 #define INTERPTERE_HPP
 
+#include <linux/limits.h>
+#include <unistd.h>
+
+#include <cstdint>
 #include <format>
 #include <memory>
 #include <optional>
@@ -35,11 +39,11 @@ struct Parsing_Data {
 class Interpreter {
  public:
   Interpreter()
-      : entry_handler("../records/database/tasks.mdb",
-                      "../records/database/categories.mdb",
-                      "../records/database/relations.mdb"),
-        tracker_handler("../records/mcgs/tracker.mcg"),
-        settings_handler("../records/mcgs/settings.mcg") {}
+      : entry_handler(get_records_path() + "/database/tasks.mdb",
+                      get_records_path() + "/database/categories.mdb",
+                      get_records_path() + "/database/relations.mdb"),
+        tracker_handler(get_records_path() + "/mcgs/tracker.mcg"),
+        settings_handler(get_records_path() + "/mcgs/settings.mcg") {}
   Interpreter(const std::string &tasks_path_,
               const std::string &categories_path_,
               const std::string &relations_path_,
@@ -117,6 +121,17 @@ class Interpreter {
   [[nodiscard]] constexpr std::vector<std::string>
   get_token_contents_if_contains_type(const std::vector<Token> &tokens,
                                       const TokenType &token_type);
+
+  std::string get_records_path() {
+    char result[PATH_MAX];
+    ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+    std::string result_str =
+        (count > 0) ? std::string(result, static_cast<uint64_t>(count))
+                    : std::string(result, 0);
+    std::string directory_path =
+        result_str.substr(0, result_str.find_last_of("/\\"));
+    return directory_path + "/../../records";
+  }
 };
 
 #endif  // INTERPTERE_HPP
