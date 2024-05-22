@@ -35,6 +35,8 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
       return mod_command(tokens);
     } else if (command_str == "rm") {
       return rm_command(tokens);
+    } else if (command_str == "help") {
+      return help_command(tokens);
     } else {
       return {.flag = "No Command", .out_buffer = "No such command"};
     }
@@ -694,6 +696,29 @@ Parsing_Data Interpreter::rm_command(const std::vector<Token> &tokens) {
 
   return {.flag = Flag_Messages::bad_return("Interpreter::rm"),
           .out_buffer = Help_Messages::rm_syntax()};
+}
+
+Parsing_Data Interpreter::help_command(const std::vector<Token> &tokens) {
+  const auto commands_arg =
+      get_token_contents_if_contains_type(tokens, TokenType::COMMAND);
+  if (commands_arg.size() < 2) {
+    return {.flag = "Help general", .out_buffer = Help_Messages::general()};
+  }
+  const auto command_str = commands_arg[1];
+  if (command_str == "add") {
+    return {.flag = "Help add", .out_buffer = Help_Messages::add()};
+  } else if (command_str == "log") {
+    return {.flag = "Help log", .out_buffer = Help_Messages::log()};
+  } else if (command_str == "mod") {
+    return {.flag = "Help mod", .out_buffer = Help_Messages::mod()};
+  } else if (command_str == "rm") {
+    return {.flag = "Help rm", .out_buffer = Help_Messages::rm()};
+  } else if (command_str == "rm") {
+    return {.flag = "Help rm", .out_buffer = Help_Messages::rm()};
+  } else if (command_str == "set") {
+    return {.flag = "Help set", .out_buffer = Help_Messages::set()};
+  }
+  return {.out_buffer = Help_Messages::general()};
 }
 
 bool constexpr Interpreter::contains_token_type(

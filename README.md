@@ -6,6 +6,10 @@ Basic todo app for Linux terminal written in C++. (Modern cpp learning phase)
 
 Works only with clang with cpp std=20 for now
 
+# Installation
+
+HERE
+
 # Syntax
 ```
   scd <command> <subject> [optional flags with parameters]

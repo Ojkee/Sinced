@@ -89,8 +89,8 @@ class Lexer {
   }
 
  private:
-  constexpr static auto commands_set = {"add", "log", "mod", "rm",
-                                        "set"};  // KEEP LEXICOGRAPHIC
+  constexpr static auto commands_set = {"add", "help", "log", "mod",
+                                        "rm",  "set"};  // KEEP LEXICOGRAPHIC
 };
 
 #endif  // LEXER_HPP
