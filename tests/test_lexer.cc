@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "../extern/include/catch.hpp"
 #include "../include/syntax_analysis/lexer.hpp"
@@ -145,4 +146,10 @@ TEST_CASE("Command tokenization") {
 
   };
   REQUIRE(result14 == target14);
+}
+
+TEST_CASE("Test preprocessing input") {
+  const std::vector<std::string> args1 = {"scd", "mod", "task", "@my category"};
+  const std::string result1 = Lexer::preprocess(args1, 1);
+  CHECK(result1 == "\"mod\" \"task\" @\"my category\" ");
 }

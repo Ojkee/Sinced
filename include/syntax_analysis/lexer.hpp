@@ -2,6 +2,10 @@
 #define LEXER_HPP
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <iomanip>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -86,6 +90,24 @@ class Lexer {
   [[nodiscard]] constexpr static bool is_date(
       const std::string &input_string, const FormatDate &date_formatter) {
     return date_formatter.is_valid(input_string);
+  }
+
+  [[nodiscard]] static std::string preprocess(
+      const std::vector<std::string> &args, const int64_t &start_concat) {
+    if (start_concat >= static_cast<int64_t>(args.size())) {
+      return "";
+    }
+    std::stringstream result;
+    std::for_each(args.begin() + start_concat, args.end(),
+                  [&result](const std::string &argv) {
+                    if (argv.front() == '@' || argv.front() == '-') {
+                      result << argv.front() << "\"" << process_content(argv)
+                             << "\" ";
+                    } else {
+                      result << "\"" << argv << "\" ";
+                    }
+                  });
+    return result.str();
   }
 
  private:

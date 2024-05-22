@@ -35,11 +35,11 @@ struct Parsing_Data {
 class Interpreter {
  public:
   Interpreter()
-      : entry_handler("../../records/database/tasks.mdb",
-                      "../../records/database/categories.mdb",
-                      "../../records/database/relations.mdb"),
-        tracker_handler("../../records/mcgs/tracker.mcg"),
-        settings_handler("../../records/mcgs/settings.mcg") {}
+      : entry_handler("../records/database/tasks.mdb",
+                      "../records/database/categories.mdb",
+                      "../records/database/relations.mdb"),
+        tracker_handler("../records/mcgs/tracker.mcg"),
+        settings_handler("../records/mcgs/settings.mcg") {}
   Interpreter(const std::string &tasks_path_,
               const std::string &categories_path_,
               const std::string &relations_path_,
