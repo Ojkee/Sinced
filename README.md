@@ -9,7 +9,7 @@ Basic todo app for Linux terminal written in C++. (Modern cpp learning phase)
 # Installation
 
 ```
-sudo git pull --depth 1 https://github.com/Ojkee/Sinced.git && chmod +x setup.sh && ./setup.sh
+sudo git clone --depth 1 https://github.com/Ojkee/Sinced.git && cd Sinced && sudo chmod +x setup.sh && sudo ./setup.sh && cd ..
 ```
 
 # Syntax
