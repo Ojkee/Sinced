@@ -31,7 +31,7 @@ class TrackerHandler : public MCGFileHandler {
  public:
   TrackerHandler() = delete;
   TrackerHandler(const std::string &path) : MCGFileHandler(path){};
-
+  void reset_file();
   void increment_field_value(const std::string &field_name);
   [[nodiscard]] std::string next_id(const std::string &field_name);
 };
@@ -46,6 +46,8 @@ class SettingsHandler : public MCGFileHandler {
                        const std::string &separator) noexcept;
   [[nodiscard]] std::shared_ptr<EntrySorter> get_sorter() noexcept;
   bool set_sorterer(const std::string &sorter_str) noexcept;
+
+  void reset_file();
 
  private:
   FormatDateFactory format_date_factory = FormatDateFactory();

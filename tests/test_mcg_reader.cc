@@ -140,3 +140,53 @@ TEST_CASE("Testing Settings Sorter") {
   const bool flag2 = settings_handler.set_sorterer("deadlinee");
   CHECK(flag2 == false);
 }
+
+TEST_CASE("Testing reset to default settings") {
+  MCG_TESTING::reset_test_settings();
+  SettingsHandler settings_handler = SettingsHandler(SETTINGS_PATH);
+
+  settings_handler.set_sorterer("deadline");
+  settings_handler.set_format_date("MMDDYYYY", ".");
+  const std::string changed =
+      "<<{ field name } { value }>>\n\n"
+      "{date format} {MMDDYYYY}\n"
+      "{date format separator} {.}\n"
+      "{sort by} {deadline}\n";
+  const std::string changed_result = MCG_TESTING::get_content(SETTINGS_PATH);
+  CHECK(changed_result == changed);
+  settings_handler.reset_file();
+  const std::string after_reset =
+      "<<{ field name } { value }>>\n\n"
+      "{date format} {DDMMYYYY}\n"
+      "{date format separator} {-}\n"
+      "{sort by} {default}\n";
+  const std::string reset_result = MCG_TESTING::get_content(SETTINGS_PATH);
+  CHECK(reset_result == after_reset);
+}
+
+TEST_CASE("Testing reset to default tracker") {
+  MCG_TESTING::reset_test_tracker();
+  TrackerHandler tracker_handler = TrackerHandler(TRACKER_PATH);
+
+  for (uint8_t i = 0; i < 10; ++i) {
+    tracker_handler.increment_field_value("last task id");
+  }
+  for (uint8_t i = 0; i < 6; ++i) {
+    tracker_handler.increment_field_value("last relation id");
+  }
+  const std::string changed =
+      "<<{ field name } { value }>>\n\n"
+      "{last task id} {10}\n"
+      "{last category id} {49}\n"
+      "{last relation id} {6}\n";
+  const std::string changed_result = MCG_TESTING::get_content(TRACKER_PATH);
+  CHECK(changed_result == changed);
+  tracker_handler.reset_file();
+  const std::string reset_result = MCG_TESTING::get_content(TRACKER_PATH);
+  const std::string after_reset =
+      "<<{ field name } { value }>>\n\n"
+      "{last task id} {0}\n"
+      "{last category id} {0}\n"
+      "{last relation id} {0}\n";
+  CHECK(reset_result == after_reset);
+}

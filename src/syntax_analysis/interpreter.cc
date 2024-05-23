@@ -37,12 +37,15 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
       return rm_command(tokens);
     } else if (command_str == "help") {
       return help_command(tokens);
+    } else if (command_str == "reset") {
+      return reset_command(tokens);
     } else {
       return {.flag = "No Command", .out_buffer = "No such command"};
     }
   }
 
-  return {.flag = Flag_Messages::bad_return("Interpreter::parse")};
+  return {.flag = Flag_Messages::bad_return("Interpreter::parse"),
+          .out_buffer = Help_Messages::general()};
 }
 
 Parsing_Data Interpreter::add_command(const std::vector<Token> &tokens) {
@@ -719,6 +722,34 @@ Parsing_Data Interpreter::help_command(const std::vector<Token> &tokens) {
     return {.flag = "Help set", .out_buffer = Help_Messages::set()};
   }
   return {.out_buffer = Help_Messages::general()};
+}
+
+Parsing_Data Interpreter::reset_command(const std::vector<Token> &tokens) {
+  const auto parameter_arg = Interpreter::get_token_content_if_contains_type(
+      tokens, TokenType::OPTION);
+  if (!parameter_arg) {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = Help_Messages::reset_syntax()};
+  }
+  if (parameter_arg.value() == "settings") {
+    settings_handler.reset_file();
+    return {.flag = "Reset settings", .out_buffer = "Reset settings complete"};
+  } else if (parameter_arg.value() == "database") {
+    entry_handler.clear_db();
+    tracker_handler.reset_file();
+    return {.flag = "Reset database", .out_buffer = "Reset database complete"};
+  } else if (parameter_arg.value() == "forceall") {
+    settings_handler.reset_file();
+    entry_handler.clear_db();
+    tracker_handler.reset_file();
+    return {.flag = "Reset all", .out_buffer = "Reset all complete"};
+  } else {
+    return {.flag = Flag_Messages::invalid_args(),
+            .out_buffer = Help_Messages::reset()};
+  }
+
+  return {.flag = Flag_Messages::bad_return("Interpreter::reset"),
+          .out_buffer = Help_Messages::reset()};
 }
 
 bool constexpr Interpreter::contains_token_type(

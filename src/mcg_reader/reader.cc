@@ -85,6 +85,23 @@ std::string TrackerHandler::next_id(const std::string &field_name) {
   }
 }
 
+void TrackerHandler::reset_file() {
+  const std::string default_content =
+      R"(<<{ field name } { value }>>
+
+{last task id} {0}
+{last category id} {0}
+{last relation id} {0}
+)";
+
+  std::ofstream tracker_file(path);
+  if (!tracker_file.is_open()) {
+    std::cerr << "Reset Tracker file error: couldn't open file: " << path
+              << "\n";
+  }
+  tracker_file << default_content;
+}
+
 std::shared_ptr<FormatDate> SettingsHandler::get_format_date() noexcept {
   std::ifstream settings_file(path);
   if (!settings_file.is_open()) {
@@ -126,4 +143,21 @@ bool SettingsHandler::set_sorterer(const std::string &sorter_str) noexcept {
     return true;
   }
   return false;
+}
+
+void SettingsHandler::reset_file() {
+  const std::string default_content =
+      R"(<<{ field name } { value }>>
+
+{date format} {DDMMYYYY}
+{date format separator} {-}
+{sort by} {default}
+)";
+
+  std::ofstream settings_file(path);
+  if (!settings_file.is_open()) {
+    std::cerr << "Reset settings file error: couldn't open file: " << path
+              << "\n";
+  }
+  settings_file << default_content;
 }

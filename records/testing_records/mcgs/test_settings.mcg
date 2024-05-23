@@ -2,4 +2,4 @@
 
 {date format} {DDMMYYYY}
 {date format separator} {-}
-{sort by} {deadline}
+{sort by} {default}

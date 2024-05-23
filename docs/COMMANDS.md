@@ -14,6 +14,7 @@
 - **set** - sets values in setting file
 - **log** - lists task via name/id/category
 - **mod** - modifies task, @category or task @category
+- **reset** - resets settings / database or all 
 
 ## Subjects
 

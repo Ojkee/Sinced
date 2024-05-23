@@ -68,6 +68,7 @@ class Interpreter {
   [[nodiscard]] Parsing_Data mod_command(const std::vector<Token> &tokens);
   [[nodiscard]] Parsing_Data rm_command(const std::vector<Token> &tokens);
   [[nodiscard]] Parsing_Data help_command(const std::vector<Token> &tokens);
+  [[nodiscard]] Parsing_Data reset_command(const std::vector<Token> &tokens);
 
   // ADD
   [[nodiscard]] Parsing_Data add_task_to_category(

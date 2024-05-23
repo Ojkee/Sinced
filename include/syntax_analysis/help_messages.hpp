@@ -13,6 +13,7 @@ class Help_Messages {
            "@category\n"
            "- set - modifies settings such as date format / separator in date "
            " / tasks filter\n"
+           "- reset - resets settings or whole database"
            "- help - displays additional information about above commands\n";
   }
   [[nodiscard]] constexpr static inline std::string add() {
@@ -312,14 +313,48 @@ EXAMPLES
   [[nodiscard]] constexpr static inline std::string set_syntax() {
     return "scd set <-parameter> <parameter flag>";
   }
+  [[nodiscard]] constexpr static inline std::string reset() {
+    return
+        R"(
+NAME
+    scd reset - Reset settings and database
+
+SYNOPSIS
+    scd reset -default
+    scd reset -force
+
+DESCRIPTION
+    The `scd reset` command is used to reset the application's settings and database.
+
+OPTIONS
+    -default
+        Resets the application to its default settings. This option will not delete any data in the database.
+
+    -force
+        Resets the application to its default settings and deletes the entire database. Use this option with caution as all data will be lost.
+
+EXAMPLES
+    Reset the application to default settings:
+        scd reset -settings
+
+    Reset the entire database:
+        scd reset -database
+
+    Reset the application to default settings and delete the entire database:
+        scd reset -forceall
+)";
+  }
+  [[nodiscard]] constexpr static inline std::string reset_syntax() {
+    return "scd reset <parameter>";
+  }
   [[nodiscard]] constexpr static inline std::string help() { return ""; }
   [[nodiscard]] constexpr static inline std::string help_syntax() {
     return "scd help <command>";
   }
 
  private:
-  const std::string RESET_COLOR = "\033[0m";
   const std::string GREEN = "\033[32m";
+  const std::string RESET_COLOR = "\033[0m";
 
   const std::string BOLD = "\x1b[1m";
   const std::string UNBOLD = "\x1b[0m";

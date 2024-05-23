@@ -17,6 +17,7 @@ set(TARGET_SOURCES
     "test_interpreter_mod.cc"
     "test_interpreter_set.cc"
     "test_interpreter_rm.cc"
+    "test_interpreter_reset.cc"
     "test_lexer.cc"
     "test_mcg_reader.cc"
 )
