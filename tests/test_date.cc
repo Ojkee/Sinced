@@ -365,7 +365,7 @@ TEST_CASE("Displaying different formats of date") {
 TEST_CASE("Date formatter validation checker") {
   DDMMYY f1 = DDMMYY(",");
   std::string d1 = "12,03,23";
-  CHECK(f1.is_valid(d1) == true);
+  CHECK(f1.is_valid(d1) == false);
 
   DDMMYY f2 = DDMMYY(",");
   std::string d2 = "22,03-23";
@@ -389,15 +389,15 @@ TEST_CASE("Date formatter validation checker") {
 
   YYYYMMDD f7 = YYYYMMDD("?");
   std::string d7 = "2001?01?2";
-  CHECK(f7.is_valid(d7) == true);
+  CHECK(f7.is_valid(d7) == false);
 
   YYYYMMDD f8 = YYYYMMDD("test");
   std::string d8 = "2001test01test2";
-  CHECK(f8.is_valid(d8) == true);
+  CHECK(f8.is_valid(d8) == false);
 
   YYYYMMDD f9 = YYYYMMDD("?..d");
   std::string d9 = "2001?..d01?..d2";
-  CHECK(f9.is_valid(d9) == true);
+  CHECK(f9.is_valid(d9) == false);
 
   YYYYMMDD f10 = YYYYMMDD("??");
   std::string d10 = "2001..1..2";
@@ -405,11 +405,11 @@ TEST_CASE("Date formatter validation checker") {
 
   YYYYMMDD f11 = YYYYMMDD("??");
   std::string d11 = "2001??1??2";
-  CHECK(f11.is_valid(d11) == true);
+  CHECK(f11.is_valid(d11) == false);
 
   YYMMDD f12 = YYMMDD("??");
   std::string d12 = "01??1??2";
-  CHECK(f12.is_valid(d12) == true);
+  CHECK(f12.is_valid(d12) == false);
 
   YYMMDD f13 = YYMMDD("??");
   std::string d13 = "1??1??2";
@@ -417,7 +417,7 @@ TEST_CASE("Date formatter validation checker") {
 
   YYMMDD f14 = YYMMDD("..");
   std::string d14 = "01..1..2";
-  CHECK(f14.is_valid(d14) == true);
+  CHECK(f14.is_valid(d14) == false);
 
   YYMMDD f15 = YYMMDD("..");
   std::string d15 = "01?.1?.2";
@@ -425,11 +425,11 @@ TEST_CASE("Date formatter validation checker") {
 
   YYMMDD f16 = YYMMDD("*");
   std::string d16 = "01.1.2";
-  CHECK(f16.is_valid(d16) == false);
+  CHECK(f16.is_valid(d16) == true);
 
   YYMMDD f17 = YYMMDD("*");
   std::string d17 = "01*1*2";
-  CHECK(f17.is_valid(d17) == true);
+  CHECK(f17.is_valid(d17) == false);
 }
 
 TEST_CASE("Day of week from date") {
@@ -561,28 +561,26 @@ TEST_CASE("Initialization from string") {
 
   BaseDate b3 = BaseDate();
   b3.set_formatter(std::make_unique<DDMMYYYY>("--"));
-  b3.initialize_from_str("00--04--3054");
+  b3.initialize_from_str("00-04-3054");
   const std::string t3 = "01--04--3054";
   const std::string r3 = std::string(b3);
   CHECK(r3 == t3);
 
   BaseDate b4 = BaseDate();
   b4.set_formatter(std::make_unique<DMY>("--"));
-  b4.initialize_from_str("00--04--54");
+  b4.initialize_from_str("00-04-54");
   const BaseDate tb4 = BaseDate(1, 4, 2054);
   CHECK(b4 == tb4);
 
   BaseDate b5 = BaseDate();
   b5.set_formatter(std::make_unique<YYMMDD>("?/?"));
-  b5.initialize_from_str("30?/?05?/?55");
+  b5.initialize_from_str("30.05.55");
   BaseDate tb5 = BaseDate(31, 5, 2030);
-  tb5.set_formatter(std::make_unique<YYMMDD>("?/?"));
   CHECK(b5 == tb5);
 
   BaseDate b6 = BaseDate();
   b6.set_formatter(std::make_unique<MDY>(" "));
-  b6.initialize_from_str("4 20 69");
+  b6.initialize_from_str("4.20.69");
   BaseDate tb6 = BaseDate(20, 4, 2069);
-  tb6.set_formatter(std::make_unique<MDY>(" "));
   CHECK(b6 == tb6);
 }

@@ -236,7 +236,7 @@ TEST_CASE("Modify task deadline") {
 
   const std::string user_input4 = "mod T5 -deadline 20.04.2069";
   const auto [flag4, buffr4, sess4] = interpreter.parse(user_input4);
-  CHECK(flag4 == "Invalid arguments");
+  CHECK(flag4 == "Modified task");
 
   const std::string user_input5 = "mod T2 -deadline 09-01-0788";
   const auto [flag5, buffr5, sess5] = interpreter.parse(user_input5);

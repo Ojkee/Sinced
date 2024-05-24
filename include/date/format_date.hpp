@@ -25,6 +25,7 @@ class FormatDate {
 
  protected:
   std::string separator = "-";
+  const std::string input_separators = "[/.\\-]";
   constexpr static std::array<std::string, 12> months_full_name = {
       "January", "February", "March",     "April",   "May",      "June",
       "July",    "August",   "September", "October", "November", "December"};

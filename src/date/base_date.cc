@@ -6,11 +6,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <ctime>
-#include <functional>
-#include <iterator>
 #include <limits>
 #include <numeric>
-#include <ranges>
+#include <vector>
 
 void BaseDate::initialize_from_str(const std::string &date_str) {
   if (!formatter->is_valid(date_str)) {

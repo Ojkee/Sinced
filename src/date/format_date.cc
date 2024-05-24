@@ -1,4 +1,5 @@
-#include <algorithm>
+#include "../../include/date/format_date.hpp"
+
 #include <cstddef>
 #include <cstdint>
 #include <format>
@@ -7,9 +8,6 @@
 #include <sstream>
 #include <string>
 #include <tuple>
-#include <vector>
-
-#include "../../include/date/format_date.hpp"
 
 std::string FormatDate::add_leading_char(const int16_t d, uint16_t width,
                                          char ch) {
@@ -18,17 +16,17 @@ std::string FormatDate::add_leading_char(const int16_t d, uint16_t width,
   return oss.str();
 }
 
-std::tuple<int16_t, int16_t, int16_t>
-FormatDate::string_to_date_vars(std::string data_str) const {
-  const auto sep_pos_1 = data_str.find(separator);
-  const auto sep_pos_2 = data_str.find(separator, sep_pos_1 + 1);
-  const int16_t d1 =
-      static_cast<int16_t>(std::stoi(data_str.substr(0, sep_pos_1)));
-  const int16_t d2 = static_cast<int16_t>(
-      std::stoi(data_str.substr(sep_pos_1 + separator.size(), sep_pos_2)));
-  const int16_t d3 = static_cast<int16_t>(
-      std::stoi(data_str.substr(sep_pos_2 + separator.size())));
-  return {d1, d2, d3};
+std::tuple<int16_t, int16_t, int16_t> FormatDate::string_to_date_vars(
+    std::string data_str) const {
+  std::vector<int16_t> digits;
+  std::regex numb_expr("(\\d+)");
+  for (std::smatch m; std::regex_search(data_str, m, numb_expr);
+       data_str = m.suffix()) {
+    int16_t number = static_cast<int16_t>(std::stoi(m[1].str()));
+    digits.emplace_back(number);
+  }
+
+  return {digits[0], digits[1], digits[2]};
 }
 
 std::string FormatDate::build(const std::string &d1, const std::string &d2,
@@ -41,16 +39,8 @@ std::string FormatDate::build(const std::string &d1, const std::string &d2,
 std::string FormatDate::build_validation_expr(const std::string &d1,
                                               const std::string &d2,
                                               const std::string &d3) const {
-  std::vector<std::string> sep_vec;
-  std::for_each(separator.begin(), separator.end(), [&sep_vec](const char &c) {
-    sep_vec.push_back((c == '?' || c == '.' || c == '*')
-                          ? "\\" + std::string(1, c)
-                          : std::string(1, c));
-  });
-  std::string sep;
-  std::for_each(sep_vec.begin(), sep_vec.end(),
-                [&sep](const auto &c) { sep += c; });
-  return d1 + sep + d2 + sep + d3;
+  return std::format("{}{}{}{}{}", d1, input_separators, d2, input_separators,
+                     d3);
 }
 
 std::string DDMMYYYY::get(const int16_t &day, const int16_t &month,
@@ -67,8 +57,8 @@ bool DDMMYYYY::is_valid(const std::string &text) const {
   return std::regex_match(text, std::regex(expr));
 }
 
-std::tuple<int16_t, int16_t, int16_t>
-DDMMYYYY::parse_from_string(const std::string &date_str) const {
+std::tuple<int16_t, int16_t, int16_t> DDMMYYYY::parse_from_string(
+    const std::string &date_str) const {
   auto const [d1, d2, d3] = string_to_date_vars(date_str);
   return {d1, d2, d3};
 }
@@ -87,8 +77,8 @@ bool DDMMYY::is_valid(const std::string &text) const {
   return std::regex_match(text, std::regex(expr));
 }
 
-std::tuple<int16_t, int16_t, int16_t>
-DDMMYY::parse_from_string(const std::string &date_str) const {
+std::tuple<int16_t, int16_t, int16_t> DDMMYY::parse_from_string(
+    const std::string &date_str) const {
   auto const [d1, d2, d3] = string_to_date_vars(date_str);
   return {d1, d2, 2000 + d3};
 }
@@ -107,8 +97,8 @@ bool DMY::is_valid(const std::string &text) const {
   return std::regex_match(text, std::regex(expr));
 }
 
-std::tuple<int16_t, int16_t, int16_t>
-DMY::parse_from_string(const std::string &date_str) const {
+std::tuple<int16_t, int16_t, int16_t> DMY::parse_from_string(
+    const std::string &date_str) const {
   auto const [d1, d2, d3] = string_to_date_vars(date_str);
   return {d1, d2, 2000 + d3};
 }
@@ -127,8 +117,8 @@ bool MMDDYYYY::is_valid(const std::string &text) const {
   return std::regex_match(text, std::regex(expr));
 }
 
-std::tuple<int16_t, int16_t, int16_t>
-MMDDYYYY::parse_from_string(const std::string &date_str) const {
+std::tuple<int16_t, int16_t, int16_t> MMDDYYYY::parse_from_string(
+    const std::string &date_str) const {
   auto const [d1, d2, d3] = string_to_date_vars(date_str);
   return {d2, d1, d3};
 }
@@ -147,8 +137,8 @@ bool MMDDYY::is_valid(const std::string &text) const {
   return std::regex_match(text, std::regex(expr));
 }
 
-std::tuple<int16_t, int16_t, int16_t>
-MMDDYY::parse_from_string(const std::string &date_str) const {
+std::tuple<int16_t, int16_t, int16_t> MMDDYY::parse_from_string(
+    const std::string &date_str) const {
   auto const [d1, d2, d3] = string_to_date_vars(date_str);
   return {d2, d1, 2000 + d3};
 }
@@ -167,8 +157,8 @@ bool MDY::is_valid(const std::string &text) const {
   return std::regex_match(text, std::regex(expr));
 }
 
-std::tuple<int16_t, int16_t, int16_t>
-MDY::parse_from_string(const std::string &date_str) const {
+std::tuple<int16_t, int16_t, int16_t> MDY::parse_from_string(
+    const std::string &date_str) const {
   auto const [d1, d2, d3] = string_to_date_vars(date_str);
   return {d2, d1, 2000 + d3};
 }
@@ -187,8 +177,8 @@ bool YYYYMMDD::is_valid(const std::string &text) const {
   return std::regex_match(text, std::regex(expr));
 }
 
-std::tuple<int16_t, int16_t, int16_t>
-YYYYMMDD::parse_from_string(const std::string &date_str) const {
+std::tuple<int16_t, int16_t, int16_t> YYYYMMDD::parse_from_string(
+    const std::string &date_str) const {
   auto const [d1, d2, d3] = string_to_date_vars(date_str);
   return {d3, d2, d1};
 }
@@ -207,8 +197,8 @@ bool YYMMDD::is_valid(const std::string &text) const {
   return std::regex_match(text, std::regex(expr));
 }
 
-std::tuple<int16_t, int16_t, int16_t>
-YYMMDD::parse_from_string(const std::string &date_str) const {
+std::tuple<int16_t, int16_t, int16_t> YYMMDD::parse_from_string(
+    const std::string &date_str) const {
   auto const [d1, d2, d3] = string_to_date_vars(date_str);
   return {d3, d2, 2000 + d1};
 }
