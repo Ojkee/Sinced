@@ -22,6 +22,10 @@ void EntryHandler::load_db() noexcept {
   }
 }
 
+void EntryHandler::load_categories() noexcept {
+  categories = load_entries<EntryCategory>(categories_db_path);
+}
+
 void EntryHandler::load_filtered_tasks() noexcept { tasks = filter_load_db(); }
 
 std::vector<std::shared_ptr<EntryTask>>

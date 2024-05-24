@@ -11,5 +11,4 @@
 
 ### Bugs
 
-- Wrong date format separator display
 

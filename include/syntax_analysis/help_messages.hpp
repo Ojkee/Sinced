@@ -107,6 +107,7 @@ SYNOPSIS
     scd log "task_name"
     scd log @"category"
     scd log -a
+    scd log -ac
     scd log -deadline MM-DD-YYYY
     scd log -status Status
 
@@ -116,6 +117,7 @@ DESCRIPTION
     - Display details of a specific task.
     - Display details of tasks in a specific category.
     - Display all tasks.
+    - Discplays all categories.
     - Filter tasks by deadline.
     - Filter tasks by status.
 
@@ -129,11 +131,14 @@ OPTIONS
     -a
         Displays all tasks.
 
+    -ac
+        Displays all categories.
+
     -deadline MM-DD-YYYY
         Filters tasks by the specified deadline.
 
     -status Status
-        Filters tasks by the specified status (e.g., Ongoing, Completed, Pending).
+        Filters tasks by the specified status (e.g., Ongoing, Completed, Done).
 
 FILTERS
     - deafault
@@ -145,6 +150,7 @@ EXAMPLES
     scd log "Finish report"
     scd log @"Work Projects"
     scd log -a
+    scd log -ac
     scd log -deadline 12-31-2024
     scd log -status Ongoing
 

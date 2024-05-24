@@ -268,3 +268,37 @@ TEST_CASE("Dislaying tasks with date and changed separator") {
   CHECK(flag1 == "Logged all tasks");
   CHECK(buffr1 == target_tasks1);
 }
+
+TEST_CASE("Log all categories") {
+  INTERPRETER_TEST_DB_LOG::reset_tasks_db();
+  INTERPRETER_TEST_DB_LOG::reset_categories_db();
+  INTERPRETER_TEST_DB_LOG::reset_relations_db();
+  INTERPRETER_TEST_DB_LOG::reset_tracker();
+  INTERPRETER_TEST_DB_LOG::reset_test_settings();
+  Interpreter interpreter = Interpreter(
+      PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
+
+  const std::string user_input1 = "log -ac";
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
+  CHECK(flag1 == "Logged all categories");
+  const std::string buffr_target1 =
+      "\"Uncategorized\"\n\tid: 0\n"
+      "\"Some category\"\n\tid: 1\n"
+      "\"another_category\"\n\tid: 2\n"
+      "\"project\"\n\tid: 3\n";
+  CHECK(buffr1 == buffr_target1);
+
+  const auto [f1, b1, s1] = interpreter.parse("reset -forceall");
+  const std::string result_categories =
+      INTERPRETER_TEST_DB_LOG::get_file_content(PATH_CATEGORIES);
+  const std::string target_categories = "";
+  CHECK(result_categories == target_categories);
+  const std::string user_input2 = "log -ac";
+  const auto [flag2, buffr2, session2] = interpreter.parse(user_input2);
+  CHECK(flag2 == "No categories");
+  const std::string buffr_target2 =
+      "No categories, add some using: \n\t"
+      "scd add <task / @category>\n\t"
+      "scd add <task> <@category> <-parameter> [parameter flags]\n";
+  CHECK(buffr2 == buffr_target2);
+}

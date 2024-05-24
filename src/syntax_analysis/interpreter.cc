@@ -21,7 +21,7 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
   }
 
   if (tokens[0].type == TokenType::COMMAND) [[likely]] {
-    // "add", "log", "mod", "rm", "set"
+    // "add", "log", "mod", "rm", "set", "reset"
     const std::string command_str = tokens.begin()->content;
     if (command_str == "add") {
       return add_command(tokens);
@@ -280,6 +280,16 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
       entry_handler.load_filtered_tasks();
       const std::string all_tasks_info = entry_handler.sorted_tasks_info();
       return {.flag = "Logged all tasks", .out_buffer = all_tasks_info};
+    } else if (options_arg.value() == "ac") {
+      entry_handler.load_categories();
+      if (entry_handler.number_of_categories() == 0) {
+        return {
+            .flag = "No categories",
+            .out_buffer = std::format("No categories, add some using: \n{}\n",
+                                      Help_Messages::add_syntax())};
+      }
+      const std::string all_categories = entry_handler.categories_info_all();
+      return {.flag = "Logged all categories", .out_buffer = all_categories};
     }
     return parse_log_filter(options_arg.value(), tokens);
   }
@@ -719,6 +729,8 @@ Parsing_Data Interpreter::help_command(const std::vector<Token> &tokens) {
     return {.flag = "Help rm", .out_buffer = Help_Messages::rm()};
   } else if (command_str == "set") {
     return {.flag = "Help set", .out_buffer = Help_Messages::set()};
+  } else if (command_str == "reset") {
+    return {.flag = "Help reset", .out_buffer = Help_Messages::reset()};
   }
   return {.out_buffer = Help_Messages::general()};
 }

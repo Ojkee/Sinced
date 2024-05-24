@@ -33,6 +33,7 @@ class EntryHandler {
         relations_db_path(relations_db_path_){};
 
   void load_db() noexcept;
+  void load_categories() noexcept;
   void load_filtered_tasks() noexcept;
 
   SP_TASKS filter_load_db() noexcept;
