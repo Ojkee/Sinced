@@ -34,9 +34,8 @@ class EntryHandler {
 
   void load_db() noexcept;
   void load_filtered_tasks() noexcept;
-  template <typename EntryType>
-  SP_T(EntryType)
-  filter_load_db(const std::string &path) noexcept;
+
+  SP_TASKS filter_load_db() noexcept;
 
   [[nodiscard]] std::size_t inline number_of_tasks() const noexcept {
     return tasks.size();
@@ -118,12 +117,13 @@ class EntryHandler {
 
   void clear_db();
 
-  template <typename EntryType>
-  [[nodiscard]] std::string entries_info(const SP_T(EntryType) & entries) const;
+  [[nodiscard]] std::string entries_info(SP_TASKS entries);
+  [[nodiscard]] std::string entries_info(const SP_CATEGORIES &entries) const;
+  [[nodiscard]] std::string entries_info(const SP_RELATIONS &entries);
 
   [[nodiscard]] std::string filtered_tasks_info();
   [[nodiscard]] std::string sorted_tasks_info();
-  [[nodiscard]] std::string tasks_info_all() const;
+  [[nodiscard]] std::string tasks_info_all();
   [[nodiscard]] std::string categories_info_all() const;
   [[nodiscard]] std::string task_info_by_id(const std::string &id) const;
   [[nodiscard]] std::string task_info_by_id(const uint16_t &id) const;
@@ -137,6 +137,9 @@ class EntryHandler {
   }
   void set_sorter(std::shared_ptr<EntrySorter> _sorter) {
     sorter = std::move(_sorter);
+  }
+  void set_date_format(std::shared_ptr<FormatDate> _date_format) {
+    date_format = std::move(_date_format);
   }
 
  private:
@@ -172,12 +175,13 @@ class EntryHandler {
   const std::string categories_db_path;
   const std::string relations_db_path;
 
-  SP_TASKS tasks;
+  std::vector<std::shared_ptr<EntryTask>> tasks;
   SP_CATEGORIES categories;
   SP_RELATIONS relations;
 
   std::shared_ptr<EntryFilter> filter = std::make_unique<DefaultFilter>();
   std::shared_ptr<EntrySorter> sorter = std::make_shared<DefaultSorter>();
+  std::shared_ptr<FormatDate> date_format = std::make_shared<DDMMYYYY>();
 };
 
 #endif  // ENTRY_HANDLER_HPP

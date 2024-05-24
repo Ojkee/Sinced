@@ -133,6 +133,7 @@ class Interpreter {
         result_str.substr(0, result_str.find_last_of("/\\"));
     return directory_path + "/../../records";
   }
+  void load_date_format_settings();
 };
 
 #endif  // INTERPTERE_HPP

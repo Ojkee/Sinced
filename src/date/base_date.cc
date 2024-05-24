@@ -88,7 +88,7 @@ uint32_t BaseDate::date_to_days(const BaseDate &bd) {
          sum_months - 1 + static_cast<uint32_t>(bd.day);
 }
 
-BaseDate BaseDate::days_to_date(int32_t _days) {
+BaseDate BaseDate::days_to_date(int64_t _days) {
   _days++;
   int16_t yr = lower_bound_year;
   auto day_in_year = [](const int16_t &y) {

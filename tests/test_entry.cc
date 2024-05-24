@@ -92,6 +92,11 @@ TEST_CASE("Testing repetetive") {
       "\"Some Task\"\n\tOngoing\n\tdeadline: 29-08-2025 "
       "every: 2 year 9 month 2 day ";
   REQUIRE(task3.info() == target_info2);
+
+  const std::string token4 = "5 \"task4\" 0 369241 0 0 0";
+  EntryTask task4 = EntryTask(token4);
+  std::string target_info4 = "\"task4\"\n\tOngoing\n\tdeadline: 12-12-2980";
+  CHECK(task4.info() == target_info4);
 }
 
 TEST_CASE("If task is in timeframe") {

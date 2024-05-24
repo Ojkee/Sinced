@@ -230,3 +230,41 @@ TEST_CASE("Log parameter argument -f [filter name]") {
   CHECK(flag6 == "Invalid arguments");
   CHECK(buffr6 == "Invalid argument for filter: deadline");
 }
+
+TEST_CASE("Dislaying tasks with date and changed separator") {
+  INTERPRETER_TEST_DB_LOG::reset_tasks_db();
+  INTERPRETER_TEST_DB_LOG::reset_categories_db();
+  INTERPRETER_TEST_DB_LOG::reset_relations_db();
+  INTERPRETER_TEST_DB_LOG::reset_tracker();
+  INTERPRETER_TEST_DB_LOG::reset_test_settings();
+  Interpreter interpreter = Interpreter(
+      PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
+
+  const auto [f1, b1, s1] = interpreter.parse("set -ds .");
+  const auto [f2, b2, s2] = interpreter.parse("set -s deadline");
+  const std::string result_settings1 =
+      INTERPRETER_TEST_DB_LOG::get_file_content(PATH_SETTINGS);
+  const std::string target_settings1 =
+      "<<{ field name } { value }>>\n\n"
+      "{date format} {DDMMYYYY}\n"
+      "{date format separator} {.}\n"
+      "{sort by} {deadline}\n";
+  CHECK(result_settings1 == target_settings1);
+  const std::string user_input1 = "log -a";
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
+  const std::string target_tasks1 =
+      "\"T7\"\n\tDone\n\tdeadline: 25.04.1979\n"
+      "\"T8\"\n\tCanceled\n\tdeadline: 25.04.1979\n"
+      "\"T10\"\n\tCanceled\n\tdeadline: 02.10.2093\n"
+      "\"T0\"\n\tOngoing\n\tdeadline: 10.01.2094 every: 14 day \n"
+      "\"T9\"\n\tUndetermined\n\tdeadline: 10.01.2094\n"
+      "\"T4\"\n\tDone\n\tdeadline: 29.07.2094\n"
+      "\"T2\"\n\tDone\n\tdeadline: 24.08.2095\n"
+      "\"T1\"\n\tOngoing\n\tdeadline: 11.12.2095 every: 2 month \n"
+      "\"T3\"\n\tDone\n\tdeadline: 15.01.2097\n"
+      "\"T5\"\n\tOngoing\n\tdeadline: None\n"
+      "\"T6\"\n\tCanceled\n\tdeadline: None\n"
+      "\"T11\"\n\tDone\n\tdeadline: None\n";
+  CHECK(flag1 == "Logged all tasks");
+  CHECK(buffr1 == target_tasks1);
+}

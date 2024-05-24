@@ -26,8 +26,7 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
     if (command_str == "add") {
       return add_command(tokens);
     } else if (command_str == "log") {
-      auto sorter = settings_handler.get_sorter();
-      entry_handler.set_sorter(sorter);
+      load_date_format_settings();
       return log_command(tokens);
     } else if (command_str == "set") {
       return set_command(tokens);
@@ -780,4 +779,13 @@ Interpreter::get_token_contents_if_contains_type(
   };
   std::for_each(tokens.begin(), tokens.end(), copy_to_result);
   return result;
+}
+
+void Interpreter::load_date_format_settings() {
+  auto sorter = settings_handler.get_sorter();
+  entry_handler.set_sorter(sorter);
+  auto sep = settings_handler.get_value_by_field("date format separator");
+  auto form = settings_handler.get_format_date();
+  form->set_separator(sep.value());
+  entry_handler.set_date_format(form);
 }

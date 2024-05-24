@@ -24,7 +24,7 @@ void EntryTask::tokenize(const std::string &line) {
   content = tokens[1];
   status = static_cast<Status>(std::stoi(tokens[2]));
   if (tokens[3] != "-1") {
-    const uint16_t int_date = static_cast<uint16_t>(std::stoul(tokens[3]));
+    const uint32_t int_date = static_cast<uint32_t>(std::stoul(tokens[3]));
     deadline = std::make_optional<BaseDate>(BaseDate::days_to_date(int_date));
   }
   r_days = static_cast<uint16_t>(std::stoul(tokens[4]));
@@ -54,10 +54,11 @@ std::string EntryTask::info() const {
     }
   };
   std::string status_str = status_to_str(status);
-  std::string deadline_str = "";
-  std::string repetetive_str = "";
+  std::string deadline_str{};
+  std::string repetetive_str{};
   if (is_repetetive() && status == Status::ongoing) {
-    deadline_str = std::string(next_repetetive_deadline());
+    BaseDate next_deadline = next_repetetive_deadline();
+    deadline_str = std::string(next_deadline);
     repetetive_str += " every: ";
     if (r_years != 0) {
       repetetive_str += std::to_string(r_years) + " year ";
@@ -77,7 +78,7 @@ std::string EntryTask::info() const {
 
 BaseDate EntryTask::next_repetetive_deadline() const {
   BaseDate today_date = BaseDate::today();
-  BaseDate result = BaseDate::shallow_copy(std::move(*deadline));
+  BaseDate result = deadline.value();
   for (std::size_t i = 0; i < 200000; ++i) {
     if (result >= today_date) {
       return result;

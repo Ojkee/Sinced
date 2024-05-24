@@ -22,22 +22,19 @@ void EntryHandler::load_db() noexcept {
   }
 }
 
-void EntryHandler::load_filtered_tasks() noexcept {
-  tasks = filter_load_db<EntryTask>(tasks_db_path);
-}
+void EntryHandler::load_filtered_tasks() noexcept { tasks = filter_load_db(); }
 
-template <typename EntryType>
-std::vector<std::shared_ptr<EntryType>> EntryHandler::filter_load_db(
-    const std::string &path) noexcept {
-  std::ifstream entry_file(path);
+std::vector<std::shared_ptr<EntryTask>>
+EntryHandler::filter_load_db() noexcept {
+  std::ifstream entry_file(tasks_db_path);
   if (!entry_file.is_open()) {
-    std::cerr << "Error loading file: " << path << '\n';
+    std::cerr << "Error loading file: " << tasks_db_path << '\n';
     exit(EXIT_FAILURE);
   }
   std::string line;
-  std::vector<std::shared_ptr<EntryType>> entries;
+  std::vector<std::shared_ptr<EntryTask>> entries;
   while (getline(entry_file, line)) {
-    std::shared_ptr<EntryType> entry = std::make_shared<EntryType>(line);
+    std::shared_ptr<EntryTask> entry = std::make_shared<EntryTask>(line);
     if (filter->passes(entry)) {
       entries.push_back(entry);
     }
@@ -196,12 +193,12 @@ void EntryHandler::clear_db() {
 }
 
 std::string EntryHandler::filtered_tasks_info() {
-  const auto filtered_tasks = filter_load_db<EntryTask>(tasks_db_path);
-  return entries_info<EntryTask>(filtered_tasks);
+  auto filtered_tasks = filter_load_db();
+  return entries_info(filtered_tasks);
 }
 
 std::string EntryHandler::sorted_tasks_info() {
-  const auto sorted_tasks = sorter->arranged(tasks);
+  auto sorted_tasks = sorter->arranged(tasks);
   return entries_info(sorted_tasks);
 }
 
@@ -263,9 +260,7 @@ int8_t EntryHandler::replace_entry_in_db(const EntryType &old_entry,
   return found ? 0 : -1;
 }
 
-std::string EntryHandler::tasks_info_all() const {
-  return entries_info<EntryTask>(tasks);
-}
+std::string EntryHandler::tasks_info_all() { return entries_info(tasks); }
 
 template <typename EntryType>
 int8_t EntryHandler::remove_entry_from_db(const EntryType &entry,
@@ -296,20 +291,33 @@ int8_t EntryHandler::remove_entry_from_db(const EntryType &entry,
 }
 
 std::string EntryHandler::categories_info_all() const {
-  return entries_info<EntryCategory>(categories);
+  return entries_info(categories);
 }
 
-template <typename EntryType>
 std::string EntryHandler::entries_info(
-    const std::vector<std::shared_ptr<EntryType>> &entries) const {
+    const std::vector<std::shared_ptr<EntryCategory>> &entries) const {
   std::ostringstream oss;
   std::for_each(entries.begin(), entries.end(),
-                [&oss](const std::shared_ptr<EntryType> &entry) {
+                [&oss](const std::shared_ptr<EntryCategory> &entry) {
                   oss << entry->info() << '\n';
                 });
   return oss.str();
 }
 
+std::string EntryHandler::entries_info(
+    std::vector<std::shared_ptr<EntryTask>> entries) {
+  std::ostringstream oss;
+  std::for_each(entries.begin(), entries.end(),
+                [&oss, this](std::shared_ptr<EntryTask> &entry) {
+                  auto d = entry->get_deadline();
+                  if (d) {
+                    d->set_formatter(date_format);
+                    entry->set_deadline(*d);
+                  }
+                  oss << entry->info() << '\n';
+                });
+  return oss.str();
+}
 std::string EntryHandler::task_info_by_id(const std::string &id) const {
   std::shared_ptr<EntryTask> task = entry_by_id<EntryTask>(id, tasks_db_path);
   return (task) ? task->info() : "No task with id: " + id;
@@ -331,7 +339,7 @@ std::string EntryHandler::category_info_by_id(const uint16_t &id) const {
 
 std::string EntryHandler::tasks_info_by_category_id(const std::string &id) {
   auto filtered_tasks = tasks_by_category_id(id);
-  return (filtered_tasks.size() > 0) ? entries_info<EntryTask>(filtered_tasks)
+  return (filtered_tasks.size() > 0) ? entries_info(filtered_tasks)
                                      : "No tasks or category";
 }
 

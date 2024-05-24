@@ -12,5 +12,4 @@
 ### Bugs
 
 - Wrong date format separator display
-- Deadline on adding
 

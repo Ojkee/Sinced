@@ -47,7 +47,7 @@ class BaseDate {
   }
   static inline BaseDate shallow_copy(const BaseDate &bd) {
     return BaseDate::days_to_date(
-        static_cast<int32_t>(BaseDate::date_to_days(bd)));
+        static_cast<int64_t>(BaseDate::date_to_days(bd)));
   }
   void add_days(int16_t _days) noexcept;
   void add_months(int16_t _months) noexcept;
@@ -68,13 +68,13 @@ class BaseDate {
     return (p && !q) || t;
   }
   [[nodiscard]] static uint32_t date_to_days(const BaseDate &bd);
-  [[nodiscard]] static BaseDate days_to_date(int32_t _days);
+  [[nodiscard]] static BaseDate days_to_date(int64_t _days);
   [[nodiscard]] static BaseDate today();
   [[nodiscard]] static BaseDate lower_bound_date() {
     return BaseDate(lower_bound_day, lower_bound_month, lower_bound_year);
   }
   [[nodiscard]] const FormatDate &get_formatter() const { return *formatter; }
-  void set_formatter(std::shared_ptr<FormatDate> &&_formatter) {
+  void set_formatter(std::shared_ptr<FormatDate> _formatter) {
     formatter = std::move(_formatter);
   }
 

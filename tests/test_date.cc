@@ -169,6 +169,9 @@ TEST_CASE("Converting days -> date") {
 
   BaseDate b13 = BaseDate::days_to_date(45500);
   CHECK(std::string(b13) == "29-07-2094");
+
+  BaseDate b14 = BaseDate::days_to_date(369241);
+  CHECK(std::string(b14) == "12-12-2980");
 }
 
 TEST_CASE("Adding days to date") {
