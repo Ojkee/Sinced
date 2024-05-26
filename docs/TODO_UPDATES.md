@@ -2,13 +2,10 @@
 
 ### Features
 
-- Add listing of categories
-- Reset database and reset to defaults commands
 - Calendar Terminal-GUI
 - Autocompletion
-- Help Command
 - Misspell handler
 
 ### Bugs
 
-
+- Invalid DateFormat input upon change setting

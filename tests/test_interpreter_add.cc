@@ -520,3 +520,61 @@ TEST_CASE("Test Add Command task to category CORRENT PROMPTS") {
   const auto [flag4, buffr4, session4] = interpreter.parse(user_input4);
   CHECK(flag4 == "Task already exists");
 }
+
+TEST_CASE("Adding with other dateformat") {
+  INTERPRETER_TEST_DB::reset_tasks_db();
+  INTERPRETER_TEST_DB::reset_categories_db();
+  INTERPRETER_TEST_DB::reset_relations_db();
+  INTERPRETER_TEST_DB::reset_tracker();
+  INTERPRETER_TEST_DB::reset_test_settings();
+  Interpreter interpreter = Interpreter(
+      PATH_TASKS, PATH_CATEGORIES, PATH_RELATIONS, PATH_TRACKER, PATH_SETTINGS);
+
+  const std::string content =
+      "0 \"T0\" 0 45300 14 0 0\n"
+      "1 \"T1\" 0 46000 0 2 0\n"
+      "2 \"T2\" 1 45891 0 0 0\n"
+      "3 \"T3\" 1 46401 0 0 0\n"
+      "4 \"T4\" 1 45500 7 0 0\n"
+      "5 \"T5\" 0 -1 0 0 0\n"
+      "6 \"T6\" 2 -1 0 0 0\n"
+      "7 \"T7\" 1 3401 0 2 0\n"
+      "8 \"T8\" 2 3401 0 0 1\n"
+      "9 \"T9\" 3 45300 0 0 0\n"
+      "10 \"T10\" 2 45200 0 1 0\n"
+      "11 \"T11\" 1 -1 0 0 0\n";
+
+  const auto [f1, b1, s1] = interpreter.parse("set -df YYMMDD");
+  const auto [f2, b2, s2] = interpreter.parse("set -ds .");
+  const auto result_settings =
+      INTERPRETER_TEST_DB::get_file_content(PATH_SETTINGS);
+  const std::string target_result =
+      "<<{ field name } { value }>>\n\n"
+      "{date format} {YYMMDD}\n"
+      "{date format separator} {.}\n"
+      "{sort by} {default}\n";
+  CHECK(result_settings == target_result);
+  const std::string user_input1 = "add task_other_df 24-12-12";
+  const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
+  const std::string tasks_target1 =
+      INTERPRETER_TEST_DB::get_file_content(PATH_TASKS);
+  const std::string tasks_result1 =
+      "0 \"T0\" 0 45300 14 0 0\n"
+      "1 \"T1\" 0 46000 0 2 0\n"
+      "2 \"T2\" 1 45891 0 0 0\n"
+      "3 \"T3\" 1 46401 0 0 0\n"
+      "4 \"T4\" 1 45500 7 0 0\n"
+      "5 \"T5\" 0 -1 0 0 0\n"
+      "6 \"T6\" 2 -1 0 0 0\n"
+      "7 \"T7\" 1 3401 0 2 0\n"
+      "8 \"T8\" 2 3401 0 0 1\n"
+      "9 \"T9\" 3 45300 0 0 0\n"
+      "10 \"T10\" 2 45200 0 1 0\n"
+      "11 \"T11\" 1 -1 0 0 0\n"
+      "12 \"task_other_df\" 0 20069 0 0 0\n";
+  CHECK(flag1 == "Added new task");
+  CHECK(tasks_result1 == tasks_target1);
+  const auto [f3, b3, s3] = interpreter.parse("log T4");
+  const std::string log_target1 = "\"T4\"\n\tDone\n\tdeadline: 94.07.29\n";
+  CHECK(b3 == log_target1);
+}

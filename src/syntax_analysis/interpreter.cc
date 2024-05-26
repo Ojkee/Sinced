@@ -15,6 +15,7 @@
 Parsing_Data Interpreter::parse(const std::string &user_input) {
   const std::shared_ptr<FormatDate> fd_ptr = settings_handler.get_format_date();
   const std::vector<Token> tokens = Lexer::tokenize(user_input, *fd_ptr);
+  load_date_format_settings();
 
   if (tokens.size() == 0) [[unlikely]] {
     return {.flag = Flag_Messages::no_args()};
@@ -26,7 +27,6 @@ Parsing_Data Interpreter::parse(const std::string &user_input) {
     if (command_str == "add") {
       return add_command(tokens);
     } else if (command_str == "log") {
-      load_date_format_settings();
       return log_command(tokens);
     } else if (command_str == "set") {
       return set_command(tokens);
@@ -161,6 +161,8 @@ std::shared_ptr<EntryTask> Interpreter::build_task(
 
   if (deadline_arg) {
     BaseDate deadline = BaseDate();
+    const auto df = settings_handler.get_format_date();
+    deadline.set_formatter(df);
     deadline.initialize_from_str(deadline_arg.value());
     task_builder.add_deadline(deadline);
     if (options_arg && options_arg.value().find("r") != std::string::npos) {
@@ -258,7 +260,8 @@ Parsing_Data Interpreter::log_command(const std::vector<Token> &tokens) {
     std::shared_ptr<EntryTask> task_ptr =
         entry_handler.get_entry_by_content<EntryTask>(text_arg.value());
     if (task_ptr) {
-      return {.flag = "Logged task", .out_buffer = task_ptr->info()};
+      return {.flag = "Logged task",
+              .out_buffer = entry_handler.entries_info({task_ptr})};
     }
     return {
         .flag = Flag_Messages::invalid_args(),

@@ -2,9 +2,7 @@
 #define LEXER_HPP
 
 #include <algorithm>
-#include <cstddef>
 #include <cstdint>
-#include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>

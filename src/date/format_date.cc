@@ -187,7 +187,7 @@ std::string YYMMDD::get(const int16_t &day, const int16_t &month,
                         const int16_t &year) const {
   const std::string fday = FormatDate::add_leading_char(day, 2, '0');
   const std::string fmonth = FormatDate::add_leading_char(month, 2, '0');
-  const std::string fyear = FormatDate::add_leading_char(year, 2, '0');
+  const std::string fyear = FormatDate::add_leading_char(year % 100, 2, '0');
   return build(fyear, fmonth, fday);
 }
 

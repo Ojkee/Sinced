@@ -111,7 +111,7 @@ TEST_CASE("Log single argument") {
   const std::string user_input1 = "log T1";
   const auto [flag1, buffr1, session1] = interpreter.parse(user_input1);
   const std::string target_buffr1 =
-      "\"T1\"\n\tOngoing\n\tdeadline: 11-12-2095 every: 2 month ";
+      "\"T1\"\n\tOngoing\n\tdeadline: 11-12-2095 every: 2 month \n";
   CHECK(flag1 == "Logged task");
   CHECK(buffr1 == target_buffr1);
 
