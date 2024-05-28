@@ -157,7 +157,7 @@ EXAMPLES
 )";
   }
   [[nodiscard]] constexpr static inline std::string log_syntax() {
-    return "\tscd add <task / @category>\n\tscd add <task> <-parameter> "
+    return "\tscd log <task / @category>\n\tscd log <task> <-parameter> "
            "[parameter flags]";
   }
   [[nodiscard]] constexpr static inline std::string mod() {
