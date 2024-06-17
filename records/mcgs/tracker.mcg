@@ -1,5 +1,5 @@
 <<{ field name } { value }>>
 
-{last task id} {0}
-{last category id} {0}
-{last relation id} {0}
+{last task id} {6}
+{last category id} {1}
+{last relation id} {3}
